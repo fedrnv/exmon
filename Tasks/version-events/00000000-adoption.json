@@ -1,0 +1,12 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 0,
+  "version": "0.1.0.0",
+  "type": "adoption",
+  "epic_id": "MIGRATION",
+  "work_item_id": "",
+  "summary": "Adopt FDTasks v4 allocator baseline",
+  "verification": [
+    "Repository baseline recorded when allocator was installed"
+  ]
+}
