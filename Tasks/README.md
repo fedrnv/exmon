@@ -8,3 +8,13 @@ This directory uses `tasks_file_structure.md`.
 - Evidence belongs under the task's `evidence/`.
 - Task directories are never moved or renamed.
 - Aggregate task lists, roadmaps, Kanban boards, activity, and changelogs are generated and are not committed.
+
+
+## FDTasks v4
+
+New work follows [Tasks File Structure v4](tasks_file_structure_v4.md).
+Executable Tasks and Bugs are medium-sized children of Epics. Legacy v3 records
+remain immutable; they must pass medium-readiness and Epic-membership checks
+before dispatch or be superseded and split. Version transitions are immutable
+under `version-events/`; the generated traceability table is
+[VERSION_HISTORY.md](VERSION_HISTORY.md).

@@ -74,3 +74,19 @@ A Work Item is Done only when:
 - the reviewed change is committed and pushed to `main`.
 
 A commit or a locally passing happy-path test alone is not completion.
+
+
+## FDTasks v4 lifecycle
+
+All newly accepted executable Tasks and Bugs must be medium-sized and belong to
+one Epic. Before dispatching a legacy v3 item, verify this condition; supersede
+and split oversized work through append-only events. Planner models receive only
+medium items, never Epics.
+
+Run focused and affected regression tests for each medium item. Run the complete
+canonical gate only when closing an Epic, for broad/unknown impact, or where the
+item explicitly requires it. A Task/Bug completion increments the fourth
+version field in the same final commit; Epic closure increments the third field
+and resets the fourth; release increments the second and resets lower fields;
+the first changes only by explicit owner decision. Version allocation is done by
+the development agent, not GitHub Actions. Preserve manual-only workflows.

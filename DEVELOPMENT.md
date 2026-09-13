@@ -29,3 +29,19 @@ For each completed task:
 - keep generated build outputs and sensitive captures out of Git.
 
 Release candidates require clean builds and smoke tests on Windows, macOS Intel/Apple Silicon as applicable, and Linux. Tests requiring physical RS-485, USB, or CAN hardware must be recorded as blocked until the declared test devices are available.
+
+
+## FDTasks v4 tasks, testing, and versions
+
+The normative v4 contract is `Tasks/tasks_file_structure_v4.md`. Executable
+Tasks and Bugs are medium-sized children of a non-executable Epic. Microtasks use
+focused tests; medium-item closure uses deterministically selected affected and
+dependent tests; Epic closure uses the complete canonical gate and Level-0
+review; release adds signing, install/update/rollback and publication checks.
+
+The canonical version is `MAJOR.RELEASE.EPIC.ITEM`. The agent increments ITEM
+inside the same final commit as each completed Task/Bug, resets it when a
+verified Epic increments EPIC, and resets both lower fields when a published
+release increments RELEASE. MAJOR is owner-controlled. Immutable version events
+generate `Tasks/VERSION_HISTORY.md`. Manual GitHub workflows validate but never
+allocate or commit versions.
