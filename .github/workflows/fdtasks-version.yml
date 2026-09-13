@@ -1,0 +1,42 @@
+name: FDTasks version allocator
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "Tasks/version-requests/*.json"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: fdtasks-version-allocator
+  cancel-in-progress: false
+
+jobs:
+  allocate:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+      - name: Allocate versions and publish ledger
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin main
+            git reset --hard origin/main
+            node scripts/fdtasks-version-allocator.mjs
+            if git diff --quiet && git diff --cached --quiet; then exit 0; fi
+            git add Tasks/version.json Tasks/version-events Tasks/VERSION_HISTORY.md
+            git commit -m "chore(version): allocate FDTasks versions [skip version]"
+            if git push origin HEAD:main; then exit 0; fi
+            test "$attempt" -lt 5
+          done
+          echo "Version allocation lost five consecutive main races" >&2
+          exit 1

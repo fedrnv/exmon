@@ -45,3 +45,8 @@ verified Epic increments EPIC, and resets both lower fields when a published
 release increments RELEASE. MAJOR is owner-controlled. Immutable version events
 generate `Tasks/VERSION_HISTORY.md`. Manual GitHub workflows validate but never
 allocate or commit versions.
+
+
+## FDTasks v4 allocation amendment
+
+`Tasks/tasks_file_structure_v4.md` version 4.1 supersedes the earlier allocation paragraphs in this file. Agents commit immutable request files; the path-scoped automatic FDTasks allocator is the only workflow permitted to assign and write versions. It is an explicit exception to the manual-workflows-only rule. All build, test, canonical, release and deployment workflows remain manual.

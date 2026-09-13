@@ -1,74 +1,59 @@
 # FDTasks File Structure v4
 
-Version: 4.0
+Version: 4.1
 
 ## Work hierarchy
 
 - An **Epic** is a non-executable delivery and integration container.
-- An executable **Task** or **Bug** must be medium-sized: one independently
-  verifiable outcome that a Planner-class model can decompose without inventing
-  product or architecture decisions.
-- A **Microtask** is temporary runtime work produced from one medium item. It is
-  not a substitute for the accepted Task/Bug contract.
-- Every executable item belongs to exactly one Epic. Existing v3 items receive
-  this relationship by an append-only event; accepted TASK.md files stay immutable.
-- Oversized items are never dispatched. Append a Superseded event and replace
-  them with an ordered series of medium items that preserves every requirement.
+- An executable **Task** or **Bug** is medium-sized: one independently verifiable outcome a Planner-class model can decompose without inventing product or architecture decisions.
+- A **Microtask** is temporary runtime work produced from one medium item.
+- Every executable item belongs to exactly one Epic.
+- Oversized accepted items are superseded by an ordered series of medium items; accepted records are never rewritten.
 
-A medium item must freeze objective, inputs/context, dependencies, scope,
-exclusions, security and compatibility boundaries, failure/recovery behavior,
-ordered stages, focused tests, observable acceptance criteria, cleanup and
-completion evidence.
+A medium item freezes objective, inputs, dependencies, scope, exclusions, security and compatibility boundaries, failure/recovery behavior, ordered stages, focused tests, observable acceptance criteria, cleanup and completion evidence.
 
 ## Verification levels
 
-1. Microtask: focused formatting/checks/tests for its bounded change.
-2. Medium Task/Bug: affected-component tests plus dependent contract/regression
-   tests selected deterministically from changed paths; review; cleanup; commit.
-3. Epic closure: complete canonical build, all required workspace/integration/
-   security/browser/package/platform checks, Level-0 review, cleanup and evidence.
-4. Release: complete release build, signing, install/update/rollback acceptance
-   and publication.
+1. Microtask: focused checks and tests for its bounded change.
+2. Medium Task/Bug: affected-component and deterministically selected dependent regression tests, review, cleanup and closure commit.
+3. Epic closure: complete canonical gate, Level-0 review, cleanup and evidence.
+4. Release: release build, signing, install/update/rollback acceptance and publication.
 
-Unknown or broad impact selects the complete gate. A passing child task does not
-close an Epic. Failed Epic verification creates correction Tasks/Bugs inside the
-same Epic and repeats the complete gate.
+Failed Epic verification creates correction items in the same Epic and repeats the complete gate.
 
-## Version model
+## Canonical version and allocation
 
-Canonical FDTasks version is four integers: MAJOR.RELEASE.EPIC.ITEM.
+The canonical version is four integers: `MAJOR.RELEASE.EPIC.ITEM`.
 
-- MAJOR changes only by explicit owner decision for a fundamental compatibility,
-  architecture or product-stage change; lower fields reset to zero.
-- RELEASE increments for each published release; EPIC and ITEM reset to zero.
-- EPIC increments only when the Epic and its complete gate pass; ITEM resets.
-- ITEM increments after every completed medium Task or Bug.
+- `MAJOR`: owner-authorized fundamental product/compatibility transition; lower fields reset.
+- `RELEASE`: published release; EPIC and ITEM reset.
+- `EPIC`: verified Epic closure; ITEM resets.
+- `ITEM`: every completed medium Task, Bug or correction. It is one repository-wide counter within the current epoch, not an Epic-local counter.
 
-The development agent reserves and increments ITEM before the task's final
-commit and includes version change, completion event and history record in that
-same commit. Epic and release transitions use their respective acceptance
-commits. Publication to main is serialized with compare-and-swap; conflicts
-refresh main and allocate the next valid number. GitHub Actions never allocate
-or commit a version. Manual workflows only verify consistency.
+The agent never edits the assigned version or history. In its closure commit it adds exactly one immutable JSON request under `Tasks/version-requests/`. The automatic `FDTasks version allocator` workflow is the sole allocator. It serializes requests on `main`, assigns the next version, writes an immutable event, regenerates `Tasks/VERSION_HISTORY.md`, updates `Tasks/version.json`, commits and pushes the result. Concurrent agents may close different tasks or Epics; unique request files and serialized compare-and-swap retries prevent a shared-file race.
 
-Ecosystems requiring SemVer use MAJOR.RELEASE.EPIC+item.ITEM for package
-metadata; Windows file versions may use all four integers. Updater comparison
-uses the canonical four integer tuple.
+This path-triggered allocator is the only automatic GitHub Actions exception. Builds, tests, canonical gates, releases and deployment remain manual and are executed as part of the applicable project build/closure process.
 
-## Version history
+## Request contract
 
-Source records are immutable files under Tasks/version-events/. Each record
-contains version, UTC time, Epic ID, Work Item ID, type (task, bug, correction,
-epic, release, major), summary, verification evidence and expected base
-revision. Tasks/VERSION_HISTORY.md is a deterministic table generated from those
-records and committed in the same closure commit. Validation must rebuild and
-compare it; humans and models do not edit rows directly.
+A request uses schema `fdtasks-version-request/v1` and contains:
 
-## Compatibility and execution
+```json
+{
+  "schema": "fdtasks-version-request/v1",
+  "request_id": "globally-unique-id",
+  "type": "task_closed",
+  "epic_id": "EPIC-ID",
+  "work_item_id": "TASK-ID",
+  "summary": "Completed outcome",
+  "verification": ["exact command or evidence"]
+}
+```
 
-v3 specifications/events/evidence remain immutable and valid historical input.
-Before any v3 executable item is dispatched under v4, validate medium readiness
-and Epic membership. Add events or supersede/split it; never rewrite it.
+Allowed types are `task_closed`, `bug_closed`, `correction_closed`, `epic_closed`, `release_published`, and `major_changed`. `major_changed` additionally requires an integer `major` and explicit owner authorization evidence. Invalid or duplicate requests fail closed.
 
-All repository-specific main-only, no-PR, manual-workflow, security, continuous
-execution, cleanup and stop-with-commit/push rules remain in force.
+Ecosystems requiring SemVer represent the tuple as `MAJOR.RELEASE.EPIC+item.ITEM`; Windows file versions may use all four integers. Updater comparison uses the canonical integer tuple.
+
+## Compatibility
+
+v3 records remain immutable historical input. Before a v3 item is dispatched under v4, validate medium readiness and Epic membership. Repository-specific main-only, no-PR, security, continuous-execution, cleanup and stop-with-commit-and-push rules remain in force.
