@@ -14,12 +14,3 @@ Review rounds use `fdtasks-review-request/v1` and
 `fdtasks-review-result/v1` under
 `epics/<epic>/reviews/<review-id>/`. Existing repository-local review schemas
 remain valid historical input; new rounds use the generic schemas.
-
-
-## DAV verification profile
-
-DAV's root DEVELOPMENT.md and accepted ADRs add scientific, numerical, data
-integrity, process-pool, native UI and packaging requirements. They strengthen
-the common standard. Historical `dav-review-*/v1` records remain valid; new
-rounds use the generic schemas. ADR-0003 remains the provenance of DAV's earlier
-adoption of the separate gate/review topology.
