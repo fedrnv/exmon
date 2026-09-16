@@ -10,11 +10,14 @@ This directory uses `tasks_file_structure.md`.
 - Aggregate task lists, roadmaps, Kanban boards, activity, and changelogs are generated and are not committed.
 
 
-## FDTasks v4
+## FDTasks v4.2
 
 New work follows [Tasks File Structure v4](tasks_file_structure_v4.md).
-Executable Tasks and Bugs are medium-sized children of Epics. Legacy v3 records
-remain immutable; they must pass medium-readiness and Epic-membership checks
-before dispatch or be superseded and split. Version transitions are immutable
-under `version-events/`; the generated traceability table is
-[VERSION_HISTORY.md](VERSION_HISTORY.md).
+Executable Tasks, Bugs and Corrections are medium-sized children of Epics and
+include an AC-to-test readiness matrix. Legacy v3 records remain immutable and
+are amended only through append-only events.
+
+Every open Epic must have a dedicated full-gate task and a separate independent
+review task before closure. Corrections reopen both. First verified closures
+create immutable version requests; the automatic allocator alone writes version
+events, `version.json` and [VERSION_HISTORY.md](VERSION_HISTORY.md).

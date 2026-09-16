@@ -31,22 +31,25 @@ For each completed task:
 Release candidates require clean builds and smoke tests on Windows, macOS Intel/Apple Silicon as applicable, and Linux. Tests requiring physical RS-485, USB, or CAN hardware must be recorded as blocked until the declared test devices are available.
 
 
-## FDTasks v4 tasks, testing, and versions
+## FDTasks v4.2 tasks, testing and versions
 
-The normative v4 contract is `Tasks/tasks_file_structure_v4.md`. Executable
-Tasks and Bugs are medium-sized children of a non-executable Epic. Microtasks use
-focused tests; medium-item closure uses deterministically selected affected and
-dependent tests; Epic closure uses the complete canonical gate and Level-0
-review; release adds signing, install/update/rollback and publication checks.
+The normative lifecycle is `Tasks/tasks_file_structure_v4.md`. Executable
+Tasks, Bugs and Corrections are medium-sized children of one non-executable Epic
+and carry stable acceptance criteria with an AC-to-test readiness matrix.
+Microtasks run focused checks; medium-item closure runs the deterministically
+selected focused, affected, dependent and invariant set required by this
+repository's verification policy.
 
-The canonical version is `MAJOR.RELEASE.EPIC.ITEM`. The agent increments ITEM
-inside the same final commit as each completed Task/Bug, resets it when a
-verified Epic increments EPIC, and resets both lower fields when a published
-release increments RELEASE. MAJOR is owner-controlled. Immutable version events
-generate `Tasks/VERSION_HISTORY.md`. Manual GitHub workflows validate but never
-allocate or commit versions.
+Each Epic has exactly one dedicated full canonical gate task and one separate
+independent Level-0 review task. The review depends on a successful current gate.
+Any correction or candidate change reopens both; repeat the complete gate and a
+fresh immutable review round before Epic closure. Existing accepted open Epics
+gain missing topology only through new items and append-only membership events.
 
-
-## FDTasks v4 allocation amendment
-
-`Tasks/tasks_file_structure_v4.md` version 4.1 supersedes the earlier allocation paragraphs in this file. Agents commit immutable request files; the path-scoped automatic FDTasks allocator is the only workflow permitted to assign and write versions. It is an explicit exception to the manual-workflows-only rule. All build, test, canonical, release and deployment workflows remain manual.
+The canonical version is `MAJOR.RELEASE.EPIC.ITEM`. First verified closure of a
+medium item creates one immutable request for ITEM; first verified Epic closure
+creates one request for EPIC and resets ITEM. Reopening and reclosing the same
+identity never allocates again. The closing agent does not assign versions or
+edit generated state/history. The path-scoped automatic allocator is the sole
+version writer and the only automatic GitHub Actions exception. Builds, tests,
+canonical gates, releases and deployments remain manual.

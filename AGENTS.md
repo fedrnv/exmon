@@ -18,7 +18,7 @@ Before any work:
 - An agent must not stop after planning, scaffolding, a partial implementation, or a successful commit while another safe and unblocked task can be completed.
 - For every task, the loop is: inspect scope and dependencies; implement; add or update tests; run focused tests; run relevant regression tests; review the diff; remove generated files and temporary artifacts; record immutable verification; commit; push to `main`; select the next unblocked task.
 - Work directly on `main`. Do not create branches or pull requests unless the project owner explicitly requests them.
-- GitHub Actions must remain manual-only until the project owner changes this policy.
+- Builds, tests, releases and deployments remain manual-only; the path-scoped FDTasks version allocator is the sole automatic exception.
 - Never force-push or rewrite published history.
 - Preserve unrelated user changes.
 
@@ -76,17 +76,26 @@ A Work Item is Done only when:
 A commit or a locally passing happy-path test alone is not completion.
 
 
-## FDTasks v4 lifecycle
+## FDTasks v4.2 lifecycle
 
-All newly accepted executable Tasks and Bugs must be medium-sized and belong to
-one Epic. Before dispatching a legacy v3 item, verify this condition; supersede
-and split oversized work through append-only events. Planner models receive only
-medium items, never Epics.
+The normative contract is `Tasks/tasks_file_structure_v4.md`. Every newly
+accepted executable Task, Bug or Correction is medium-sized, belongs to exactly
+one Epic and includes stable acceptance-criterion IDs plus an AC-to-test
+readiness matrix. Planner models receive medium items, never Epics. Oversized
+accepted work is superseded and split only through append-only records.
 
-Run focused and affected regression tests for each medium item. Run the complete
-canonical gate only when closing an Epic, for broad/unknown impact, or where the
-item explicitly requires it. A Task/Bug completion increments the fourth
-version field in the same final commit; Epic closure increments the third field
-and resets the fourth; release increments the second and resets lower fields;
-the first changes only by explicit owner decision. Version allocation is done by
-the development agent, not GitHub Actions. Preserve manual-only workflows.
+Each Epic has one separate medium full-gate task and one separate medium
+independent Level-0 review task. Corrections or candidate changes reopen both;
+repeat the complete gate and a fresh immutable review round. Epic closure
+requires all members Done, a current passing gate, an Accepted review for the
+tested source, resolved findings and closure evidence.
+
+Run focused checks after each microtask. Medium-item closure runs
+impact-selected focused, affected, dependent and invariant tests. Project rules
+may add stricter safety, platform or domain checks but may not weaken v4.2.
+
+On first verified closure, write one immutable version request. Never assign a
+version or create another request when the same item is reopened and reclosed.
+The path-scoped automatic FDTasks allocator is the sole version writer and only
+automatic Actions exception. Builds, tests, canonical gates, releases and
+deployments remain manual.

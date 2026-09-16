@@ -12,15 +12,24 @@ These instructions apply below `Tasks/` and supplement the root `AGENTS.md`.
 - Never project Done until every acceptance criterion is verified.
 
 
-## FDTasks v4
+## FDTasks v4.2
 
 Read [tasks_file_structure_v4.md](tasks_file_structure_v4.md). Every executable
-Task/Bug must be medium-sized and have one parent Epic. Epics are acceptance
-containers and are never sent to a coding Planner/Worker. Before dispatch,
-validate legacy v3 items; append Superseded and create medium successors when
-needed. Never rewrite accepted history.
+Task, Bug or Correction is medium-sized, belongs to exactly one Epic and has
+stable acceptance-criterion IDs plus an AC-to-test readiness matrix. Epics are
+never sent to a coding Planner/Worker. Oversized accepted work is superseded and
+split only through append-only records.
 
-Each Task/Bug closure records focused/affected verification and one immutable
-version event. Epic closure requires the complete canonical gate and increments
-the Epic version field. `VERSION_HISTORY.md` is generated only from immutable
-version events; do not hand-edit its rows.
+Run focused checks after each microtask and impact-selected focused, affected,
+dependent and invariant verification before medium-item closure. Record exact
+source and policy revisions, commands/manual scenarios, environment, outcomes,
+limitations, applicable visual inspection and cleanup.
+
+Each Epic has a separate full-gate task and independent Level-0 review task.
+Candidate changes or corrections reopen both and require a complete new gate
+plus fresh review round. Epic closure requires all members Done, a current
+successful gate and an Accepted review for the same tested source.
+
+Create one immutable version request only on first verified closure. Reclosing
+the same item creates no second request. Never assign versions or edit generated
+version state, events or history.
