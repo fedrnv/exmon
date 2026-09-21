@@ -16,6 +16,17 @@ created_by: "actor"
 
 # <PROJECT>-<ID> — Outcome
 
+## Classification
+
+Use the relevant open development Epic for bugs belonging to its development.
+If the related Epic is closed, or the relationship is unclear, use EPIC-999 and
+do not reopen the closed Epic; link it for traceability when known.
+For isolated bugs and minor improvements, use
+`epic_id: <PROJECT>-EPIC-999`. Such items require testing changed functionality and
+directly affected behaviour; full testing and independent review require an
+explicit verification task within EPIC-999. One task may request both. Define
+the selected scope and dependencies; do not depend on every EPIC-999 item.
+
 ## Goal
 
 One independently verifiable outcome.

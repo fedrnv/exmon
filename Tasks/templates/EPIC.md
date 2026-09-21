@@ -10,6 +10,21 @@ created_by: "actor"
 
 # Epic outcome
 
+## Maintenance exception
+
+For `<PROJECT>-EPIC-999`, replace the delivery outcome with permanent maintenance:
+isolated bugs, minor improvements, bugs whose related Epic is closed, and bugs
+without a clear relationship to an open development Epic. Bugs belonging to an
+open development Epic stay there. Link a closed original Epic without reopening it.
+
+EPIC-999 remains open, does not count against the active-development-Epic limit,
+and has no mandatory overall gate or review tasks. Its ordinary items require
+testing changed functionality and directly affected behaviour. Full testing and/or
+independent review require an explicit verification task inside EPIC-999; one may
+request both. Replace the development-only membership/gate/closure sections below
+accordingly. Never close EPIC-999 or generate its Epic version request.
+
+
 ## Outcome
 
 Non-executable delivery and integration container.

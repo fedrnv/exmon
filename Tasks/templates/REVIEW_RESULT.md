@@ -13,6 +13,10 @@ independence: "<different person or fresh session; disclose limitations>"
 verdict: "<Accepted | Changes requested | Blocked>"
 ---
 
+For an explicitly requested maintenance review, use `epic_id: <PROJECT>-EPIC-999`
+and the explicit verification task as `review_task_id`. Acceptance may close that
+task but never EPIC-999. Ordinary maintenance items do not require this record.
+
 # Independent Level-0 result
 
 ## Coverage and evidence checked

@@ -9,3 +9,7 @@ The automatic allocator is the sole version writer and permanently deduplicates
 both request IDs and closed work-item/Epic identities across version epochs.
 Agents never assign versions or edit `version.json`, version events or generated
 history.
+
+EPIC-999 item closures use the normal request with their actual `epic_id` and
+increment ITEM. EPIC-999 stays open permanently: never create an `epic_closed`
+request or increment EPIC for that maintenance container.
