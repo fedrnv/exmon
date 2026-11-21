@@ -1,0 +1,80 @@
+{
+  "schema": "fdtasks-closure/v1",
+  "closure_id": "CLS-2c8af270-cca8-4c7c-8ff0-30c6bf7f2f12",
+  "task_id": "EXM-084",
+  "epic_id": "EXM-EPIC-S001",
+  "item_type": "Correction",
+  "source": {
+    "base_commit": "03f1db024e36298d4e49468052d4601733f64c2e",
+    "tree": "6649220e3488b366af2204a9086325da64b7de9e",
+    "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "candidate_artifacts": [
+      {
+        "path": "AGENTS.md",
+        "sha256": "08a219b2497df1c7ccd581c27452b17831daaae8d68d41a622cbbb38d769cb42"
+      },
+      {
+        "path": "DEVELOPMENT.md",
+        "sha256": "6689327c1784c5e9d81a4d0ccbd69f3f38d5892ba6d896e6de0b8990031ff955"
+      },
+      {
+        "path": "Tasks/AGENTS.md",
+        "sha256": "02d135000fa97eebb92429bfa699a555476a7df244c748c5b2e1c99e34ad5550"
+      },
+      {
+        "path": "Tasks/FDTasks_5_7_ADOPTION.md",
+        "sha256": "b202c3f6a9372a938baf921bba2f533d61bd896b68dead36c2cbd5054324942a"
+      },
+      {
+        "path": "Tasks/FORMAT.md",
+        "sha256": "da3b697fa0f6b884b822ad2a0976b5dd4282c23646e3ef5132de03f1b68d635d"
+      },
+      {
+        "path": "Tasks/LIFECYCLE_VERSION_HISTORY.md",
+        "sha256": "525ae5210f9a31b3d57b96e607fa466018c786f55db873cd10581146e314922d"
+      },
+      {
+        "path": "Tasks/developer-policy.json",
+        "sha256": "0bdda218b864946db94100a65342e160bd9fa5226bcad53d36785aad9083eb87"
+      },
+      {
+        "path": "Tasks/tasks_file_structure_v5_7.md",
+        "sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8"
+      }
+    ],
+    "lifecycle_version": "repository-local legacy baseline",
+    "developer_policy_version": "5.7"
+  },
+  "status_event": "Tasks/items/governance/EXM-084-adopt-fdtasks-5-7/events/20261121-02-verified-done.md",
+  "acceptance": [
+    {
+      "ac_id": "AC-01",
+      "verdict": "pass",
+      "evidence": [
+        "Tasks/items/governance/EXM-084-adopt-fdtasks-5-7/evidence/20261121-fdtasks57-verification.json"
+      ]
+    },
+    {
+      "ac_id": "AC-02",
+      "verdict": "pass",
+      "evidence": [
+        "Tasks/items/governance/EXM-084-adopt-fdtasks-5-7/evidence/20261121-fdtasks57-verification.json"
+      ]
+    },
+    {
+      "ac_id": "AC-03",
+      "verdict": "pass",
+      "evidence": [
+        "Tasks/items/governance/EXM-084-adopt-fdtasks-5-7/evidence/20261121-fdtasks57-verification.json"
+      ]
+    },
+    {
+      "ac_id": "AC-04",
+      "verdict": "pass",
+      "evidence": [
+        "Tasks/items/governance/EXM-084-adopt-fdtasks-5-7/evidence/20261121-fdtasks57-verification.json"
+      ]
+    }
+  ],
+  "cleanup": "Owned temporary bare Git fixture and both clones removed. No product build, remote deployment or unrelated workspace effects."
+}
