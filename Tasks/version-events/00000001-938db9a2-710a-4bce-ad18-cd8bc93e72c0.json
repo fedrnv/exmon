@@ -1,0 +1,16 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 1,
+  "version": "0.1.0.1",
+  "request_id": "938db9a2-710a-4bce-ad18-cd8bc93e72c0",
+  "type": "correction_closed",
+  "epic_id": "EXM-EPIC-S001",
+  "work_item_id": "EXM-084",
+  "summary": "Publish exact FDTasks 5.7 developer rules with exclusive published claims and immediate commit publication",
+  "verification": [
+    "Tasks/items/governance/EXM-084-adopt-fdtasks-5-7/evidence/20261121-fdtasks57-verification.json",
+    "Tasks/items/governance/EXM-084-adopt-fdtasks-5-7/evidence/20261121-closure.json"
+  ],
+  "request_file": "Tasks/version-requests/20261121-EXM-084-fdtasks57.json",
+  "request_sha256": "6e43ab3be609052da0ebc0a54a5eaaeac0e87987086d8c3184a1ab4776e18422"
+}
