@@ -10,5 +10,7 @@ pub mod native_pcap;
 pub mod native_serial;
 #[cfg(feature = "native-usb")]
 pub mod native_usb;
+pub mod native_usbmon;
 pub mod serial;
 pub mod usb_transfers;
+pub mod usbmon;

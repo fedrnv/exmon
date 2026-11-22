@@ -124,6 +124,7 @@ dependencies = [
  "hidapi",
  "nusb",
  "pcap",
+ "rustix",
  "serial2",
 ]
 

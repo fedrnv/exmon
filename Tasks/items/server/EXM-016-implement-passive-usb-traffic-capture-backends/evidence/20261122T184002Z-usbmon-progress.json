@@ -1,0 +1,64 @@
+{
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "reviewer":  "Codex exmon passive USB development (author source/diff review)",
+    "blocker":  "AC-01 native Linux live metadata/payload/start-stop/permissions acceptance unavailable on this Windows host",
+    "task_id":  "EXM-016",
+    "source_base":  "554b20de7d2bef1780cc1ad9791cfde3d6ff95b7",
+    "files":  {
+                  "crates/capture/src/usbmon.rs":  "964b89404328c66323dc8f390117dcf0a601c120fe50d7a3f93fdc2fff9e1e05",
+                  "crates/domain/src/observation.rs":  "c6fdc1f1140c3ddcd8bfce9f56033df4f0be0203e861cc2164d1fba9f3190fac",
+                  "crates/capture/src/native_usbmon.rs":  "1f7e5e11080d6788d1172b40d02c7a7238a4b4df1c99dd956f6c8fe25557c782",
+                  "crates/capture/Cargo.toml":  "51c780060f185a25afee9a29502202c97ad72bb7cacdccc338f1d0dc93b62877",
+                  "Cargo.lock":  "017d93a128e6306acb5a2439aa304e888b5fd91af37b8881f0aa9ca80eb16afb",
+                  "docs/passive-usb.md":  "4e2cea7e7f959e885db898330fa097f5b7770e84bce88331ab4ca41f29ebd0af",
+                  "crates/capture/tests/usbmon.rs":  "8d7a8c53f141c5e3fdc1d2cb93b96e3d674c8327a5144d93eaf110070057f9f8",
+                  "crates/capture/src/lib.rs":  "d87ef70fa09cf2419c78f3601d34771f7d810ab41b2b12aff3d2b57a0c7e783e"
+              },
+    "outcomes":  {
+                     "AC-02":  "PASS locally: Windows unsupported capability/open/discovery fail explicitly. Linux missing debugfs maps Unsupported, denied access maps PermissionDenied by source inspection; actual Linux failure-path runtime not available. Windows USBPcap/macOS evaluated and explicitly unimplemented.",
+                     "AC-01":  "PARTIAL: production parser/reader/common Session fixture tests preserve B/I/C/Z event metadata and exact bytes, including setup/ISO sparse data, source time and snapshot truncation; Linux source compile/lint passes. Actual Linux usbmon runtime unavailable, not inferred from compile."
+                 },
+    "cleanup":  "No raw captures/device identities/generated outputs staged; target/.idea preserved; no running capture sessions",
+    "limitations":  [
+                        "No actual Linux host/debugfs/usbmon source available in current Windows environment; no native runtime or hardware acceptance PASS.",
+                        "Deprecated 1u text only; no binary ioctl/mmap or 1t implementation.",
+                        "USBPcap and macOS passive capture unimplemented, explicitly Unsupported.",
+                        "Text source cannot measure backend loss; unknown is reported, not zero.",
+                        "No physical USB capture, driver installation, module loading, mounting, permission changes, active claim/read/write or elevation performed.",
+                        "EXM-008/014 acceptance blockers unchanged."
+                    ],
+    "candidate_tree":  "d0b3102c444f6877ba6628dc00bd798085558a8a",
+    "state":  "In Progress; not Done",
+    "owner_action":  "Provide a Linux environment with externally prepared usbmon/debugfs and approved synthetic USB traffic (virtual USB is sufficient where available), explicit bus-read permission and expected records. Run and record actual native acceptance; no physical stand required if equivalent virtual facility is available.",
+    "review_details":  "Reviewed source, bounds and actual staged diff: fixed Linux bus paths, safe read-only NONBLOCK/CLOEXEC/NOFOLLOW open, no USB claims or transmission, bounded line/payload/ISO/field counts, checked timestamp/offset arithmetic, missing/sparse size semantics, finite 4096-byte polling, oversized recovery and incomplete EOF rejection. Common Adapter honors snapshot/batch/cancellation and reports backend loss unknown once per activation. Domain fixed metadata extension is required to preserve accepted passive capture data; existing active USB metadata cannot represent it.",
+    "development_failures":  [
+                                 "Clippy requested as_chunks rather than chunks_exact; corrected byte-pair parsing and final lint passed.",
+                                 "One patch context did not match formatting; no partial mutation, corrected patch then focused verification passed."
+                             ],
+    "hash_basis":  "SHA-256 of verified checkout bytes (CRLF permitted); candidate_tree identifies Git-normalized staged source before evidence",
+    "checkpoint":  {
+                       "next_action":  "Fresh turn: fetch main; verify published EXM-016 progress; preserve EXM-008/014/016 open acceptance checkpoints. Read EXM-017 CAN complete records/dependencies/rules; publish readiness and claim before implementation.",
+                       "evidence_identity":  "Source hashes and staged candidate_tree in this immutable manifest",
+                       "task":  "EXM-016",
+                       "resources":  "Global goal active; safe dependency-ready work remains. No physical device opening/TX authority expanded.",
+                       "state":  "Own claim retained In Progress pending native Linux acceptance"
+                   },
+    "sources":  [
+                    "https://docs.kernel.org/usb/usbmon.html",
+                    "https://desowin.org/usbpcap/index.html",
+                    "https://desowin.org/usbpcap/capture_limitations.html",
+                    "https://developer.apple.com/documentation/iousbhost",
+                    "https://developer.apple.com/documentation/bundleresources/entitlements/com.apple.vm.device-access"
+                ],
+    "commands":  [
+                     "cargo test -p exmon-capture --test usbmon --locked: PASS (6 tests)",
+                     "cargo test -p exmon-capture --locked: PASS (1 unit + 23 integration tests)",
+                     "cargo test -p exmon-domain --locked: PASS (6 tests)",
+                     "cargo fmt --all -- --check: PASS",
+                     "cargo clippy --workspace --all-targets --locked -- -D warnings: PASS",
+                     "cargo clippy -p exmon-capture --features native-usbmon --target x86_64-unknown-linux-gnu --all-targets --locked -- -D warnings: PASS (compile-only, no Linux runtime)",
+                     "node scripts/check-architecture.mjs: PASS (six layers plus three negative fixtures)",
+                     "git diff --cached --check: PASS"
+                 ],
+    "environment":  "Windows x64; Rust/Cargo 1.98.0; Linux GNU cross-target; rustix 1.1; synthetic usbmon 1u text only"
+}

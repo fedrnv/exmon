@@ -12,6 +12,26 @@ pub enum TransportKind {
     Usb,
     Can,
 }
+/// Fixed-size host-controller trace metadata, distinct from active USB I/O.
+#[derive(Clone, PartialEq, Eq)]
+pub struct UsbMonMetadata {
+    pub tag: u64,
+    pub event: u8,
+    pub transfer: u8,
+    pub bus: u16,
+    pub device: u8,
+    pub endpoint: u8,
+    pub status: Option<i32>,
+    pub interval: Option<i32>,
+    pub start_frame: Option<i32>,
+    pub errors: Option<u32>,
+    pub setup: Option<[u8; 8]>,
+    pub setup_tag: Option<u8>,
+    pub iso_count: u32,
+    pub iso: [Option<(i32, u32, u32)>; 5],
+    pub reported_length: u32,
+    pub data_tag: u8,
+}
 #[derive(Clone, PartialEq, Eq)]
 pub enum Metadata {
     Ethernet {
@@ -40,6 +60,7 @@ pub enum Metadata {
         usage: u16,
         report_id: u8,
     },
+    UsbMon(UsbMonMetadata),
     Can {
         id: u32,
         extended: bool,
@@ -53,7 +74,7 @@ impl Metadata {
             Self::Tcp { .. } => TransportKind::Tcp,
             Self::Udp { .. } => TransportKind::Udp,
             Self::Serial { .. } => TransportKind::Serial,
-            Self::Usb { .. } | Self::Hid { .. } => TransportKind::Usb,
+            Self::Usb { .. } | Self::Hid { .. } | Self::UsbMon(_) => TransportKind::Usb,
             Self::Can { .. } => TransportKind::Can,
         }
     }
