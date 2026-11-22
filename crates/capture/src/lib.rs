@@ -4,3 +4,5 @@ pub mod adapter;
 pub mod ethernet;
 #[cfg(feature = "native-pcap")]
 pub mod native_pcap;
+pub mod native_serial;
+pub mod serial;

@@ -1,0 +1,52 @@
+{
+    "development_failures":  [
+                                 "Initial virtual test had ambiguous Vec element inference; explicitly typed byte vector and used extend_from_slice.",
+                                 "Initial Clippy rejected collapsible nested RS-485 validation if; collapsed condition without changing validation. Final tests/lint pass."
+                             ],
+    "outcomes":  {
+                     "AC-02":  "Conditional physical validation status RECORDED UNAVAILABLE, not PASS: no exchange stand/authorized RS-485 transceiver. Accepted TASK requires physical evidence when hardware is available; root prototype-first policy permits virtual implementation closure with explicit hardware limitation.",
+                     "AC-01":  "PASS: 3 virtual paired in-memory serial integration tests run production adapter; fragmented A5 then 00 2A preserved exactly, explicit TX A5 00 07 observed at peer; no startup TX; settings propagation, partial-write/no-retry, cancellation, disconnected/explicit reconnect and unrelated-session isolation verified"
+                 },
+    "source_base":  "e23af7c7d91fd08439746ce41632628b6f4eeb4d",
+    "files":  {
+                  "docs/serial-capture.md":  "6cd21484025b6e173e791e1ef90afa23767ed48ca40d3de61ddd7efd7a397463",
+                  "crates/capture/tests/serial.rs":  "ad72b05bc45c712b3426fb6691ea277875f5db6a40267a87a2c5286f9e2fdf55",
+                  "crates/capture/src/native_serial.rs":  "0ed9bb576914a1ce9e78849b16bbbe4c1de231784ea56652dbf1e25690b4b855",
+                  "crates/capture/src/serial.rs":  "025636fe0d5c5430b33f4d98f9547dec714ba908d1181d90669e0459695a15c6",
+                  "crates/capture/Cargo.toml":  "41b9b19066e2c7a9f23c7352ca72e35eef25c649b3d87d9c4d0dd1626813bb3d",
+                  "Cargo.lock":  "692c81a0afb6b405d7c456f9ed4d0cd703de1bfd6fe41150dbd1f2c4622122ed",
+                  "crates/capture/src/lib.rs":  "bd38f2ef8283a30981b2ce557f53e916d16a4626a16c55e06c8425a68c8d9423"
+              },
+    "commands":  [
+                     "cargo check -p exmon-capture: PASS (native Windows source)",
+                     "cargo test -p exmon-capture --locked: PASS (4 adapter + 3 Ethernet + 3 serial integration tests)",
+                     "cargo test -p exmon-capture --test serial --locked after final serial changes: PASS (3 tests)",
+                     "cargo check -p exmon-capture --target x86_64-unknown-linux-gnu --locked: PASS (includes Linux RS-4xx branch)",
+                     "cargo fmt --all -- --check: PASS",
+                     "cargo clippy --workspace --all-targets --locked -- -D warnings: PASS",
+                     "node scripts/check-architecture.mjs: PASS",
+                     "git diff --cached --check: PASS"
+                 ],
+    "task_id":  "EXM-013",
+    "environment":  "Windows x64; Rust/Cargo 1.98.0; Node 24.22.1; serial2 0.2.39; Linux GNU standard-library target added for compile checking",
+    "limitations":  [
+                        "Virtual peer is bounded in-memory simulated serial, not installed VCOM or an executed OS PTY test",
+                        "Linux target compile verifies code shape only; no Linux/macOS native port or physical electrical run claimed",
+                        "Native Windows serial code compiles but no real port opened; no physical transmission occurred",
+                        "RS-485 direction/timing, flow wiring and device protocol qualification remain blocked on stand; kernel readback alone is not electrical validation",
+                        "Windows/macOS Linux-style direction mode requests explicitly Unsupported; externally configured auto-direction hardware uses unchanged serial mode",
+                        "No application schedule/TX authorization worker implemented; adapter explicit transmit operation requires future application authorization",
+                        "EXM-008 remains checkpointed In Progress with native smoke blocker, unchanged by this task"
+                    ],
+    "checkpoint":  {
+                       "next_action":  "Fresh turn: fetch main, verify EXM-013 closure; inspect dependency-ready EXM-014 USB HID complete records/rules; publish readiness and claim before HID implementation. Preserve EXM-008 blocker checkpoint.",
+                       "evidence_identity":  "Changed source hashes in this immutable manifest",
+                       "task":  "EXM-013",
+                       "resources":  "No external blocker to further virtual prototype work; physical stand absent; ordinary main publication authority active",
+                       "state":  "Verified virtual prototype Done upon publication; physical RS-485 tests explicitly unavailable"
+                   },
+    "reviewer":  "Codex exmon serial development (author source/diff inspection)",
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "cleanup":  "No generated build outputs or device identifiers staged; ignored target/.idea preserved; all command sessions finished",
+    "candidate_tree":  "884c5e4e86e0de5bdd4d1220e848fa10152a9dc9"
+}

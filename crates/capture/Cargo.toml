@@ -9,6 +9,7 @@ workspace = true
 
 [dependencies]
 exmon-domain.workspace = true
+serial2 = { version = "0.2.39", features = ["rs4xx"] }
 pcap = { version = "2.5", optional = true }
 
 [features]
