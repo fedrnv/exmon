@@ -91,7 +91,58 @@ The ignored test verifies iproute2 JSON `info_kind == vcan` before opening socke
 or sending. It refuses physical interfaces, performs no setup and has a one-second
 receive deadline. Never remove that check to run this test on a real bus.
 
-Current Windows host has no installed WSL/Linux runtime. Native vcan integration
-is UNAVAILABLE, not a passing mock or cross-compile. EXM-017 stays In Progress
-until its actual SocketCAN vcan acceptance has run successfully. Physical bus,
-controller behavior and timing remain separate stand validation.
+Native SocketCAN RX/TX/filtering passed on Alpine 3.23.8, Linux 6.18.60-0-lts,
+inside portable QEMU 11.1.0 using software-only TCG on Windows. The negative
+`EXMON_TEST_VCAN=lo` scenario refused the interface before opening a socket.
+The six non-ignored CAN tests also passed in that guest, including invalid and
+missing channel errors. This qualifies the Linux virtual integration; physical
+bus, controller behavior and timing remain separate stand validation. Native
+Windows/macOS CAN adapters and CAN FD remain explicitly Unsupported.
+
+For a similar manual VM check, use Alpine **standard**, whose kernel includes
+CAN/vcan. The Alpine virt kernel inspected here has CAN disabled. Verify the
+downloaded image against its published checksum, extract `boot/vmlinuz-lts` and
+`boot/initramfs-lts`, and boot with QEMU options `-machine q35,accel=tcg -smp 2
+-m 512 -display none -monitor none -no-reboot`, that kernel/initrd, the standard
+ISO as `-cdrom`, and kernel arguments `console=ttyS0 alpine_dev=cdrom
+modules=loop,squashfs,sd-mod,usb-storage quiet`. Use only emulated networking
+for public package downloads; no physical passthrough or host drivers are needed.
+Prepare the guest link manually, outside the application:
+
+```sh
+ip link set eth0 up
+timeout 20 udhcpc -i eth0 -q -t 5
+printf 'https://dl-cdn.alpinelinux.org/alpine/v3.23/main\n' > /etc/apk/repositories
+timeout 45 apk add iproute2
+modprobe vcan
+modprobe can_raw
+ip link add exmonvcan0 type vcan
+ip link set exmonvcan0 up
+ip -details -json link show dev exmonvcan0
+```
+
+Build on Linux using the Cargo command above, or cross-link a static test binary
+on Windows with the installed Rust toolchain's LLD and musl standard library:
+
+```powershell
+rustup target add x86_64-unknown-linux-musl
+$rustRoot = rustc --print sysroot
+$env:CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER = Join-Path $rustRoot 'lib/rustlib/x86_64-pc-windows-msvc/bin/rust-lld.exe'
+$env:CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS = '-C linker-flavor=ld.lld'
+cargo test -p exmon-capture --features native-can --test can --target x86_64-unknown-linux-musl --locked --no-run
+```
+
+Copy only the produced test executable into a dedicated artifact directory, never
+share the repository or user home. A read-only QEMU `fat:ro:` virtio drive exposes
+that directory as `/dev/vda1`; mount it read-only in the guest and copy the binary
+to `/tmp/can-tests`. Check matching SHA-256 hashes before running:
+
+```sh
+chmod 700 /tmp/can-tests
+EXMON_TEST_VCAN=exmonvcan0 /tmp/can-tests --ignored --exact native_vcan_rx_tx_and_filtering --nocapture
+/tmp/can-tests --nocapture
+poweroff
+```
+
+The immutable EXM-017 closure evidence records the actual harness, serial output,
+image/tool hashes, commands and failures corrected during fixture preparation.

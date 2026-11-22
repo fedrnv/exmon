@@ -1,0 +1,140 @@
+{
+  "task_id": "EXM-017",
+  "owner": "Codex exmon CAN development",
+  "verified_at": "2026-11-22T20:12:37Z",
+  "state": "Done after successful publication",
+  "source_base": "d770e42c967c308901ab77a7ccc855d7f0abe418",
+  "candidate_tree": "7cd89536a6e6c4029af286a364f3e2e7228e63de",
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "hash_basis": "SHA-256 of verified checkout bytes; candidate_tree identifies staged Git-normalized source before closure records",
+  "files": {
+    "crates/capture/src/can.rs": "86c502734715b894f1aba8dbba48e9c90878d092431c3342bd3b05158a1e9293",
+    "crates/capture/src/native_can.rs": "c634e6ab3d265b2f5991b6ef592b242aa6f62f5277c4adf2ad26c7ea720ef03c",
+    "crates/capture/src/virtual_can.rs": "d1ed0f063ebf8fc1384f773bda42a737e97eb0332a5df255dcd619f524968063",
+    "crates/capture/tests/can.rs": "360e384d5282b6230eb3520e9f2dbeaadb36b7145464a2bc147d942a4c62c27c",
+    "crates/domain/src/observation.rs": "3cb6e31a37c6583f7b40ff8d8975e44a0b44065376cff8159d02928e2f831631",
+    "crates/capture/Cargo.toml": "c2610a1f8470161964e57561dc891c9d21cbb091ecfe358897cc58dab1ca526f",
+    "Cargo.lock": "d62dad039ac5a116640f5cd7f39044397b52afd04d2a2eebf5a0d17ad9cddeff",
+    "docs/can.md": "7fdac670129c48df9de6adccdabef8ad1154084a6eebdd65dae6f96a6209f6a3"
+  },
+  "acceptance": {
+    "AC-01": "PASS: actual production Linux SocketCAN in software-only QEMU, verified vcan link kind, two native sockets, excluded 0x122 then allowed 0x123, exactly one payload [165,0,42], source timestamp and CAN metadata asserted. Native test 1 passed. Six ordinary CAN tests passed in same guest, covering virtual bus bounds/loss/cancel/reconnect, extended/RTR/filter/DLC and error semantics.",
+    "AC-02": "PASS: native invalid/missing channel indices return Disconnected; subsequent send InvalidState; requirements actionable. Windows unsupported backend paths, denied activation without poll/send, FD and invalid settings errors pass. No hidden interface selection, setup or retry. Deliberate non-vcan lo scenario fails at vcan-kind assertion before opening socket; this expected negative failure is evidence of refusal, not an unexplained failed gate."
+  },
+  "environment": {
+    "host": "Windows x86_64, Rust/Cargo 1.98.0 stable, Node 24.22.1; WSL absent",
+    "guest": "Alpine Linux standard 3.23.8 x86_64, Linux 6.18.60-0-lts, iproute2 6.17.0-r0",
+    "qemu": "11.1.0 (v11.1.0-12130-ge470268ff4), q35 TCG, two vCPUs, 512 MiB RAM, no writable guest disk",
+    "isolation": "Read-only ISO and narrow synthetic-binary vvfat drive; no repository/home sharing, host drivers, elevation, hardware passthrough, TAP or bridging. Ephemeral loopback-only serial TCP connection and guest user-mode networking for public package downloads. Guest-only manual iproute2/module/vcan preparation, separate from application. VM powered off and no QEMU process remains."
+  },
+  "acquisition": [
+    {
+      "url": "https://qemu.weilnetz.de/w64/qemu-w64-setup-20260811.exe",
+      "sha512": "5bcf9eed634e8575a37b74f445af41a2fe4106da512d0c30c368301d4c105037fdfab40a5287367a28a957624cddebbc8c07e16c88ab6634f554cdf3d16bf543",
+      "verified_against": "https://qemu.weilnetz.de/w64/qemu-w64-setup-20260811.sha512",
+      "use": "Extracted by 7-Zip; host installer never executed"
+    },
+    {
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/x86_64/alpine-standard-3.23.8-x86_64.iso",
+      "sha256": "5d5b4fc2244b25170e915c05141b259fec5350499928eab21c4dd34b24e0dbe4",
+      "verified_against": "same URL with .sha256 suffix"
+    },
+    {
+      "url": "https://github.com/ip7z/7zip/releases/download/26.06/7zr.exe",
+      "sha256": "e80db2dad715a6c5adabe292d31ed54e11f4e9b99ca349827b50573b175891bc",
+      "use": "Official upstream HTTPS link; extracted full 7-Zip archive"
+    },
+    {
+      "url": "https://github.com/ip7z/7zip/releases/download/26.06/7z2606-x64.exe",
+      "sha256": "9b697f65ecc2d9b0152f5ee96d72dde522a7827690349d9307935dacf40f42ec",
+      "use": "Extracted, not installed"
+    },
+    {
+      "url": "https://ziglang.org/download/0.15.2/zig-x86_64-windows-0.15.2.zip",
+      "sha256": "3a0ed1e8799a2f8ce2a6e6290a9ff22e6906f8227865911fb7ddedc3cc14cb0c",
+      "use": "Verified official index hash but ultimately unnecessary; Rust LLD performed link"
+    },
+    {
+      "url": "https://dl-cdn.alpinelinux.org/alpine/v3.23/releases/x86_64/alpine-virt-3.23.8-x86_64.iso",
+      "sha256": "5e0879304cfbc433bcafd007f5ef88f6c717020bf739a7636b5d5598fd1b4671",
+      "use": "Verified hash; rejected after kernel config inspection showed CAN disabled"
+    }
+  ],
+  "verification": [
+    {
+      "command": "cargo test -p exmon-capture -p exmon-domain --locked",
+      "result": "PASS: capture 31 tests plus domain 6, doctests; transport regressions"
+    },
+    {
+      "command": "rustup target add x86_64-unknown-linux-musl; set CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=<sysroot>/lib/rustlib/x86_64-pc-windows-msvc/bin/rust-lld.exe and CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_RUSTFLAGS=-C linker-flavor=ld.lld; cargo test -p exmon-capture --features native-can --test can --target x86_64-unknown-linux-musl --locked --no-run",
+      "result": "PASS: static binary built; final-source rebuild after comment correction produced identical SHA-256 1e2f67a78dbdb63fb265467f70bc033e63f5d226b036da11a221b300d1dd90b3, identical to binary checked and executed inside guest"
+    },
+    {
+      "command": "node target/can-vm/run.mjs",
+      "result": "PASS: actual manual harness snapshot attached, native RC=0, fixture RC=0, expected non-vcan refusal, clean VM exit 0. Setup-only failed attempts corrected; not counted as runtime passes."
+    },
+    {
+      "command": "cargo test --workspace --locked",
+      "result": "PASS: 59 tests, all six layers and doctests; includes GUI/worker/storage dependent regressions"
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "result": "PASS"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets --locked -- -D warnings",
+      "result": "PASS"
+    },
+    {
+      "command": "cargo clippy -p exmon-capture --features native-can --target x86_64-unknown-linux-gnu --all-targets --locked -- -D warnings",
+      "result": "PASS"
+    },
+    {
+      "command": "node scripts/check-architecture.mjs",
+      "result": "PASS: six layers, resolved graph and three negative fixtures"
+    },
+    {
+      "command": "git diff --check; git diff --cached --check; author source/staged diff review",
+      "result": "PASS for closing changes; no weakening of limits, native guards or tests"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "Tasks/items/server/EXM-017-implement-can-capture-and-transmission/evidence/20261122T201237Z-guest-output.txt",
+      "sha256": "a5903155a2136e9e9e519b97f0b09d9e9e05efacfd20b1a584273b9482c9e156",
+      "description": "Actual guest serial output from uname onward, ANSI controls and CR removed; no inferred result"
+    },
+    {
+      "path": "Tasks/items/server/EXM-017-implement-can-capture-and-transmission/evidence/20261122T201237Z-manual-harness.txt",
+      "sha256": "5ae1b4fe2d09321b0b032ac781ca6b82979d29075f75b798f5d2abedb129e291",
+      "description": "Actual one-off manual provisioning and test orchestration source, local paths retained for exact reproduction; not a canonical automated gate"
+    },
+    {
+      "path": "ignored target/can-vm/serial.log",
+      "sha256": "87b585b90b08cfa7a586f8640a02f43edf2d2125e15aa53e3af1faddc25382ba",
+      "description": "Raw serial source for normalized attached output"
+    }
+  ],
+  "failures_corrected": [
+    "Readiness event writer initially used unavailable JS crypto; no file mutation occurred, retried with unique random identity. Published readiness has an extra EOF blank line; immutable record retained unchanged, closing diff is clean.",
+    "First linker invocation preceded completion of optional Zig extraction; no successful link claimed. Rust LLD gnu-lld flavor was rejected on stable; supported ld.lld alias then linked successfully without Zig.",
+    "Alpine virt kernel lacks CONFIG_CAN; selected verified standard ISO with CONFIG_CAN and CONFIG_CAN_VCAN.",
+    "ConPTY input burst lost characters during preliminary guest inspection; switched to bounded loopback serial socket transport.",
+    "First guest package attempt had eth0 down; stopped only verified isolated QEMU process. Added guest link up and finite DHCP/package timeouts.",
+    "Second setup mounted whole vvfat disk instead of its vda1 partition; no test executed, statuses127 recorded. Corrected partition, added fail-fast guest setup and poweroff trap, then actual tests passed."
+  ],
+  "review": "Author reviewed all new staged source and documentation, existing native socket/channel validation and error mapping, typed TX and vcan-only test guard. No functional production source changed this turn; new Linux negative test covers missing/invalid indices and post-failure send. GUI appearance unchanged; no new visual acceptance required. Prior immutable implementation evidence remains accepted history.",
+  "limitations": [
+    "Physical CAN ACK/electrical/timing/controller behavior unqualified; no physical interface opened or transmitted.",
+    "Native Linux direction and loss remain Unknown; no fabricated provenance or zero-loss claim.",
+    "CAN FD and Windows/macOS vendor-native adapters Unsupported; extension boundary explicit.",
+    "Other task blockers (EXM-008 Ethernet, EXM-014 physical HID, EXM-016 native usbmon runtime) remain separate. No Epic gate/review or release qualification claimed."
+  ],
+  "cleanup": "No binaries/images/generated build outputs/credentials/private captures staged. target/can-vm tool cache retained ignored for next native virtual check; no live VM or port listener remains. Unrelated .idea preserved.",
+  "checkpoint": {
+    "goal": "active, all-tasks objective unchanged; current turn made concrete verified progress",
+    "task": "EXM-017 first verified Done, publish immediately",
+    "next_action": "Fresh turn fetch main and verify EXM-017 closure/version allocation. Revalidate rules and EXM-016 owner/evidence; reuse isolated Linux environment to qualify passive usbmon with emulated USB traffic, no physical passthrough. Publish resumed readiness before work. Do not start dependent Epic002/EXM-043.",
+    "owner_action": "None required for next safe virtual-environment work."
+  }
+}

@@ -1,0 +1,67 @@
+Linux localhost 6.18.60-0-lts #1-Alpine SMP PREEMPT_DYNAMIC 2026-11-01 07:52:36 x86_64 Linux
+udhcpc: started, v1.37.0
+udhcpc: broadcasting discover
+udhcpc: broadcasting select for 10.0.2.15, server 10.0.2.2
+udhcpc: lease of 10.0.2.15 obtained from 10.0.2.2, lease time 86400
+[fetch https://dl-cdn.alpinelinux.org/alpine...](1/9) Installing zstd-libs (1.5.7-r2)
+  0%                                               7% ███                                          14% ██████                                       21% █████████                                   (2/9) Installing libelf (0.194-r0)
+ 21% █████████                                    24% ██████████                                   27% ███████████                                 (3/9) Installing libmnl (1.0.5-r2)
+ 27% ███████████                                  30% █████████████                                31% █████████████                               (4/9) Installing iproute2-minimal (6.17.0-r0)
+ 31% █████████████                                34% ███████████████                              42% ██████████████████                           49% █████████████████████                        50% ██████████████████████                      (5/9) Installing ifupdown-ng-iproute2 (0.12.1-r7)
+ 50% ██████████████████████                       54% ███████████████████████                     (6/9) Installing libxtables (1.8.11-r1)
+ 54% ███████████████████████                      57% █████████████████████████                    59% ██████████████████████████                  (7/9) Installing iproute2-tc (6.17.0-r0)
+ 59% ██████████████████████████                   63% ███████████████████████████                  70% ██████████████████████████████               77% ██████████████████████████████████          (8/9) Installing iproute2-ss (6.17.0-r0)
+ 77% ██████████████████████████████████           81% ███████████████████████████████████          83% ████████████████████████████████████        (9/9) Installing iproute2 (6.17.0-r0)
+ 83% ████████████████████████████████████         87% ██████████████████████████████████████       94% █████████████████████████████████████████    96% ██████████████████████████████████████████    Executing iproute2-6.17.0-r0.post-install
+ 96% ██████████████████████████████████████████  100% ████████████████████████████████████████████Executing busybox-1.37.0-r30.trigger
+[syncing disks...]OK: 12.9 MiB in 37 packages
+[{"ifindex":3,"ifname":"exmonvcan0","flags":["NOARP","UP","LOWER_UP"],"mtu":2060,"qdisc":"noqueue","operstate":"UNKNOWN","linkmode":"DEFAULT","group":"default","txqlen":1000,"link_type":"can","promiscuity":0,"allmulti":0,"min_mtu":0,"max_mtu":0,"linkinfo":{"info_kind":"vcan"},"inet6_addr_gen_mode":"eui64","num_tx_queues":1,"num_rx_queues":1,"gso_max_size":65536,"gso_max_segs":65535,"tso_max_size":65536,"tso_max_segs":65535,"gro_max_size":65536,"gso_ipv4_max_size":65536,"gro_ipv4_max_size":65536}]
+1e2f67a78dbdb63fb265467f70bc033e63f5d226b036da11a221b300d1dd90b3  /tmp/can-tests
+
+running 1 test
+
+thread 'native_vcan_rx_tx_and_filtering' (2211) panicked at crates\capture\tests\can.rs:382:5:
+assertion `left == right` failed: refuse non-vcan interface before opening socket
+  left: Null
+ right: "vcan"
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test native_vcan_rx_tx_and_filtering ... FAILED
+
+failures:
+
+failures:
+    native_vcan_rx_tx_and_filtering
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.12s
+
+EXMON_NON_VCAN_REFUSED
+
+running 1 test
+test native_vcan_rx_tx_and_filtering ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.05s
+
+EXMON_NATIVE_RC=0
+
+running 7 tests
+test error_metadata_is_receive_only_and_send_disconnect_revokes_running_source ... ok
+test invalid_can_frames_modes_filters_and_raw_byte_tx_are_rejected ... ok
+test bounded_bus_loss_session_limits_cancel_and_reconnect_are_explicit ... ok
+test native_vcan_rx_tx_and_filtering ... ignored, requires an externally prepared vcan and EXMON_TEST_VCAN; never physical CAN
+test native_missing_channel_is_explicit_without_open_or_send ... ok
+test unavailable_backends_and_activation_failure_do_not_send ... ok
+test virtual_exchange_filters_standard_extended_remote_and_preserves_metadata ... ok
+
+test result: ok. 6 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+EXMON_FIXTURE_RC=0
+localhost:~#  * Stopping busybox syslog ... [ ok ]
+ * Unmounting loop devices
+ *   Remounting /.modloop read only ... [ ok ]
+ * Unmounting filesystems
+ *   Unmounting /test ... [ ok ]
+ *   Unmounting /media/cdrom ... [ ok ]
+ * Setting hardware clock using the system clock [UTC] ... [ ok ]
+ * Stopping busybox mdev ... [ ok ]
+ [ ok ]
+ * Terminating remaining processes ...[   28.703717] reboot: Power down

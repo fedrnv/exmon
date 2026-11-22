@@ -337,6 +337,24 @@ fn error_metadata_is_receive_only_and_send_disconnect_revokes_running_source() {
     );
 }
 
+/// Invalid/missing indices must fail without opening an all-interface socket.
+#[cfg(all(target_os = "linux", feature = "native-can"))]
+#[test]
+fn native_missing_channel_is_explicit_without_open_or_send() {
+    let mut source = native_can::NativeCan::default();
+    assert_eq!(source.list(0).err(), Some(Error::InvalidConfig));
+    assert_eq!(
+        source.activate(0, &Options::default()),
+        Err(Error::Disconnected)
+    );
+    assert_eq!(
+        source.activate(u32::MAX, &Options::default()),
+        Err(Error::Disconnected)
+    );
+    assert_eq!(source.send(&data(0x123)), Err(Error::InvalidState));
+    assert!(native_can::requirements().contains("up SocketCAN/vcan link"));
+}
+
 /// Explicit opt-in only; verifies link kind before any native socket/TX.
 #[cfg(all(target_os = "linux", feature = "native-can"))]
 #[test]

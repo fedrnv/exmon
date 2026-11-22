@@ -1,0 +1,29 @@
+import {spawn} from 'node:child_process';
+import net from 'node:net';
+import fs from 'node:fs';
+const root='C:/GitHub/exmon/target/can-vm';
+const serial=net.createServer();
+await new Promise(r=>serial.listen(0,'127.0.0.1',r));
+const port=serial.address().port;
+await new Promise(r=>serial.close(r));
+const args=['-machine','q35,accel=tcg','-smp','2','-m','512','-display','none','-serial',`tcp:127.0.0.1:${port},server=on,wait=on`,'-monitor','none','-no-reboot','-kernel',`${root}/alpine-standard/boot/vmlinuz-lts`,'-initrd',`${root}/alpine-standard/boot/initramfs-lts`,'-append','console=ttyS0 alpine_dev=cdrom modules=loop,squashfs,sd-mod,usb-storage quiet','-cdrom',`${root}/downloads/alpine-standard.iso`,'-nic','user,model=virtio-net-pci','-drive',`file=fat:ro:${root}/share,format=raw,if=virtio,readonly=on`];
+const log=fs.createWriteStream(`${root}/serial.log`);
+const child=spawn(`${root}/qemu/qemu-system-x86_64.exe`,args,{windowsHide:true,stdio:['ignore','pipe','pipe']});
+child.stdout.pipe(process.stdout);child.stderr.pipe(process.stderr);
+let socket, transcript='', stage=0;
+const timeout=setTimeout(()=>{console.error('VM watchdog expired');socket?.destroy();child.kill();process.exitCode=1;},240000);
+child.on('exit',(code)=>{clearTimeout(timeout);socket?.destroy();log.end();console.log('VM_EXIT',code);process.exitCode=code===0&&transcript.includes('EXMON_NATIVE_RC=0')?0:1;});
+for(let attempt=0;attempt<100;attempt++){
+  socket=await new Promise(r=>{const s=net.connect(port,'127.0.0.1');s.once('connect',()=>r(s));s.once('error',()=>{s.destroy();r(null);});});
+  if(socket)break;
+  await new Promise(r=>setTimeout(r,100));
+}
+if(!socket){child.kill();throw new Error('Serial connection failed');}
+socket.on('data',data=>{
+ log.write(data);process.stdout.write(data);transcript+=data.toString();
+ if(stage===0&&transcript.includes('login: ')){stage=1;socket.write('root\n');}
+ if(stage===1&&transcript.includes('localhost:~# ')){
+  stage=2;
+  socket.write("stty -echo; trap 'poweroff' EXIT; set -e; uname -a; ip link set eth0 up; timeout 20 udhcpc -i eth0 -q -t 5; printf 'https://dl-cdn.alpinelinux.org/alpine/v3.23/main\\n' > /etc/apk/repositories; timeout 45 apk add iproute2; modprobe vcan; modprobe can_raw; ip link add exmonvcan0 type vcan; ip link set exmonvcan0 up; ip -details -json link show dev exmonvcan0; mkdir /test; mount -o ro /dev/vda1 /test; cp /test/can-tests /tmp/can-tests; chmod 700 /tmp/can-tests; sha256sum /tmp/can-tests; if EXMON_TEST_VCAN=lo /tmp/can-tests --ignored --exact native_vcan_rx_tx_and_filtering --nocapture; then exit 9; else echo EXMON_NON_VCAN_REFUSED; fi; EXMON_TEST_VCAN=exmonvcan0 /tmp/can-tests --ignored --exact native_vcan_rx_tx_and_filtering --nocapture; rc=$?; echo EXMON_NATIVE_RC=$rc; /tmp/can-tests --nocapture; echo EXMON_FIXTURE_RC=$?; poweroff\n");
+ }
+});
