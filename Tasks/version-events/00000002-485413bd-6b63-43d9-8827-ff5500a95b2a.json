@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 2,
+  "version": "0.1.0.2",
+  "request_id": "485413bd-6b63-43d9-8827-ff5500a95b2a",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-001",
+  "summary": "Defined transport-neutral product domain contract",
+  "verification": [
+    "Tasks/items/foundation/EXM-001-define-the-product-domain-model/evidence/20261122T170402Z-domain-verification.md"
+  ],
+  "request_file": "Tasks/version-requests/20261122-EXM-001-domain-model.json",
+  "request_sha256": "993ee4f32e13cd4ed4945640f682628f7785d1a6ceb43e802df1f8230f97e982"
+}
