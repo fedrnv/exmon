@@ -23,6 +23,8 @@ The accepted starting architecture is Rust with `egui/eframe`. Platform capture 
 ## Status
 
 The domain contract is documented in [docs/domain-model.md](docs/domain-model.md).
+Platform permissions, capture privacy and explicit transmission requirements are
+defined in [the product safety policy](docs/security-and-transmission.md).
 The six-layer Rust workspace is initialized; transport and GUI functionality
 will be implemented in subsequent tasks. No physical adapter support is claimed.
 

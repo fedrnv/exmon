@@ -1,0 +1,46 @@
+{
+    "checkpoint":  {
+                       "next_action":  "Fresh turn: fetch main, verify EXM-006 closure; inspect server EXM-007-implement-the-capture-adapter-api and all dependencies/events/evidence; publish readiness and claim before capture adapter API implementation",
+                       "evidence_identity":  "Changed file SHA-256 values in this immutable manifest",
+                       "task":  "EXM-006",
+                       "resources":  "No external blocker; normal main publication authority remains active",
+                       "state":  "Verified Done upon publication"
+                   },
+    "outcomes":  {
+                     "AC-02":  "PASS: policy prohibits implicit launch/load/recovery/replay/reconnect TX; existing config tests reject enabled schedules and verify disabled defaults; manual inspection of all six library manifests plus app/capture/gui sources confirms no executable/startup send path exists",
+                     "AC-01":  "PASS: Windows/macOS/Linux matrix explicitly covers live capture, sockets, serial, USB, CAN and offline access; official upstream references support stated boundaries; product restrictions distinguish unsupported backend and unavailable permission"
+                 },
+    "source_base":  "6045b314bc16404aa2223478214853700ffbbf0d",
+    "files":  {
+                  "docs/security-and-transmission.md":  "e71d13677a4f3ec18cc6c878d853cb02b88a6a59131d53dbc3b1c375053eaa06",
+                  "README.md":  "5ef49f8495ad16ca8858a304a187e5441c3ff71de0725136b49f80cff6a3d385"
+              },
+    "review_details":  "Explicit one-shot and schedule enable, final worker revalidation, Stop generation invalidation and honest in-flight completion specified. Permission denial cannot auto-elevate. File bounds, redaction, no automatic uploads and synthetic-only Git fixtures specified. Read source config load/save: validation only, no I/O. Documentation-only candidate changes no Rust functional inputs, manifests or toolchain; unchanged formatting/lint/architecture PASS evidence from EXM-005 remains applicable.",
+    "commands":  [
+                     "cargo test -p exmon-storage --test configuration --locked: PASS (8 tests)",
+                     "cargo test -p exmon-app --test diagnostics --locked: PASS (2 tests)",
+                     "rg --files crates: inspected complete source list",
+                     "rg transmission/launch entrypoint names across crates: exit 1, no matches (expected; not a command failure)",
+                     "git diff --cached --check: PASS"
+                 ],
+    "task_id":  "EXM-006",
+    "environment":  "Windows; Rust/Cargo 1.98.0; local existing safety tests; official documentation reviewed 2026-11-22",
+    "limitations":  [
+                        "Defines product security policy, not task-lifecycle rule changes",
+                        "No driver installation, permission changes, physical transmission or hardware verification performed",
+                        "Current startup-safe baseline proven by no executable/send path and disabled config contract; future runtime adapter/scheduler tasks must test their actual entrypoints/races before closure",
+                        "First closure request follows accepted allocator compatibility boundary"
+                    ],
+    "sources":  [
+                    "https://npcap.com/guide/npcap-users-guide.html",
+                    "https://raw.githubusercontent.com/the-tcpdump-group/libpcap/master/pcap.3pcap.in",
+                    "https://learn.microsoft.com/en-us/windows/win32/devio/communications-resource-handles",
+                    "https://docs.kernel.org/networking/can.html",
+                    "https://libusb.sourceforge.io/api-1.0/libusb_caveats.html"
+                ],
+    "publication_recovery":  "Unpublished claim ff2e552 rejected after unrelated allocator update 5bb8a0c. Inspected remote diff: version files only, task remains Planned/unowned. Preserved old attempt in refs/codex/rejected-claims/EXM-006-ff2e552; created fresh readiness/claim against current base and published 6045b31 before implementation.",
+    "reviewer":  "Codex exmon safety policy development (author contract/source review)",
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "cleanup":  "No generated artifacts or secret data staged; ignored cache/.idea preserved; all command sessions complete",
+    "candidate_tree":  "c1889729e51197e97e8a80cc0b9ddfe9887c5efe"
+}
