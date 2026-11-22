@@ -204,3 +204,145 @@ fn common_session_preserves_passive_direction_limits_and_cancellation() {
     assert_eq!(session.state(), State::Stopped);
     session.close().unwrap();
 }
+
+/// Manual isolated QEMU fixture only; never accepts a host USB/disk path.
+#[cfg(all(target_os = "linux", feature = "native-usbmon"))]
+#[test]
+#[ignore = "requires explicitly prepared isolated QEMU missing/denied setup phase"]
+fn native_qemu_usbmon_setup_errors_are_explicit() {
+    use std::{fs, process::Command};
+    assert_eq!(
+        fs::read_to_string("/sys/class/dmi/id/product_name")
+            .unwrap()
+            .trim(),
+        "EXMON-USBMON-FIXTURE"
+    );
+    let mut native = native_usbmon::NativeUsbmon::default();
+    match std::env::var("EXMON_TEST_USBMON_PHASE").unwrap().as_str() {
+        "missing" => {
+            assert_eq!(native.enumerate().err(), Some(Error::Unsupported));
+            assert_eq!(native.open(0), Err(Error::Unsupported));
+        }
+        "denied" => {
+            let uid = Command::new("id").arg("-u").output().unwrap();
+            assert!(uid.status.success());
+            assert_ne!(String::from_utf8(uid.stdout).unwrap().trim(), "0");
+            match native.enumerate() {
+                Err(e) => assert_eq!(e, Error::PermissionDenied),
+                Ok(buses) => {
+                    let bus = buses.into_iter().find(|b| *b != 0).unwrap();
+                    assert_eq!(native.open(bus), Err(Error::PermissionDenied));
+                }
+            }
+        }
+        _ => panic!("explicit missing/denied phase required"),
+    }
+    assert_eq!(native.poll().err(), Some(Error::InvalidState));
+}
+
+/// Manual isolated QEMU fixture only; never accepts a host USB/disk path.
+#[cfg(all(target_os = "linux", feature = "native-usbmon"))]
+#[test]
+#[ignore = "requires the isolated EXMON QEMU USB fixture; never physical USB"]
+fn native_qemu_usbmon_preserves_payload_and_lifecycle() {
+    use exmon_capture::adapter::{Adapter, Cancellation};
+    use std::{
+        fs,
+        process::Command,
+        time::{Duration, Instant},
+    };
+    assert_eq!(
+        std::env::var("EXMON_TEST_USBMON").as_deref(),
+        Ok("qemu-fixture")
+    );
+    fn text(path: &str) -> String {
+        fs::read_to_string(path).unwrap().trim().to_owned()
+    }
+    assert_eq!(
+        text("/sys/class/dmi/id/product_name"),
+        "EXMON-USBMON-FIXTURE"
+    );
+    assert_eq!(text("/sys/class/dmi/id/sys_vendor"), "EXMON-QEMU");
+    assert_eq!(text("/sys/class/block/sda/device/vendor"), "QEMU");
+    let device = fs::canonicalize("/sys/class/block/sda/device").unwrap();
+    let usb = device
+        .ancestors()
+        .find(|p| p.join("busnum").is_file())
+        .unwrap();
+    assert_eq!(
+        text(usb.join("serial").to_str().unwrap()),
+        "EXMON-SYNTHETIC"
+    );
+    let bus: u16 = text(usb.join("busnum").to_str().unwrap()).parse().unwrap();
+    let address: u8 = text(usb.join("devnum").to_str().unwrap()).parse().unwrap();
+    assert_ne!(bus, 0, "never select all-bus capture");
+    let mut adapter = Usbmon::new(native_usbmon::NativeUsbmon::default());
+    assert!(
+        adapter
+            .enumerate(64)
+            .unwrap()
+            .iter()
+            .any(|d| d.id == u64::from(bus))
+    );
+    adapter.open(u64::from(bus)).unwrap();
+    adapter.configure(64).unwrap();
+    assert_eq!(
+        adapter.poll(&Cancellation::default(), 8, 512).err(),
+        Some(Error::InvalidState)
+    );
+    for _ in 0..2 {
+        adapter.start().unwrap();
+        assert_eq!(adapter.take_backend_loss(), Some(None));
+        assert_eq!(adapter.transmit(&[1]), Err(Error::Unsupported));
+        let io = Command::new("timeout")
+            .args([
+                "5",
+                "dd",
+                "if=/dev/sda",
+                "of=/dev/null",
+                "bs=512",
+                "count=1",
+                "iflag=direct",
+            ])
+            .output()
+            .unwrap();
+        assert!(io.status.success(), "synthetic disk read failed");
+        let deadline = Instant::now() + Duration::from_secs(2);
+        let mut found = false;
+        while Instant::now() < deadline {
+            for observation in adapter.poll(&Cancellation::default(), 32, 4096).unwrap() {
+                let Metadata::UsbMon(m) = observation.metadata() else {
+                    panic!("wrong metadata")
+                };
+                assert_eq!(m.bus, bus);
+                if m.device == address
+                    && m.transfer == b'B'
+                    && m.event == b'C'
+                    && m.endpoint & 0x80 != 0
+                    && m.reported_length == 512
+                {
+                    assert_eq!(m.status, Some(0));
+                    assert_eq!(observation.direction(), Direction::Rx);
+                    assert_eq!(observation.original_length(), Some(512));
+                    assert_eq!(observation.bytes(), (0..32).collect::<Vec<u8>>());
+                    assert!(observation.source_timestamp_ns().unwrap() > 0);
+                    found = true;
+                }
+            }
+            if found {
+                break;
+            }
+            std::thread::sleep(Duration::from_millis(2));
+        }
+        assert!(found, "no matching synthetic bulk callback before deadline");
+        let cancel = Cancellation::default();
+        cancel.cancel();
+        assert_eq!(adapter.poll(&cancel, 8, 512).err(), Some(Error::Cancelled));
+        adapter.stop().unwrap();
+        assert_eq!(
+            adapter.poll(&Cancellation::default(), 8, 512).err(),
+            Some(Error::InvalidState)
+        );
+    }
+    adapter.close().unwrap();
+}

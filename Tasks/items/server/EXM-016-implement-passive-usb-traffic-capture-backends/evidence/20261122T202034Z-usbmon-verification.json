@@ -1,0 +1,129 @@
+{
+  "task_id": "EXM-016",
+  "owner": "Codex exmon passive USB development",
+  "verified_at": "2026-11-22T20:20:34Z",
+  "state": "Done after successful publication",
+  "source_base": "9da245154fa0e6e666804b3e41dbd33e17b7c0f6",
+  "candidate_tree": "d5317b8fe978718a5bedc4b9e61e639bfd431bf4",
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "hash_basis": "SHA-256 of verified checkout bytes; candidate_tree identifies staged Git-normalized source before closure records",
+  "files": {
+    "crates/capture/src/usbmon.rs": "964b89404328c66323dc8f390117dcf0a601c120fe50d7a3f93fdc2fff9e1e05",
+    "crates/capture/src/native_usbmon.rs": "1f7e5e11080d6788d1172b40d02c7a7238a4b4df1c99dd956f6c8fe25557c782",
+    "crates/capture/tests/usbmon.rs": "823a97fd2e7ccf0449fdabe741d7ac1f36f0b7c07c7ba4bdaf093f6f44bf8e4c",
+    "crates/domain/src/observation.rs": "3cb6e31a37c6583f7b40ff8d8975e44a0b44065376cff8159d02928e2f831631",
+    "crates/capture/Cargo.toml": "c2610a1f8470161964e57561dc891c9d21cbb091ecfe358897cc58dab1ca526f",
+    "Cargo.lock": "d62dad039ac5a116640f5cd7f39044397b52afd04d2a2eebf5a0d17ad9cddeff",
+    "docs/passive-usb.md": "3a9622dfa0cc111a5736ef77082bff68c22eaf7cc94f98606f8acca6318abadc"
+  },
+  "acceptance": {
+    "AC-01": "PASS: real Linux usbmon 1u source through production Usbmon<NativeUsbmon> Adapter passively captured emulated QEMU USB mass-storage callbacks. Exact first 32 bytes 0..31, reported/original length512, selected nonzero bus, synthetic device address, IN bulk callback, successful status, source timestamp and Rx direction asserted. Two start/read/cancel/stop rounds passed; polling before/after activation InvalidState, cancellation Cancelled, transmit Unsupported, backend loss unknown. Six parser/reader/Session fixtures cover control/interrupt/iso/error, sparse/missing/truncated records, bounds, overflow recovery and unsupported platforms.",
+    "AC-02": "PASS: actual guest missing usbmon subsystem returns Unsupported, then poll InvalidState. After module provisioning unprivileged nobody returns PermissionDenied without reader activation; poll remains InvalidState. Windows Unsupported integration passes, requirements actionable, Windows USBPcap and macOS backend evaluation retained. No active USB fallback or host installation."
+  },
+  "environment": {
+    "host": "Windows x86_64, Rust/Cargo 1.98.0 stable, Node24.22.1; WSL absent",
+    "guest": "Alpine standard3.23.8 x86_64, Linux6.18.60-0-lts",
+    "qemu": "11.1.0 v11.1.0-12130-ge470268ff4, q35 TCG, 2vCPU, 512MiB, no writable guest disk",
+    "isolation": "No guest network, no host drivers/elevation, no hardware passthrough, no repository/home share. Read-only emulated USB disk, read-only ISO and narrow binary-only vvfat drive. Loopback-only serial TCP connection. Module loading/debugfs setup only in disposable guest, outside capture. Guest powered off; no QEMU process remains."
+  },
+  "fixture": {
+    "disk": "1MiB synthetic.raw, byte at offset i is i%256, read-only USB mass-storage",
+    "disk_sha256": "fbbab289f7f94b25736c58be46a994c441fd02552cc6022352e3d86d2fab7c83",
+    "binary_sha256": "4f3b8999c397e98100329e9fc5848546ca439a8df7446b41b5e4e73dedc92004",
+    "guards": "Explicit EXMON_TEST_USBMON=qemu-fixture; exact DMI manufacturer/product EXMON-QEMU/EXMON-USBMON-FIXTURE; fixed sda QEMU vendor and USB synthetic serial EXMON-SYNTHETIC; derive selected bus/address from sysfs before open or I/O. No caller-provided disk path. Generator timeout5s; poll deadline2s per round; full VM watchdog240s.",
+    "qemu_additions": [
+      "-nic none",
+      "-smbios type=1,manufacturer=EXMON-QEMU,product=EXMON-USBMON-FIXTURE",
+      "-device qemu-xhci",
+      "-drive file=<synthetic.raw>,if=none,id=synthetic,format=raw,readonly=on",
+      "-device usb-storage,drive=synthetic,serial=EXMON-SYNTHETIC"
+    ],
+    "base_environment_evidence": "Tasks/items/server/EXM-017-implement-can-capture-and-transmission/evidence/20261122T201237Z-can-verification.json",
+    "iso_sha256": "5d5b4fc2244b25170e915c05141b259fec5350499928eab21c4dd34b24e0dbe4",
+    "qemu_sha512": "5bcf9eed634e8575a37b74f445af41a2fe4106da512d0c30c368301d4c105037fdfab40a5287367a28a957624cddebbc8c07e16c88ab6634f554cdf3d16bf543"
+  },
+  "verification": [
+    {
+      "command": "cargo test -p exmon-capture --features native-usbmon --test usbmon --target x86_64-unknown-linux-musl --locked --no-run",
+      "environment": "Rust LLD at <sysroot>/lib/rustlib/x86_64-pc-windows-msvc/bin/rust-lld.exe; target RUSTFLAGS=-C linker-flavor=ld.lld",
+      "result": "PASS; final static binary SHA matches guest sha256sum"
+    },
+    {
+      "command": "node target/usbmon-vm/run.mjs",
+      "result": "PASS, missing/denied/native/fixture RC=0 and VM_EXIT0. Full exact manual harness attached. Source test run executes two lifecycle rounds."
+    },
+    {
+      "command": "EXMON_TEST_USBMON_PHASE=missing /tmp/usbmon-tests --ignored --exact native_qemu_usbmon_setup_errors_are_explicit --nocapture",
+      "result": "PASS1 before guest module load"
+    },
+    {
+      "command": "modprobe usbmon; su nobody -s /bin/sh -c 'EXMON_TEST_USBMON_PHASE=denied /tmp/usbmon-tests --ignored --exact native_qemu_usbmon_setup_errors_are_explicit --nocapture'",
+      "result": "PASS1; unprivileged guest only"
+    },
+    {
+      "command": "EXMON_TEST_USBMON=qemu-fixture /tmp/usbmon-tests --ignored --exact native_qemu_usbmon_preserves_payload_and_lifecycle --nocapture",
+      "result": "PASS1; exact production source/Adapter assertions, two rounds"
+    },
+    {
+      "command": "/tmp/usbmon-tests --nocapture",
+      "result": "PASS6; native opt-ins ignored2 in this ordinary invocation, executed separately above"
+    },
+    {
+      "command": "cargo test -p exmon-capture -p exmon-domain --locked",
+      "result": "PASS31 capture tests plus6 domain tests and doctests; implemented transport regression set"
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "result": "PASS"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets --locked -- -D warnings",
+      "result": "PASS"
+    },
+    {
+      "command": "cargo clippy -p exmon-capture --features native-usbmon --target x86_64-unknown-linux-gnu --all-targets --locked -- -D warnings",
+      "result": "PASS"
+    },
+    {
+      "command": "node scripts/check-architecture.mjs; git diff --check; git diff --cached --check",
+      "result": "PASS; six layers/resolved graph/three negative graph fixtures"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "Tasks/items/server/EXM-016-implement-passive-usb-traffic-capture-backends/evidence/20261122T202034Z-guest-output.txt",
+      "sha256": "4b422da9540254931d17af296adc87f579e35c6fd1c285639bef3f00b34facac",
+      "description": "Actual guest serial output from uname onward, ANSI controls and CR removed. No raw URB records or real identifiers."
+    },
+    {
+      "path": "Tasks/items/server/EXM-016-implement-passive-usb-traffic-capture-backends/evidence/20261122T202034Z-manual-harness.txt",
+      "sha256": "c03ec079bc5e6dcd4165aeb60278782a43cf38243ccb3811fa57eb39e5ab384a",
+      "description": "Exact one-off manual VM orchestration snapshot; not a canonical automated gate."
+    },
+    {
+      "path": "ignored target/usbmon-vm/serial.log",
+      "sha256": "4b197cd0ed116189ef571da22451af94001969d827e8a600a35c3ad380e0336c",
+      "description": "Raw source of normalized attached output"
+    }
+  ],
+  "review": "Author reviewed exact new native tests/docs/staged diff, existing passive source/read-only fixed-path open, parser bounds and Adapter lifecycle. No production source/API/schema/dependency changes this turn. Explicit fixture identity gates precede synthetic disk I/O; source has no active USB operation. Nonblocking bounded Reader and unknown loss preserved. No GUI change or new visual acceptance.",
+  "failures_and_recovery": [
+    "Readiness push rejected because allocator published unrelated EXM-017 version9e77f80 concurrently. Fetched and verified only version files changed, EXM-016 owner/scope unchanged. Rebased only unpublished own resume event, pushed9da2451 before implementation. No lost competing claim replayed or published history rewritten.",
+    "First native candidate without generator timeout passed all three native phases. Added5s timeout to guard fixture I/O; rebuilt final binary and reran affected actual guest phases and source checks. Final binary passed; no functional failing test or unexplained flaky acceptance."
+  ],
+  "limitations": [
+    "Physical USB/electrical/controller behavior unqualified; no physical device opened, captured or transmitted.",
+    "Deprecated usbmon1u text only; no binary/ioctl/mmap, backend loss total unknown. Only32 printed bytes of synthetic512 transfer captured, not a full payload claim.",
+    "Windows USBPcap/macOS passive sources evaluated and explicitly Unsupported, not implemented.",
+    "Native runtime covers emulated bulk/Linux source; control/interrupt/iso preservation independently exercised by parser fixtures, no claim of native physical runtime coverage for those transfers.",
+    "No Epic gate/review or release qualification claimed."
+  ],
+  "cleanup": "No binaries/images/generated build outputs/private captures/credentials staged. Ignored target/can-vm environment and target/usbmon-vm fixture cache retained for native development; VM powered off and serial listener closed. Unrelated .idea preserved. Accepted history unchanged.",
+  "checkpoint": {
+    "goal": "active, previous turn and current turn concrete progress, all-tasks objective unchanged",
+    "task": "EXM-016 first verified Done; publish immediately",
+    "next_action": "Fresh turn fetch main, verify EXM-016 closure and allocation. Revalidate own EXM-008 Ethernet records/rules, publish resumed readiness and qualify Linux libpcap capture/stop under synthetic guest traffic. Existing Windows Npcap and macOS platform requirements remain explicit; do not claim their checks passed or start dependent Epic002/EXM-043.",
+    "authority": "Only isolated virtual guest fixture work authorized; no host drivers/elevation or physical capture/TX.",
+    "owner_action": "None required for next safe Linux qualification work."
+  }
+}

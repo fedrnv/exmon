@@ -1,0 +1,11 @@
+{
+  "schema": "fdtasks-version-request/v1",
+  "request_id": "EXM-016-20261122T202034Z-native-usbmon-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-016",
+  "summary": "Verified passive Linux usbmon metadata and payload on emulated USB with explicit unavailable and permission errors",
+  "verification": [
+    "Tasks/items/server/EXM-016-implement-passive-usb-traffic-capture-backends/evidence/20261122T202034Z-usbmon-verification.json"
+  ]
+}

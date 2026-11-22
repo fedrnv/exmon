@@ -1,0 +1,29 @@
+import {spawn} from 'node:child_process';
+import net from 'node:net';
+import fs from 'node:fs';
+const root='C:/GitHub/exmon/target/can-vm'; const fixture='C:/GitHub/exmon/target/usbmon-vm';
+const serial=net.createServer();
+await new Promise(r=>serial.listen(0,'127.0.0.1',r));
+const port=serial.address().port;
+await new Promise(r=>serial.close(r));
+const args=['-machine','q35,accel=tcg','-smp','2','-m','512','-display','none','-serial',`tcp:127.0.0.1:${port},server=on,wait=on`,'-monitor','none','-no-reboot','-kernel',`${root}/alpine-standard/boot/vmlinuz-lts`,'-initrd',`${root}/alpine-standard/boot/initramfs-lts`,'-append','console=ttyS0 alpine_dev=cdrom modules=loop,squashfs,sd-mod,usb-storage quiet','-cdrom',`${root}/downloads/alpine-standard.iso`,'-nic','none','-smbios','type=1,manufacturer=EXMON-QEMU,product=EXMON-USBMON-FIXTURE','-device','qemu-xhci','-drive',"file=C:/GitHub/exmon/target/usbmon-vm/synthetic.raw,if=none,id=synthetic,format=raw,readonly=on",'-device','usb-storage,drive=synthetic,serial=EXMON-SYNTHETIC','-drive',`file=fat:ro:${fixture}/share,format=raw,if=virtio,readonly=on`];
+const log=fs.createWriteStream(`${fixture}/serial.log`);
+const child=spawn(`${root}/qemu/qemu-system-x86_64.exe`,args,{windowsHide:true,stdio:['ignore','pipe','pipe']});
+child.stdout.pipe(process.stdout);child.stderr.pipe(process.stderr);
+let socket, transcript='', stage=0;
+const timeout=setTimeout(()=>{console.error('VM watchdog expired');socket?.destroy();child.kill();process.exitCode=1;},240000);
+child.on('exit',(code)=>{clearTimeout(timeout);socket?.destroy();log.end();console.log('VM_EXIT',code);process.exitCode=code===0&&transcript.includes('EXMON_NATIVE_RC=0')&&transcript.includes('EXMON_FIXTURE_RC=0')&&transcript.includes('EXMON_DENIED_RC=0')&&transcript.includes('EXMON_MISSING_RC=0')?0:1;});
+for(let attempt=0;attempt<100;attempt++){
+  socket=await new Promise(r=>{const s=net.connect(port,'127.0.0.1');s.once('connect',()=>r(s));s.once('error',()=>{s.destroy();r(null);});});
+  if(socket)break;
+  await new Promise(r=>setTimeout(r,100));
+}
+if(!socket){child.kill();throw new Error('Serial connection failed');}
+socket.on('data',data=>{
+ log.write(data);process.stdout.write(data);transcript+=data.toString();
+ if(stage===0&&transcript.includes('login: ')){stage=1;socket.write('root\n');}
+ if(stage===1&&transcript.includes('localhost:~# ')){
+  stage=2;
+  socket.write("stty -echo; trap \u0027poweroff\u0027 EXIT; set -e; uname -a; mkdir /test; mount -o ro /dev/vda1 /test; cp /test/usbmon-tests /tmp/usbmon-tests; chmod 755 /tmp/usbmon-tests; sha256sum /tmp/usbmon-tests; EXMON_TEST_USBMON_PHASE=missing /tmp/usbmon-tests --ignored --exact native_qemu_usbmon_setup_errors_are_explicit --nocapture; echo EXMON_MISSING_RC=0; modprobe usbmon; ls /sys/kernel/debug/usb/usbmon; su nobody -s /bin/sh -c \"EXMON_TEST_USBMON_PHASE=denied /tmp/usbmon-tests --ignored --exact native_qemu_usbmon_setup_errors_are_explicit --nocapture\"; echo EXMON_DENIED_RC=0; EXMON_TEST_USBMON=qemu-fixture /tmp/usbmon-tests --ignored --exact native_qemu_usbmon_preserves_payload_and_lifecycle --nocapture; echo EXMON_NATIVE_RC=0; /tmp/usbmon-tests --nocapture; echo EXMON_FIXTURE_RC=0; poweroff\n");
+ }
+});

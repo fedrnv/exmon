@@ -83,8 +83,59 @@ and explicit Unsupported on the current Windows host. Native Linux code is
 compile-checked through `cargo check -p exmon-capture --features native-usbmon
 --target x86_64-unknown-linux-gnu --locked`.
 
-No Linux usbmon live source is available on this Windows host and no physical
-USB capture has been authorized or run. EXM-016 remains In Progress until Linux
-live acceptance verifies host metadata and bytes against approved synthetic
-traffic, startup/stop, permission failure, text-format behavior and loss limits.
-No physical or native runtime PASS is inferred from fixtures or compilation.
+Native Linux acceptance passed in portable QEMU 11.1.0 with software-only TCG,
+Alpine standard 3.23.8 and Linux 6.18.60-0-lts. A read-only, emulated USB mass
+storage disk supplied a known repeating 0..255 byte pattern. The production
+`Usbmon<NativeUsbmon>` captured its bulk callbacks with matching bus/device,
+endpoint direction, successful status, source timestamp and exact 32 printed
+payload bytes from a reported 512-byte transfer. The text facility's short
+capture is preserved; the missing 480 bytes are never fabricated. Two start/read/
+cancel/stop rounds passed, RX-only transmit refusal stayed explicit, and backend
+loss remained unknown. Missing usbmon setup returned Unsupported; an unprivileged
+guest reader received PermissionDenied. These are native Linux runtime results
+on emulated USB, without physical device qualification.
+
+The opt-in tests are deliberately ignored during ordinary test runs:
+
+```text
+cargo test -p exmon-capture --features native-usbmon --test usbmon --locked native_qemu_usbmon_preserves_payload_and_lifecycle -- --ignored --exact --nocapture
+```
+
+Use only an isolated guest with no physical passthrough. The test requires
+`EXMON_TEST_USBMON=qemu-fixture`, exact guest DMI fixture identities, the fixed
+`sda` QEMU vendor and synthetic USB serial. It derives a nonzero selected bus
+from that device's sysfs ancestry before activating capture. It never accepts an
+arbitrary device path. The synthetic I/O generator is separate from the passive
+source: a five-second bounded `dd` reads one sector into `/dev/null` after the
+fixture checks. Capture itself still performs no active USB operation.
+
+For reproduction, reuse the manual Alpine standard boot recipe in
+[CAN verification](can.md), with networking disabled and these QEMU additions:
+
+```text
+-smbios type=1,manufacturer=EXMON-QEMU,product=EXMON-USBMON-FIXTURE
+-device qemu-xhci
+-drive file=<synthetic.raw>,if=none,id=synthetic,format=raw,readonly=on
+-device usb-storage,drive=synthetic,serial=EXMON-SYNTHETIC
+```
+
+Create `synthetic.raw` as exactly 1 MiB with byte `i % 256` at offset `i`.
+Share only the test executable on the narrow read-only artifact drive, copy it
+into `/tmp/usbmon-tests` in the guest and set mode 755. Static musl cross-linking
+uses the CAN recipe with feature `native-usbmon` and test `usbmon`. After boot,
+debugfs is mounted by Alpine's startup; run these manual phases:
+
+```sh
+EXMON_TEST_USBMON_PHASE=missing /tmp/usbmon-tests --ignored --exact native_qemu_usbmon_setup_errors_are_explicit --nocapture
+modprobe usbmon
+su nobody -s /bin/sh -c 'EXMON_TEST_USBMON_PHASE=denied /tmp/usbmon-tests --ignored --exact native_qemu_usbmon_setup_errors_are_explicit --nocapture'
+EXMON_TEST_USBMON=qemu-fixture /tmp/usbmon-tests --ignored --exact native_qemu_usbmon_preserves_payload_and_lifecycle --nocapture
+/tmp/usbmon-tests --nocapture
+poweroff
+```
+
+The missing phase must precede module loading; denied runs as an unprivileged
+guest account. Do not change host permissions or install host drivers. These
+fixtures do not qualify physical USB, other Linux configurations, binary usbmon,
+USBPcap or a macOS passive backend. Exact runtime/source/tool hashes and outcomes
+are recorded in immutable EXM-016 evidence; no raw URB identifiers are committed.

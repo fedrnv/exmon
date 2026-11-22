@@ -1,0 +1,48 @@
+Linux localhost 6.18.60-0-lts #1-Alpine SMP PREEMPT_DYNAMIC 2026-11-01 07:52:36 x86_64 Linux
+4f3b8999c397e98100329e9fc5848546ca439a8df7446b41b5e4e73dedc92004  /tmp/usbmon-tests
+
+running 1 test
+test native_qemu_usbmon_setup_errors_are_explicit ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.02s
+
+EXMON_MISSING_RC=0
+0s  0u  1s  1t  1u  2s  2t  2u
+
+running 1 test
+test native_qemu_usbmon_setup_errors_are_explicit ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.02s
+
+EXMON_DENIED_RC=0
+
+running 1 test
+test native_qemu_usbmon_preserves_payload_and_lifecycle ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.10s
+
+EXMON_NATIVE_RC=0
+
+running 8 tests
+test bulk_interrupt_control_and_iso_preserve_metadata_and_bytes ... ok
+test incomplete_data_and_invalid_records_are_explicit ... ok
+test common_session_preserves_passive_direction_limits_and_cancellation ... ok
+test native_qemu_usbmon_preserves_payload_and_lifecycle ... ignored, requires the isolated EXMON QEMU USB fixture; never physical USB
+test native_qemu_usbmon_setup_errors_are_explicit ... ignored, requires explicitly prepared isolated QEMU missing/denied setup phase
+test incremental_nonblocking_reader_preserves_lines_and_reports_truncated_eof ... ok
+test unsupported_hosts_cannot_fall_back_to_active_usb ... ok
+test oversized_line_is_rejected_and_following_record_recovers ... ok
+
+test result: ok. 6 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.22s
+
+EXMON_FIXTURE_RC=0
+localhost:~#  * Stopping busybox syslog ... [ ok ]
+ * Unmounting loop devices
+ *   Remounting /.modloop read only ... [ ok ]
+ * Unmounting filesystems
+ *   Unmounting /test ... [ ok ]
+ *   Unmounting /media/cdrom ... [ ok ]
+ * Setting hardware clock using the system clock [UTC] ... [ ok ]
+ * Stopping busybox mdev ... [ ok ]
+ [ ok ]
+ * Terminating remaining processes ...[   30.468046] reboot: Power down
