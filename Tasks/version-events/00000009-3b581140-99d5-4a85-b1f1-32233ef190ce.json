@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 9,
+  "version": "0.1.0.9",
+  "request_id": "3b581140-99d5-4a85-b1f1-32233ef190ce",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-013",
+  "summary": "Implemented serial RX/TX and RS-4xx capability handling with verified virtual prototype",
+  "verification": [
+    "Tasks/items/server/EXM-013-implement-serial-and-rs-485-support/evidence/20261122T181440Z-serial-verification.json"
+  ],
+  "request_file": "Tasks/version-requests/20261122-EXM-013-serial.json",
+  "request_sha256": "dcca5ffa4ee2ce64b07aa50274ebb8fdda924bc27bf1e9b4a7ca9962af00c1b6"
+}
