@@ -62,9 +62,13 @@ pub enum Metadata {
     },
     UsbMon(UsbMonMetadata),
     Can {
+        channel: u32,
         id: u32,
         extended: bool,
         fd: bool,
+        remote: bool,
+        error: bool,
+        dlc: u8,
     },
 }
 impl Metadata {
@@ -136,9 +140,30 @@ impl Observation {
             Metadata::Usb { endpoint, .. } if endpoint & 0x70 != 0 => {
                 return Err("invalid USB endpoint");
             }
-            Metadata::Can { id, extended, fd }
-                if *id > (if *extended { 0x1fff_ffff } else { 0x7ff })
-                    || bytes.len() > (if *fd { 64 } else { 8 }) =>
+            Metadata::Can {
+                id,
+                extended,
+                fd,
+                remote,
+                error,
+                dlc,
+                ..
+            } if *id
+                > (if *extended || *error {
+                    0x1fff_ffff
+                } else {
+                    0x7ff
+                })
+                || (*remote && (*fd || *error || !bytes.is_empty()))
+                || *dlc > 15
+                || bytes.len()
+                    > (if *fd {
+                        64
+                    } else if *remote {
+                        0
+                    } else {
+                        usize::from((*dlc).min(8))
+                    }) =>
             {
                 return Err("invalid CAN identifier or data length");
             }
@@ -170,9 +195,13 @@ mod tests {
     #[test]
     fn bounds_metadata_and_privacy() {
         let meta = Metadata::Can {
+            channel: 1,
             id: 0x123,
             extended: false,
             fd: false,
+            remote: false,
+            error: false,
+            dlc: 8,
         };
         assert!(Observation::new(1, Direction::Rx, meta.clone(), Some(1), &[1, 2]).is_err());
         assert!(Observation::new(1, Direction::Rx, meta.clone(), None, &[0; 9]).is_err());

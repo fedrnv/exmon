@@ -1,0 +1,65 @@
+{
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "reviewer":  "Codex exmon CAN development (author source and actual staged diff review)",
+    "blocker":  "Actual SocketCAN/vcan integration cannot run on this Windows host; WSL query confirms no installed Linux subsystem",
+    "task_id":  "EXM-017",
+    "source_base":  "3a195b7becf698651a2fa3d9522e15c04108c1cc",
+    "files":  {
+                  "crates/capture/src/can.rs":  "86c502734715b894f1aba8dbba48e9c90878d092431c3342bd3b05158a1e9293",
+                  "docs/can.md":  "d056facb00ab8d0e9ce8f05ae3c2cb42cd4c1a7c14c3cf4d109278476bf2aac8",
+                  "crates/capture/src/virtual_can.rs":  "d1ed0f063ebf8fc1384f773bda42a737e97eb0332a5df255dcd619f524968063",
+                  "crates/domain/src/observation.rs":  "3cb6e31a37c6583f7b40ff8d8975e44a0b44065376cff8159d02928e2f831631",
+                  "crates/capture/tests/can.rs":  "50873a91bfc98b07161073688642f77288c514b17d87728381e2ce2f544222ad",
+                  "crates/capture/Cargo.toml":  "c2610a1f8470161964e57561dc891c9d21cbb091ecfe358897cc58dab1ca526f",
+                  "Cargo.lock":  "ffa0c18ed0d0f7b05410d349eb67e61b4c1cc33be5859a4f1c88716c71e793e2",
+                  "crates/capture/src/native_can.rs":  "c634e6ab3d265b2f5991b6ef592b242aa6f62f5277c4adf2ad26c7ea720ef03c",
+                  "crates/capture/src/lib.rs":  "2e74747759f82b191f536b1d4a39a7aeedd6574738a6d820c470c1dc87c8bcef"
+              },
+    "outcomes":  {
+                     "AC-02":  "PASS locally: current Windows native source discovery/activate/send Unsupported with explicit setup requirements; denied activation fails without poll/send. Linux maps missing link/protocol/access/queue busy explicitly, never changes link/driver or retries. Native failure-path runtime remains unavailable.",
+                     "AC-01":  "PARTIAL: 5 integration tests verify production controller via in-process bounded virtual CAN endpoints: exact RX/TX, standard/extended/RTR filters and empty filters, DLC15, source time, error records, Session snapshots/loss, cancellation, stop/reconnect and failed send revocation. Actual Linux SocketCAN vcan integration test authored and cross-compiled, not executed."
+                 },
+    "cleanup":  "No raw device identifiers/captures or generated artifacts staged; target/.idea preserved; no active capture or command sessions",
+    "limitations":  [
+                        "Actual Linux vcan runtime UNAVAILABLE; cross-compile and in-process virtual exchange are not native runtime acceptance.",
+                        "Physical CAN controller ACK, electrical behavior, driver timing, listen-only and delivery not qualified.",
+                        "CAN FD, BRS/ESI and vendor Windows/macOS sources explicitly unimplemented; Mode::Fd Unsupported.",
+                        "Native socket receive direction Unknown and backend loss unknown; no fabricated Rx provenance or zero-loss claim.",
+                        "TX caller must enforce current explicit user/epoch authority in a serialized worker; this transport does not implement app command/scheduler tasks.",
+                        "EXM-008/014/016 blockers preserved; no physical capture/TX or driver/install/elevation performed."
+                    ],
+    "candidate_tree":  "bf88c2fa665b571c3f797a29edc632ba018fe1c6",
+    "state":  "In Progress; native vcan acceptance unavailable",
+    "owner_action":  "Provide an externally prepared Linux host with iproute2 and an up approved vcan link. Set EXMON_TEST_VCAN and run the exact opt-in command from docs/can.md; record native RX/TX/filter evidence. No physical stand is needed for this acceptance.",
+    "review_details":  "Validated private frame construction, all identifier flags and DLC/data bounds, remote empty payload and error RX-only, finite polling even empty/rejected frames, source/backend queue loss separation, safe native read/write and timestamp conversion, no unsafe repository code. Native mode uses selected nonzero CAN ifindex, no all-interface binding, nonblocking sockets and no setup privileges. Native receive direction Unknown because safe API omits loopback provenance flags. Typed send fault stops source. Native test checks iproute2 info_kind vcan before socket/TX; never physical. Only 8 new required dependency packages; unrelated pinned versions preserved.",
+    "development_failures":  [
+                                 "After dev-dependency addition locked test initially refused stale lockfile. Offline fetch could not fetch uncached irrelevant GNU Windows dependency. Offline lock regeneration changed unrelated WASM versions; discarded only owned lock edit, then targeted Linux fetch preserved existing versions and resolved new dependencies. Final lock diff reviewed.",
+                                 "Test initially accessed nonexistent HealthSnapshot field; corrected to count(Counter::BackendLoss).",
+                                 "Reconnect test requested snapshot8 with batch_bytes4 and correctly failed InvalidConfig; changed test reconfiguration to snapshot2, preserving resource limits and explicit reconfigure assertion."
+                             ],
+    "hash_basis":  "SHA-256 of verified checkout bytes; candidate_tree identifies Git-normalized staged source before evidence",
+    "checkpoint":  {
+                       "next_action":  "Fresh turn: fetch main and verify EXM-017 published progress. Preserve EXM-008/014/016/017 acceptance checkpoints. EXM-018/019 depend on unclosed network work; select dependency-ready EXM-025 main egui shell after reading full rules/task/events/evidence and publish claim before implementation.",
+                       "evidence_identity":  "Source hashes and candidate_tree in this immutable manifest",
+                       "task":  "EXM-017",
+                       "resources":  "Global goal active; safe ready UI work remains. No physical I/O authority expanded. Current Windows host has no Linux/WSL runtime.",
+                       "state":  "Published own claim retained In Progress, no Done/version request"
+                   },
+    "sources":  [
+                    "https://docs.kernel.org/networking/can.html",
+                    "https://docs.rs/socketcan/4.0.0/socketcan/",
+                    "Local downloaded socketcan 4.0.0 and libc 0.2.189 source inspected for safe frame conversion, len8_dlc and timestamp/read/write semantics"
+                ],
+    "commands":  [
+                     "cargo test -p exmon-capture --test can --locked: PASS (5 tests)",
+                     "cargo test -p exmon-capture --locked: PASS (1 unit + 28 integration tests)",
+                     "cargo test -p exmon-domain --locked: PASS (6 tests)",
+                     "cargo fmt --all -- --check: PASS",
+                     "cargo clippy --workspace --all-targets --locked -- -D warnings: PASS",
+                     "cargo clippy -p exmon-capture --features native-can --target x86_64-unknown-linux-gnu --all-targets --locked -- -D warnings: PASS (native code and opt-in test compile only)",
+                     "node scripts/check-architecture.mjs: PASS",
+                     "git diff --cached --check: PASS",
+                     "wsl --list --quiet: UNAVAILABLE; Windows Subsystem for Linux not installed"
+                 ],
+    "environment":  "Windows x64; Rust/Cargo 1.98.0; socketcan 4.0.0 safe API; Linux GNU target compile/lint; WSL not installed"
+}
