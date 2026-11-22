@@ -1,0 +1,55 @@
+{
+    "source_base":  "bdb72dfaa3643fa434e76182fdbb6f5227170a1c",
+    "candidate_tree":  "3456091239b7b7fbdb07b8e3d8ae0ee857a86ec6",
+    "checkpoint":  {
+                       "next_action":  "Fresh turn: fetch main, verify EXM-002 closure, read EXM-003 and its events/evidence, validate dependency readiness and publish claim before versioned configuration implementation",
+                       "evidence_identity":  "This immutable manifest binds all changed source files by SHA-256",
+                       "task":  "EXM-002",
+                       "resources":  "No running build/test sessions; reusable target cache; owner authorizes main commits and pushes; no external blockers",
+                       "state":  "Verified Done upon publication"
+                   },
+    "commands":  [
+                     "cargo build --workspace: PASS",
+                     "cargo build --workspace --locked: PASS",
+                     "cargo test --workspace --locked: PASS (3 passed, 0 failures)",
+                     "cargo fmt --all -- --check: PASS",
+                     "cargo clippy --workspace --all-targets --locked -- -D warnings: PASS",
+                     "node scripts/check-architecture.mjs: PASS",
+                     "git diff --cached --check: PASS",
+                     "git check-ignore target/example .idea/example scratch.pcap scratch.pcapng: PASS"
+                 ],
+    "reviewer":  "Codex exmon workspace development (author diff review)",
+    "environment":  "Windows; rustc 1.98.0; cargo 1.98.0; Node 24.22.1",
+    "limitations":  [
+                        "No native executable/UI or adapters in this workspace initialization task; no hardware/native UI verification",
+                        "Cargo baseline package version is internal metadata, not a canonical FDTasks allocation",
+                        "Native/local version publisher remains unqualified per adoption boundary; publish first-closure request for accepted allocator"
+                    ],
+    "files":  {
+                  "crates/capture/Cargo.toml":  "a530e915ba06204bcf5647c466d71c543fb555db5ee55f2eda53f4907bca3896",
+                  "crates/storage/Cargo.toml":  "5af41c59927fa83e50f72075a418e144402684e8d4e54cb3ae347d8d3b2db8ab",
+                  ".gitignore":  "3ec9cd772454bea0ad08f04e57769715a8079c75ab3028e7ccfb299e5cdd69c6",
+                  "scripts/check-architecture.mjs":  "3f1dbeb19df1b0b8a23eb03cdc2cbb74f407831a91ea23b5e0e8087b91a541cc",
+                  "crates/app/src/lib.rs":  "bae979e4914bb47169e557fecbec3aba07d1a53ef7cc011f8755be1a5e40fdcd",
+                  "crates/domain/src/lib.rs":  "b72812d2de6623c533121b97fd50764ea2115bfe9a5f8b6970701030682e0b36",
+                  "crates/domain/Cargo.toml":  "4bdc89c0d8339238c4a2d270f59dd764403759b90d32446660f2cd0c52fd9692",
+                  "crates/storage/src/lib.rs":  "8640745cebbbe0c6b56b1d6d2717fcc81b041e88289f2ba604cc0566a31944d2",
+                  "crates/protocol/src/lib.rs":  "64564a7113ab1e3d049b2faca91ccf49153b59c9a1019dec100bf9f91ffdae1e",
+                  "Cargo.lock":  "72017aca0705a671d918e4425d447b9d3bb62b2b7d6d3d32c3494577858d4927",
+                  "crates/capture/src/lib.rs":  "765c3a5ebe07e5777aca7d0fe774cbb044fb81cbcb95204eb4b39bcb9a69486d",
+                  "crates/app/Cargo.toml":  "544af13f8227d899b6a4b1c6792cfdcfeed066e540afea1891619f00791751b0",
+                  "README.md":  "9c7b92da2f4beb06b350ac06f481d2ce25426af703eed800dbda831224fd80fb",
+                  "crates/gui/src/lib.rs":  "52d02866f8ece48752b7a0a0db8f4ece9b10e9e7da6f53099e28da172bf0f438",
+                  "crates/gui/Cargo.toml":  "343c6fb104c77583290fad4de5199078637b130104207c6721eff6f4b8fc6be0",
+                  "rust-toolchain.toml":  "7458b2d74495e6fb1c1edeea4d5a793705476431dadb60627187111f91441e13",
+                  "Cargo.toml":  "3315a09769122add333b9dd82a5b2443000b94971bc9be3309074243a73cd37e",
+                  "crates/protocol/Cargo.toml":  "eed25e0ee3efcc6e746549fb9484db4bb12ff0ffb8b0ac35f827a9e64d5e7003"
+              },
+    "outcomes":  {
+                     "AC-02":  "PASS: resolved Cargo graph valid; two forbidden direct edges and transitive GUI edge rejected",
+                     "AC-01":  "PASS: all six libraries build, three unit tests pass, all doc-test targets pass"
+                 },
+    "task_id":  "EXM-002",
+    "cleanup":  "Build cache ignored, no generated build files staged; unrelated .idea preserved",
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8"
+}

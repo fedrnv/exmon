@@ -1,0 +1,16 @@
+[package]
+name = "exmon-app"
+version.workspace = true
+edition.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+exmon-domain.workspace = true
+exmon-capture.workspace = true
+exmon-protocol.workspace = true
+exmon-storage.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true

@@ -22,4 +22,27 @@ The accepted starting architecture is Rust with `egui/eframe`. Platform capture 
 
 ## Status
 
-Planning initialized. Implementation has not started.
+The domain contract is documented in [docs/domain-model.md](docs/domain-model.md).
+The six-layer Rust workspace is initialized; transport and GUI functionality
+will be implemented in subsequent tasks. No physical adapter support is claimed.
+
+## Local development
+
+Install stable Rust with rustfmt and Clippy, plus Node.js for the architecture
+check. Run from the repository root:
+
+```text
+cargo build --workspace --locked
+cargo test --workspace --locked
+cargo fmt --all -- --check
+cargo clippy --workspace --all-targets --locked -- -D warnings
+node scripts/check-architecture.mjs
+```
+
+Dependencies point inward: GUI -> application -> capture/protocol/storage ->
+domain. Capture, protocol and storage cannot depend on each other or on the GUI.
+All crates inherit workspace lints. Cargo.lock is committed for reproducibility;
+target directories, local IDE files and sensitive capture files are ignored.
+Synthetic fixtures requiring capture file extensions must be explicitly reviewed
+before adding them. The GUI crate is a library boundary at this stage; the native
+egui/eframe entry point and screens belong to subsequent GUI tasks.
