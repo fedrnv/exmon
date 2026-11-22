@@ -2,6 +2,9 @@
 
 pub mod adapter;
 pub mod ethernet;
+pub mod hid;
+#[cfg(feature = "native-hid")]
+pub mod native_hid;
 #[cfg(feature = "native-pcap")]
 pub mod native_pcap;
 pub mod native_serial;

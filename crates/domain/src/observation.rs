@@ -33,6 +33,13 @@ pub enum Metadata {
         endpoint: u8,
         completed: bool,
     },
+    Hid {
+        vendor_id: u16,
+        product_id: u16,
+        usage_page: u16,
+        usage: u16,
+        report_id: u8,
+    },
     Can {
         id: u32,
         extended: bool,
@@ -46,7 +53,7 @@ impl Metadata {
             Self::Tcp { .. } => TransportKind::Tcp,
             Self::Udp { .. } => TransportKind::Udp,
             Self::Serial { .. } => TransportKind::Serial,
-            Self::Usb { .. } => TransportKind::Usb,
+            Self::Usb { .. } | Self::Hid { .. } => TransportKind::Usb,
             Self::Can { .. } => TransportKind::Can,
         }
     }

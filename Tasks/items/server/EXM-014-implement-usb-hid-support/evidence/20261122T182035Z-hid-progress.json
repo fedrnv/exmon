@@ -1,0 +1,61 @@
+{
+    "blocker":  "AC-01 approved physical-device fidelity unavailable; AC-02 actual GUI interaction tests unavailable until GUI implementation. These are explicit incomplete acceptance boundaries, not passing tests.",
+    "owner_action":  "For physical qualification provide an approved test HID collection, explicit permission for selected device read/write, known report descriptor and expected synthetic reports; run selection tests once GUI exists.",
+    "source_base":  "f2fd79013508bab0c543d463239b6cbccae33531",
+    "checkpoint":  {
+                       "next_action":  "Fresh turn: fetch main; preserve EXM-008 and EXM-014 checkpoints. Inspect dependency-ready server EXM-015 USB Bulk/Interrupt full records and rules, then publish readiness/claim before implementation. Resume HID acceptance when approved physical device and GUI tests are available.",
+                       "evidence_identity":  "Exact changed-source hashes in this immutable manifest",
+                       "task":  "EXM-014",
+                       "resources":  "Global goal active: safe dependency-ready prototype work remains; no physical I/O authorization expanded",
+                       "state":  "Own claim retained In Progress pending physical/UI acceptance"
+                   },
+    "outcomes":  {
+                     "AC-02":  "PARTIAL: production adapter tested against two mock device entries; construction/discovery/logical selection do not open or send; only exact selected index opens. Native source uses exact path and checks selected identity before/after handle open. Actual UI not implemented/tested yet.",
+                     "AC-01":  "PARTIAL: mock report fidelity verified for numbered and unnumbered input/output with VID/PID/usage/report-id/direction. Approved physical-device test unavailable, so criterion not fully satisfied."
+                 },
+    "commands":  [
+                     "cargo test -p exmon-capture --locked: PASS (13 integration tests: adapter 4, Ethernet 3, HID 3, serial 3)",
+                     "cargo test -p exmon-domain --locked: PASS (6 tests)",
+                     "cargo test -p exmon-capture --features native-hid --test hid --locked: PASS (3 mock tests linked with native feature; no hardware opened)",
+                     "cargo check -p exmon-capture --features native-hid --locked: PASS (Windows)",
+                     "cargo check -p exmon-capture --features native-hid --target x86_64-unknown-linux-gnu --locked: PASS",
+                     "cargo fmt --all -- --check: PASS",
+                     "cargo clippy --workspace --all-targets --locked -- -D warnings: PASS",
+                     "cargo clippy -p exmon-capture --features native-hid --all-targets --locked -- -D warnings: PASS",
+                     "node scripts/check-architecture.mjs: PASS",
+                     "git diff --cached --check: PASS"
+                 ],
+    "reviewer":  "Codex exmon HID development (author source/diff review)",
+    "candidate_tree":  "89cbfac43580f99f149114d58a186f7fd6c04f06",
+    "limitations":  [
+                        "No approved physical HID device or explicit device open/TX authorization available; no physical handle opened or output report sent",
+                        "UI selection acceptance awaits actual GUI integration/tests; no UI claim inferred from mock adapter results",
+                        "Native write cancellation/timeout is platform-dependent; inspected Windows upstream uses 1000ms overlapped wait and may return zero on synchronous completion; no silent retry or hard real-time claim",
+                        "Original report wire length remains unknown; configured read buffer must fit approved device report descriptor, actual fidelity requires hardware qualification",
+                        "Metadata identity checks are consistency checks, not device authentication; paths/serials never committed",
+                        "EXM-008 platform-smoke blocker unchanged"
+                    ],
+    "cleanup":  "No device identifiers/captures or generated build outputs staged; ignored target/.idea preserved; no running sessions",
+    "state":  "In Progress; not Done",
+    "files":  {
+                  "docs/hid-capture.md":  "2cc69a4723dcc9f091327ab809982bcf0c02b67e067783a87dd737ef7ef0bc39",
+                  "crates/capture/src/hid.rs":  "c8a6f8a65db918d439fbdb4ee3eaf893dca3cef0ef6f9736af2ae0ae51a7bb54",
+                  "crates/capture/src/native_hid.rs":  "efff369df6a99e9220acbfd11ffd1ec66e9594b3c45dc7457dad5becffb941df",
+                  "crates/capture/Cargo.toml":  "684fb82680b5e43b8f82a9a3cc50821f9ce0047cb7311ef694936726b4586214",
+                  "crates/domain/src/observation.rs":  "c411e811a8010d4ee6ba54b4e0b2f701801b1f20b531a02e15386c1dc5c334ff",
+                  "Cargo.lock":  "e4f3969332fd062c60d510aa68880868a733eb9ebdc9484c05783d5d8527f1c5",
+                  "crates/capture/tests/hid.rs":  "e5c00879640eb37cc9f2515836f4ca5f8cab9ab5be258cdfbe2fda85de84b73b",
+                  "crates/capture/src/lib.rs":  "1b715af9cc7f56cfbd5f73fd3b895e15183f9ba27a322d0e4ae2c6244b5b854f"
+              },
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "task_id":  "EXM-014",
+    "development_failures":  [
+                                 "Initial native compile used equality on upstream BusType lacking PartialEq; replaced with matches! and compile passed.",
+                                 "Initial Clippy found needless vec allocation in oversized-report test; replaced with fixed array retaining same negative assertion. Final lint passed."
+                             ],
+    "sources":  [
+                    "https://docs.rs/hidapi/2.6.7/hidapi/",
+                    "https://docs.rs/hidapi/2.6.7/hidapi/struct.HidDevice.html"
+                ],
+    "environment":  "Windows x64; Rust/Cargo 1.98.0; Linux GNU cross-target compile; hidapi 2.6.7; bounded synthetic two-device mock only"
+}
