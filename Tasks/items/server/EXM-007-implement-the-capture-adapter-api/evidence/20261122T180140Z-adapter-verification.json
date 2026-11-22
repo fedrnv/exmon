@@ -1,0 +1,44 @@
+{
+    "checkpoint":  {
+                       "next_action":  "Fresh turn: fetch main, verify EXM-007 closure; read server EXM-008 Ethernet discovery/raw capture and all events/evidence/dependencies; evaluate development-host capture backend availability, publish readiness/claim before implementation",
+                       "evidence_identity":  "Exact changed-source SHA-256 values in this immutable manifest",
+                       "task":  "EXM-007",
+                       "resources":  "No external blocker to API work; no physical TX performed; normal main publication authority active",
+                       "state":  "Verified Done upon publication"
+                   },
+    "outcomes":  {
+                     "AC-02":  "PASS: 100 polls generate 200 observations; 8-byte queue retains two 3-byte records, measures 198 application drops, 100 unknown backend-loss reports, no display decimation; separate item-bound queue verified; drain releases bytes and sequence gaps expose dropped observations",
+                     "AC-01":  "PASS: four mock integration tests cover discovery/open/configure/start/stop/close, cancellation, explicit reconnect, new epochs/token isolation, bounded errors, permission denial, disconnect, failed cleanup, invalid transition/config and backend contract violations; mock transmit panics if lifecycle ever invokes TX"
+                 },
+    "source_base":  "a28b6862283ef76f291fb647521a1fb9dbe2f92d",
+    "files":  {
+                  "crates/capture/src/adapter.rs":  "678c5e4b31072946e5b78edb1be007829f16790f32bf6c8de7dcabceb6d0b1c3",
+                  "crates/domain/src/lib.rs":  "02ed4728650dee731c95a9317215348f45f3ff4457078922c03f9810ec25d42d",
+                  "crates/domain/src/observation.rs":  "65004e914364a993d606ccc6d0a4d94df3c780f266aaa3e99115512084f64f05",
+                  "crates/capture/tests/adapter.rs":  "10d69c5f027e793db2b71fcf17c7ebef886ed155e7dd907e818ab8a7bca93a77",
+                  "docs/capture-api.md":  "4a349621bd43fe8450175e841d169f19d3c39f4b52bcab11432e1ca2c98fa267",
+                  "crates/capture/src/lib.rs":  "36ea2f71a4e08721480533c31f14eb1f175da451807c09bfe1103066d976f339"
+              },
+    "review_details":  "Reviewed immutable observation constructor, payload/metadata redaction, bounded batch/count/byte checks before sum/enqueue, checked epoch/sequence, fresh per-run metrics, cancelled poll rejection, no automatic start on reconnect, failed close cannot become Closed, stop cannot erase disconnected/failed state. Clearing queued records accounts drops. No dependencies/manifests changed.",
+    "commands":  [
+                     "cargo test -p exmon-capture --locked: PASS (4 integration tests)",
+                     "cargo test -p exmon-domain --locked: PASS (6 unit tests)",
+                     "cargo fmt --all -- --check: PASS",
+                     "cargo clippy --workspace --all-targets --locked -- -D warnings: PASS",
+                     "node scripts/check-architecture.mjs: PASS",
+                     "git diff --cached --check: PASS"
+                 ],
+    "task_id":  "EXM-007",
+    "environment":  "Windows; rustc/cargo 1.98.0; Node 24.22.1; deterministic in-memory serial mock, no hardware",
+    "limitations":  [
+                        "No native/physical adapters implemented; platform permission and stop-under-load tests belong to their tasks",
+                        "Trusted adapters must bound allocation before returning a Vec and cooperate with cancellation/finite poll; wrapper cannot prevent an allocation inside a violating backend",
+                        "No scheduler/TX authorization engine implemented; TX trait hook defaults unsupported and is never invoked by lifecycle",
+                        "Metadata currently supplies common fields; richer backend-specific DLC/error/remote/transfer details belong to corresponding adapter tasks",
+                        "First closure request follows accepted allocator compatibility boundary"
+                    ],
+    "reviewer":  "Codex exmon capture core development (author source/diff review)",
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "cleanup":  "No temporary or generated build artifacts staged; ignored target cache and unrelated .idea preserved; no running command sessions",
+    "candidate_tree":  "173969d9970f1525fda52ff645a6631d0e79c998"
+}

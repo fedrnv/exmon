@@ -1,0 +1,11 @@
+{
+    "type":  "task_closed",
+    "schema":  "fdtasks-version-request/v1",
+    "request_id":  "945ea499-d086-44d2-8125-bda12c5ac9c3",
+    "epic_id":  "EXM-EPIC-001",
+    "work_item_id":  "EXM-007",
+    "summary":  "Implemented common bounded capture adapter lifecycle and event API",
+    "verification":  [
+                         "Tasks/items/server/EXM-007-implement-the-capture-adapter-api/evidence/20261122T180140Z-adapter-verification.json"
+                     ]
+}
