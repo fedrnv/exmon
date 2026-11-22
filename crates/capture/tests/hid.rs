@@ -75,6 +75,30 @@ fn start(adapter: &mut Hid<Mock>, id: u64) {
 }
 
 #[test]
+fn report_mode_must_be_fixed_before_selecting_a_collection() {
+    let (mut adapter, c) = setup(ReportMode::Numbered);
+    adapter.set_report_mode(ReportMode::Unnumbered).unwrap();
+    adapter.enumerate(2).unwrap();
+    adapter.open(1).unwrap();
+    assert_eq!(
+        adapter.set_report_mode(ReportMode::Numbered),
+        Err(Error::InvalidState)
+    );
+    adapter.configure(64).unwrap();
+    adapter.start().unwrap();
+    c.lock().unwrap().input = vec![165, 0, 42];
+    let report = adapter.poll(&Cancellation::default(), 1, 64).unwrap();
+    assert_eq!(report[0].bytes(), [165, 0, 42]);
+    assert!(matches!(
+        report[0].metadata(),
+        Metadata::Hid { report_id: 0, .. }
+    ));
+    adapter.close().unwrap();
+    adapter.set_report_mode(ReportMode::Numbered).unwrap();
+    assert!(c.lock().unwrap().writes.is_empty());
+}
+
+#[test]
 fn selection_and_numbered_report_fidelity_are_explicit() {
     let (mut adapter, c) = setup(ReportMode::Numbered);
     assert_eq!(adapter.start(), Err(Error::InvalidState));

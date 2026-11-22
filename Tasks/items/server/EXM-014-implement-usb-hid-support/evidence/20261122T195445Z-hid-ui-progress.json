@@ -1,0 +1,81 @@
+{
+  "task_id": "EXM-014",
+  "state": "In Progress; approved physical-device fidelity remains unavailable",
+  "source_base": "3139caf19eb72cbdd29f3eb3a73d55289bb38c52",
+  "candidate_tree": "49fdab0c8e1ba90917ec1313fd28666926a3eb40",
+  "hash_basis": "SHA-256 of verified checkout bytes; candidate_tree identifies Git-normalized staged implementation before evidence",
+  "files": {
+    "crates/gui/examples/native_hid_smoke.rs": "24a1ad1453636a515ffbdf557974efa17fec85a62975271141a5058bb8d8f8a8",
+    "crates/capture/src/hid.rs": "7dc0611d1568c71e95706e433594094a846a70692f5e62e256af1217abe274dd",
+    "crates/app/src/lib.rs": "0c38bff9c3fa130d2e4dedfd02cfb8a0c132ff8dd90d1420c37ff6f75160944f",
+    "README.md": "f9570f0946000a90c69635e72de5e792b71e2aa242091beb62857c803e40048b",
+    "crates/app/src/hid_worker.rs": "0458eb48d012a077140c54fa97679007960914b292551388c932c618b4c47c81",
+    "crates/capture/tests/hid.rs": "d9d6e2632275df984f0a501885c2c34adb4ddab455823a96bc96aa01ee39f41b",
+    "crates/app/Cargo.toml": "3adab4bbaf9996f148f99235b776219617cb5763818a82e4a73bbe125db0e5c3",
+    "crates/gui/src/lib.rs": "dde6bad1ba29c06f9c74d9eed4b3db66554ea6a8e5135687d3ffbcc0bbb10af6",
+    "crates/gui/Cargo.toml": "70a161f153ed71a670c09b3a9231fad072637fbc07df98758bf104b4c5741490",
+    "crates/app/tests/hid_worker.rs": "f424b0fff3efa56eb3d9850764b06cee4344d4ddf6b0135e3802000b962aa06a",
+    "crates/gui/tests/hid.rs": "a651584214ba7a98851fd4e52dc9ffd3329485cacf6755dce71cc3f6773e1322",
+    "docs/desktop-shell.md": "013f4af8afce8033c0d7f09e9d79ff712b1a3b0ca7a8e47b9cd1a3e852fcf0e3",
+    "crates/gui/src/shell.rs": "5c78bd0127c31b4b4e636b3bff845f12c92f8eb195047575b4f97f4088af38a1",
+    "crates/gui/src/hid.rs": "c8d908ce8b04fec8daa362a07bea9a422a6329733356bb77a8220f39a6d8d7c8",
+    "docs/hid-capture.md": "15dcc38f56d151e1b1eb87d8dfe8b2a5d581885db748281180d17ad85e96a2d0"
+  },
+  "visuals": {
+    "Tasks/items/server/EXM-014-implement-usb-hid-support/evidence/20261122T195445Z-native-hid-panel-windows.png": "4820c0746826719fd6dcc6124600e221031d167143dc24d2981a42102ddf77eb",
+    "Tasks/items/server/EXM-014-implement-usb-hid-support/evidence/20261122T195445Z-hid-shell-900x600-1.5-dark.png": "1d66878a17d48af7c6a73053a83aaa0264d8779675ef5806f3b0af56b680c8d9",
+    "Tasks/items/server/EXM-014-implement-usb-hid-support/evidence/20261122T195445Z-hid-shell-900x600-1.5-light-closed.png": "0b84210ac84c17f4817856915930fb5c9ac2c904e5e278c2f07c34f7ae4c4da3",
+    "Tasks/items/server/EXM-014-implement-usb-hid-support/evidence/20261122T195445Z-hid-shell-1200x760-dark.png": "7a16d5fc5836e39e313ca7e28601f04a0a404dc3a6a279dfcc49399ad067adb7"
+  },
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "task_sha256": "fc613978c88b994f74ec396b34a3ed90cbd4be7ad87af6cf0e5fef1b9c3a6419",
+  "environment": "Windows x64; Rust/Cargo 1.98.0; egui/eframe/egui_kittest 0.37.0; HIDAPI 2.6.7; WGPU native/offscreen; Linux GNU compile target only",
+  "outcomes": {
+    "AC-01": "PARTIAL: prior capture fidelity fixtures and new worker fixtures preserve selected numbered/unnumbered RX/TX; malformed/oversized inputs, denial/removal, stale discovery/epoch and report-mode immutability verified. Approved physical HID device/descriptor/known traffic unavailable, so criterion remains incomplete.",
+    "AC-02": "Production UI/worker boundary verified with audited two-collection mock: constructor/discovery/selection cause no report open or write; explicit Open/Send reach only selected collection 1; wrong-device/stale/revoked commands never write. Default native backend Unsupported, feature-enabled same UI/worker fixtures and native source compile pass. No actual native physical device runtime claim."
+  },
+  "commands": [
+    "cargo test -p exmon-capture -p exmon-app --locked: PASS (capture 1 unit + 30 integration; app 1 unit + 6 integration); unaffected checks retained, subsequent discovery correction covered by focused tests",
+    "cargo test -p exmon-app --test hid_worker -p exmon-gui --test hid --locked -- --nocapture: final PASS (2 worker + 2 UI tests)",
+    "cargo test -p exmon-gui --features native-hid --test hid --locked -- --nocapture: final PASS (1 audited mock UI test; default Unsupported case cfg-excluded; no native hardware discovery)",
+    "cargo test -p exmon-capture --test hid --locked: PASS (4 tests including report-mode freeze)",
+    "cargo test -p exmon-gui --test shell --locked -- --nocapture: final PASS (2 existing shell tests, sustained scenario 104 frames; slowest 14.8953 ms below declared 200 ms ceiling)",
+    "cargo build -p exmon-gui --example native_hid_smoke --locked: final PASS",
+    "Start-Process target/debug/examples/native_hid_smoke.exe -WindowStyle Hidden, redirected local logs, 15-second external bound: final PASS marker; internal 8-second UI deadline; hardcoded synthetic source only",
+    "cargo clippy --workspace --all-targets --locked -- -D warnings: final PASS",
+    "cargo clippy -p exmon-app --features native-hid --all-targets --locked -- -D warnings: final PASS",
+    "cargo check -p exmon-app --features native-hid --target x86_64-unknown-linux-gnu --locked: final PASS, compile only",
+    "cargo fmt --all -- --check: PASS",
+    "node scripts/check-architecture.mjs: PASS",
+    "git diff --cached --check: PASS"
+  ],
+  "visual_review": "Four exact PNGs inspected: production shell selected HID RX/TX at 1200x760 dark 1x; fresh 900x600 viewport dark and light/closed at 1.5x with asserted/observed 1350x900 PNG size; actual native Windows HID panel at 1200x760 with synthetic selected RX/TX. Controls wrap at minimum size; Open/Send/Close disabled appropriately; VID/PID/usage, report ID, bytes, completion and unknown source loss visible. Editor scroll height bounded and Send disabled for saturated text input. Images contain synthetic data only.",
+  "reviewer": "Codex exmon HID development (author source/staged-diff/visual review, not independent Epic review)",
+  "review_details": "Reviewed exact source and staged diff. HID commands/results/snapshots/history bounded; all discovery/report I/O/open/close and HEX parse run on worker. Device enumeration revision invalidates failed/stale discovery; generation plus exact id checked again before write. CAS lease linearizes report open/write entry with Close revocation. A leased operation may finish later; completion is accepted-byte count, not delivery. Metadata enumeration is a separate explicit action and may query descriptors; it does not start an application report session. Optional native-hid factory uses existing exact-path NativeHid source. No source/device/TX state enters layout preferences. README/desktop-shell direct-consumer docs updated to remove obsolete capability claims. No dependencies, policies or immutable accepted records changed.",
+  "development_failures": [
+    "Initial enumeration counter needed explicit u64; misplaced pending-store statement in a patch corrected before focused verification.",
+    "UI test initially typed text without focusing the editor; added actual focus action; original no-write assertion retained.",
+    "Clippy formatting/collapsible-if findings corrected; unused/wrong disabled-node accessor corrected using AccessKit node API.",
+    "Feature-enabled UI run exposed discovery completion race/fixed-frame assumption. Discovery now owns pending state through metadata publication, Open is blocked until completion, and tests wait for actual rendered readiness within unchanged two-second bound. Final default/feature paths pass.",
+    "Runtime harness resize preserved original screenshot dimensions. Rebuilt a fresh requested-size/DPI viewport and asserted actual 1350x900 PNG dimensions before acceptance.",
+    "One incremental-cache finalization emitted Access denied note while tests passed; later compilation/tests/lint succeeded. No cache privilege/protection changes attempted."
+  ],
+  "limitations": [
+    "Approved physical-device RX/TX fidelity, descriptor behavior, driver timing and Stop latency remain unavailable; EXM-014 is not Done and receives no version request.",
+    "Native enumeration can query device descriptors; no real enumeration/open/write occurred in these development checks. Mock UI proves selected report-session boundary, not actual device identity/authentication or physical behavior.",
+    "Already leased native open/write may complete after Close; native I/O can delay teardown. No recall/hard real-time or automatic retry guarantee.",
+    "Backend loss remains unknown; display-channel skips are counted. Only the latest 256 reports retained; no session recording claim.",
+    "Other native OS/packaged acceptance remains in platform/packaging tasks. EXM-008/016/017 qualification checkpoints preserved."
+  ],
+  "blocker": "Only approved physical HID report-fidelity qualification remains for EXM-014 after completing the previously pending UI boundary",
+  "owner_action": "Provide an approved HID test collection, explicit selected-device read/output permission, report descriptor, numbering/capacity and known synthetic expected RX/TX. Run and record real fidelity/removal/Stop results without committing serials or sensitive captures.",
+  "project_readiness_observation": "EXM-043 was not claimed: owner migration gives it Epic 002, whose accepted Epic dependency is incomplete Epic 001. Future Epic D001 also waits for accepted predecessors. No dependency or scheduling exception invented.",
+  "cleanup": "All helper/test processes finished; failed UI diagnostic and obsolete-dimension PNG removed. Four reviewed visual evidence files only; no build binaries, physical identifiers/captures or credentials staged. target cache/bounded local logs and existing .idea preserved.",
+  "checkpoint": {
+    "task": "EXM-014",
+    "state": "Own claim retained In Progress pending physical fidelity; UI implementation/evidence published",
+    "evidence_identity": "Exact source/visual SHA-256 values and candidate_tree in this immutable manifest",
+    "next_action": "Fresh turn: fetch/revalidate records/rules and resume own EXM-017 qualification. Investigate a bounded portable headless Linux VM using user-mode TCG and an isolated static Linux test binary, preserving the vcan-only guard. No host driver/hypervisor installation, elevation or physical passthrough. Do not assume missing WSL exhausts virtual test options; record exact failure if safe guest setup is unavailable.",
+    "resources": "Global goal active. PATH probe found ssh but no qemu-system-x86_64/docker/podman/7z; WSL earlier reported not installed. Guest tooling is not provisioned or qualified yet. Keep EXM-008/014/016/017 owners/blockers; physical/report and external-account authority not expanded."
+  }
+}

@@ -48,6 +48,14 @@ impl<S: Source> Hid<S> {
     pub fn device(&self, id: u64) -> Option<Device> {
         self.devices.get(usize::try_from(id).ok()?).copied()
     }
+    /// Report semantics may change only before a collection is selected/opened.
+    pub fn set_report_mode(&mut self, mode: ReportMode) -> Result<(), Error> {
+        if self.selected.is_some() || self.clock.is_some() {
+            return Err(Error::InvalidState);
+        }
+        self.mode = mode;
+        Ok(())
+    }
     fn descriptor(id: u64) -> Descriptor {
         Descriptor {
             id,

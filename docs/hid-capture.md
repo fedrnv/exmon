@@ -70,6 +70,67 @@ bounded mock reports to test exact selection, no automatic opens/writes,
 numbered/unnumbered fidelity, partial writes, invalid sizes, cancellation,
 permission denial and removal. Native Windows and Linux compile checks are
 separate from runtime qualification. No physical HID was opened for these tests.
-EXM-014 remains In Progress: approved physical-device fidelity and the future UI
-selection interaction tests are unavailable. This implementation cannot close
-those acceptance criteria from mock/source inspection alone.
+The production UI selection boundary is now covered by audited mock interaction
+tests. EXM-014 remains In Progress because approved physical-device fidelity is
+unavailable; a passing virtual UI/source test does not close that criterion.
+
+## Desktop HID controls
+
+The shell's **HID reports** view uses `HidPanel` and `HidWorker`. Default builds
+report the native backend Unsupported; enabling the existing backend is explicit:
+
+```text
+cargo run -p exmon-gui --features native-hid --locked
+```
+
+Nothing discovers or opens a HID report session on launch. Discover HID performs
+bounded descriptor enumeration on a worker. Choose an exact collection and known
+Numbered/Unnumbered format and capacity, then Open selected HID. A new collection
+or discovery clears the previous format and output draft. Active selection is
+locked until Close HID completes. RX shows VID/PID/usage, report ID, direction and
+exact bytes. Native descriptor probing may itself query devices, so discovery
+and report access are separate explicit actions. No device was probed for these
+development checks.
+
+Send HID report accepts HEX with the HIDAPI ID byte once, including leading zero
+for unnumbered output. HEX parsing runs on the worker, bounded to 4096 decoded
+bytes and 12288 ASCII input bytes. There is no schedule, automatic retry or send
+on a saturated/truncated text input. The UI editor scrolls within 140 logical
+pixels and disables Send at its text limit until the operator shortens/reviews
+the input. There is also no automatic send
+on discovery/open/reconnect. Every command includes selected id and session
+generation. Failed refresh invalidates old selections. Wrong-device, stale or
+revoked commands fail before a source write.
+
+Close atomically revokes queued operations without waiting for a full result
+queue or GUI-thread I/O. A worker CAS lease linearizes entry into an open/write
+operation with revocation; an operation that already acquired that lease may
+complete after Close was requested. UI reports closing and actual accepted-byte
+completion without claiming recall or wire delivery. Native I/O latency remains
+platform-dependent as described above. Final handle close and all report I/O
+remain worker-owned. This one-shot HID path does not implement the future general
+transmission/scheduler contracts.
+
+There are four queued commands, eight queued reports, at most 64 discovered
+collections, and 256 retained displayed reports. UI snapshots use a short
+nonblocking try-lock and bounded cloning; views drain at most four reports per
+frame and render visible rows. Source loss is unknown; display-channel skips
+are counted separately. Device ids, output drafts, open state and modes do not
+enter safe layout preferences. Application exit revokes and joins the worker;
+an already pending platform write can delay teardown.
+
+```text
+cargo test -p exmon-app --test hid_worker --locked
+cargo test -p exmon-gui --test hid --locked
+cargo test -p exmon-gui --features native-hid --test hid --locked
+cargo run -p exmon-gui --example native_hid_smoke --locked
+```
+
+Feature-enabled tests inject the same audited synthetic source into the real
+worker/UI and never discover native hardware. The default Unsupported test is
+compiled only without native-hid. The hidden native renderer smoke hardcodes a
+synthetic two-collection source and one explicit selected report; it cannot open
+physical hardware even in a feature-enabled build. It has an eight-second UI
+deadline and writes the screenshot from a separate thread. Approved real-device
+RX/TX fidelity, report descriptors, platform behavior and physical Stop latency
+still require explicit owner-provided hardware/access and exact evidence.

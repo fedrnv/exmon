@@ -10,8 +10,8 @@ The top bar selects a transport and one of two explicitly synthetic interfaces.
 Start capture begins deterministic RX observations on an application worker.
 Stop revokes the request independently of the data queue; another explicit Start
 is needed to resume. Selection is disabled while starting/running/stopping.
-The effective filter is all synthetic observations. This shell does not open
-physical interfaces, send data or arm schedules. Network-labelled synthetic
+The effective filter is all synthetic observations. The default capture view
+does not open physical interfaces, send data or arm schedules. Network-labelled synthetic
 observations contain byte patterns, not qualified Ethernet/IP protocol fixtures.
 
 Incoming is on the left and Outgoing on the right, separated by a draggable
@@ -20,6 +20,12 @@ visible rows. Clear view affects display history. Outgoing is a disabled empty
 state until the independently accepted template/transmission tasks are integrated.
 Theme can be changed during capture. Source loss, application queue drops,
 display decimation and history evictions remain separate indicators.
+
+The separate **HID reports** view connects the selected HID collection through
+its own worker when built with `native-hid`; otherwise it reports Unsupported.
+Discovery, open and one-shot report output each require explicit user actions.
+See [HID controls and qualification limits](hid-capture.md). It never starts a
+physical report session on launch or restores device/output state from preferences.
 
 ## Worker and memory boundaries
 

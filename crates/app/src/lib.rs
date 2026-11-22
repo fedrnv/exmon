@@ -1,6 +1,7 @@
 //! Exchange Monitor app layer. See docs/domain-model.md for the domain contract.
 
 pub mod diagnostics;
+pub mod hid_worker;
 pub mod shell;
 
 /// Initialize process logging once at the application entry point.

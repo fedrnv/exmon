@@ -28,8 +28,8 @@ defined in [the product safety policy](docs/security-and-transmission.md).
 The six-layer Rust workspace includes a native egui shell with bounded background
 mock capture, interface selection, incoming/outgoing panels and safe layout
 preferences. Run it with `cargo run -p exmon-gui --locked`; see
-[desktop shell details](docs/desktop-shell.md). Physical adapters are not connected
-to this shell, and no physical qualification is claimed.
+[desktop shell details](docs/desktop-shell.md). Optional selected HID report
+controls use `--features native-hid`; physical qualification remains pending.
 
 ## Local development
 

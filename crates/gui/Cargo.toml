@@ -15,3 +15,6 @@ eframe = { version = "0.37.0", default-features = false, features = ["default_fo
 [dev-dependencies]
 egui_kittest = { version = "0.37.0", features = ["wgpu"] }
 image = { version = "0.25.10", default-features = false, features = ["png"] }
+
+[features]
+native-hid = ["exmon-app/native-hid"]
