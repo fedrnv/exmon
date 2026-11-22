@@ -1,0 +1,11 @@
+{
+    "type":  "task_closed",
+    "schema":  "fdtasks-version-request/v1",
+    "request_id":  "a3f994bd-a2bc-490f-b6e5-e1f874cc923b",
+    "epic_id":  "EXM-EPIC-001",
+    "work_item_id":  "EXM-004",
+    "summary":  "Implemented nonblocking metrics and redacted structured diagnostics",
+    "verification":  [
+                         "Tasks/items/foundation/EXM-004-implement-structured-diagnostics-and-metrics/evidence/20261122T174713Z-diagnostics-verification.json"
+                     ]
+}

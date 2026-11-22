@@ -1,0 +1,44 @@
+{
+    "checkpoint":  {
+                       "next_action":  "Fresh turn: fetch main and validate EXM-004 published closure; read EXM-005 task/events/evidence and current rules; publish readiness/claim, then generate deterministic synthetic transport/framing fixtures",
+                       "evidence_identity":  "Changed source SHA-256 values in this immutable manifest",
+                       "task":  "EXM-004",
+                       "resources":  "No external blockers, no running workers; owner authorization remains active",
+                       "state":  "Verified Done upon successful publication"
+                   },
+    "outcomes":  {
+                     "AC-02":  "PASS: distinct stage totals, unknown backend count, gauge, health and saturation; captured structured output includes named numeric fields with payload/device redacted; wrapped sensitive formatter never invoked",
+                     "AC-01":  "PASS: producer source uses atomics only; 4 x 10000 concurrent updates produce 40000 packets / 2560000 bytes; producer completes 10000 increments while logging writer demonstrably blocked; fixed-state snapshots and epoch-safe monotonic rates"
+                 },
+    "source_base":  "f66688233958f937d930bef66d108262b52d2b87",
+    "files":  {
+                  "crates/domain/src/lib.rs":  "537d7d0b44b6d6a2cd13b12e1428c89644f68ad01fdaf7d25b30f58914fac5a4",
+                  "crates/domain/src/metrics.rs":  "fbb34ef5bc0121ed94bc755d7110e60d534a15145d9d10fd0f6af63ce28116a5",
+                  "docs/diagnostics.md":  "33de49b748a55a46bf63762210deb018f2729b10afee3dca3766e0f54be286eb",
+                  "crates/app/src/diagnostics.rs":  "106ac5c4ff8acd2fc413ebe9d77439838d868d0c3e6ba294d8af58668d76d818",
+                  "crates/app/tests/diagnostics.rs":  "deb50d1d8aa2b8025470cd6a5ab7e4059642b2df2aa3964670ddaa6d9ec50273",
+                  "crates/app/src/lib.rs":  "ec52a7762869af36f439fa5f2ba8bd9d71c8a3e131818a3b6180c246d108ffea"
+              },
+    "commands":  [
+                     "cargo test -p exmon-domain --locked: PASS (5 tests)",
+                     "cargo test -p exmon-app --locked: PASS (1 unit + 2 integration tests)",
+                     "cargo fmt --all -- --check: PASS",
+                     "cargo clippy --workspace --all-targets --locked -- -D warnings: PASS",
+                     "node scripts/check-architecture.mjs: PASS",
+                     "git diff --cached --check: PASS"
+                 ],
+    "task_id":  "EXM-004",
+    "environment":  "Windows; rustc/cargo 1.98.0; Node 24.22.1; synthetic metrics and secret markers only",
+    "limitations":  [
+                        "Atomic snapshot is approximate across fields, not transactional",
+                        "Lock-free CAS retry is not wait-free or a hard real-time latency guarantee",
+                        "Background tracing sink can block; producer updates never call it; actual adapter/GUI wiring belongs to subsequent tasks",
+                        "No hardware or visual UI behavior changed; no physical validation claimed",
+                        "First closure request follows accepted allocator compatibility boundary; native automation remains unqualified"
+                    ],
+    "publication_recovery":  "Original claim 31f85a1 rejected by normal fast-forward guard after unrelated version allocation 4ba0d3b. Task remained Planned/unowned. Rejected commit preserved in local refs/codex/rejected-claims/EXM-004-31f85a1. Fresh readiness/claim against revalidated 4ba0d3b published at f666882 before implementation; no lost claim replay or remote history rewrite.",
+    "reviewer":  "Codex exmon diagnostics development (author diff inspection)",
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "cleanup":  "All command sessions complete; ignored target reused; no generated files or secrets staged; unrelated .idea preserved",
+    "candidate_tree":  "9565faed5062c2b4876344a5bd075e9a51183181"
+}

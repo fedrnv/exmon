@@ -1,5 +1,7 @@
 //! Exchange Monitor app layer. See docs/domain-model.md for the domain contract.
 
+pub mod diagnostics;
+
 /// Initialize process logging once at the application entry point.
 ///
 /// The caller supplies the filter explicitly; device input never controls it.

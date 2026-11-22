@@ -3,6 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 pub mod config;
+pub mod metrics;
 
 /// Direction relative to the selected capture interface.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
