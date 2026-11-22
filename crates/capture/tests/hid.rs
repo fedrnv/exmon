@@ -2,6 +2,161 @@ use exmon_capture::{adapter::*, hid::*};
 use exmon_domain::{Direction, observation::Metadata};
 use std::sync::{Arc, Mutex};
 
+#[cfg(all(target_os = "linux", feature = "native-hid", feature = "native-usbmon"))]
+mod native_virtual {
+    use super::*;
+    use exmon_capture::{native_hid::NativeHid, native_usbmon::NativeUsbmon};
+    use std::{
+        fs,
+        io::Write,
+        process::Command,
+        time::{Duration, Instant},
+    };
+
+    fn text(path: impl AsRef<std::path::Path>) -> String {
+        fs::read_to_string(path).unwrap().trim().to_owned()
+    }
+    fn fixture() -> (u16, u8) {
+        assert_eq!(
+            std::env::var("EXMON_TEST_HID").as_deref(),
+            Ok("qemu-keyboard")
+        );
+        assert_eq!(text("/sys/class/dmi/id/product_name"), "EXMON-HID-FIXTURE");
+        assert_eq!(text("/sys/class/dmi/id/sys_vendor"), "EXMON-QEMU");
+        let entries: Vec<_> = fs::read_dir("/sys/class/hidraw").unwrap().take(4).collect();
+        assert_eq!(
+            entries.len(),
+            1,
+            "fixture must contain exactly one emulated HID collection"
+        );
+        let path = fs::canonicalize(entries[0].as_ref().unwrap().path().join("device")).unwrap();
+        let usb = path
+            .ancestors()
+            .find(|p| p.join("busnum").is_file())
+            .unwrap();
+        assert_eq!(text(usb.join("idVendor")), "0627");
+        assert_eq!(text(usb.join("idProduct")), "0001");
+        assert_eq!(text(usb.join("serial")), "EXMON-SYNTHETIC-HID");
+        let bus = text(usb.join("busnum")).parse().unwrap();
+        let device = text(usb.join("devnum")).parse().unwrap();
+        assert_ne!(bus, 0, "never capture all buses");
+        (bus, device)
+    }
+    fn selected() -> Hid<NativeHid> {
+        let mut adapter = Hid::new(NativeHid::default(), ReportMode::Unnumbered);
+        let devices = adapter.enumerate(64).unwrap();
+        assert_eq!(devices.len(), 1);
+        let id = devices[0].id;
+        let d = adapter.device(id).unwrap();
+        assert_eq!(
+            (d.vendor_id, d.product_id, d.usage_page, d.usage),
+            (0x0627, 1, 1, 6)
+        );
+        adapter.open(id).unwrap();
+        adapter.configure(8).unwrap();
+        adapter
+    }
+    #[test]
+    #[ignore = "requires isolated EXMON QEMU USB keyboard and monitor-injected synthetic key"]
+    fn native_qemu_keyboard_input_and_output_fidelity() {
+        let (bus, device) = fixture();
+        let mut adapter = selected();
+        adapter.start().unwrap();
+        let mut spy = NativeUsbmon::default();
+        spy.open(bus).unwrap();
+        assert_eq!(adapter.transmit(&[0, 2]), Ok(2));
+        let deadline = Instant::now() + Duration::from_secs(2);
+        let mut submission = None;
+        let mut completed = false;
+        while Instant::now() < deadline {
+            if let Some(record) = spy.poll().unwrap() {
+                let m = record.metadata;
+                if m.device == device && m.transfer == b'C' && m.endpoint == 0 {
+                    if m.event == b'S' && m.setup == Some([0x21, 9, 0, 2, 0, 0, 1, 0]) {
+                        assert_eq!(record.bytes, [2]);
+                        submission = Some(m.tag);
+                    }
+                    if m.event == b'C' && submission == Some(m.tag) {
+                        assert_eq!(m.status, Some(0));
+                        completed = true;
+                        break;
+                    }
+                }
+            } else {
+                std::thread::sleep(Duration::from_millis(1));
+            }
+        }
+        spy.stop();
+        assert!(
+            completed,
+            "expected synthetic LED SET_REPORT and successful callback"
+        );
+        println!("EXMON_HID_READY");
+        std::io::stdout().flush().unwrap();
+        let deadline = Instant::now() + Duration::from_secs(3);
+        let mut received = false;
+        while Instant::now() < deadline {
+            for record in adapter.poll(&Cancellation::default(), 1, 8).unwrap() {
+                if record.bytes() == [0, 0, 4, 0, 0, 0, 0, 0] {
+                    assert_eq!(record.direction(), Direction::Rx);
+                    assert!(matches!(
+                        record.metadata(),
+                        Metadata::Hid {
+                            vendor_id: 0x0627,
+                            product_id: 1,
+                            usage_page: 1,
+                            usage: 6,
+                            report_id: 0
+                        }
+                    ));
+                    assert_eq!(record.original_length(), None);
+                    received = true;
+                }
+            }
+            if received {
+                break;
+            }
+        }
+        assert!(received, "expected synthetic unnumbered keyboard report");
+        let token = Cancellation::default();
+        token.cancel();
+        assert_eq!(adapter.poll(&token, 1, 8).err(), Some(Error::Cancelled));
+        println!("EXMON_HID_REMOVE");
+        std::io::stdout().flush().unwrap();
+        let deadline = Instant::now() + Duration::from_secs(3);
+        let mut removed = false;
+        while Instant::now() < deadline {
+            match adapter.poll(&Cancellation::default(), 1, 8) {
+                Err(Error::Disconnected) => {
+                    removed = true;
+                    break;
+                }
+                Ok(_) => {}
+                Err(other) => panic!("unexpected removal result: {other:?}"),
+            }
+        }
+        assert!(
+            removed,
+            "expected emulated removal to revoke selected handle"
+        );
+        assert_eq!(adapter.transmit(&[0, 2]), Err(Error::InvalidState));
+        adapter.close().unwrap();
+        assert_eq!(adapter.transmit(&[0, 2]), Err(Error::InvalidState));
+    }
+    #[test]
+    #[ignore = "requires unprivileged account in isolated EXMON QEMU USB keyboard fixture"]
+    fn native_qemu_keyboard_permission_denied_is_explicit() {
+        fixture();
+        let uid = Command::new("id").arg("-u").output().unwrap();
+        assert!(uid.status.success());
+        assert_ne!(String::from_utf8(uid.stdout).unwrap().trim(), "0");
+        let mut adapter = selected();
+        assert_eq!(adapter.start(), Err(Error::PermissionDenied));
+        assert_eq!(adapter.transmit(&[0, 2]), Err(Error::InvalidState));
+        adapter.close().unwrap();
+    }
+}
+
 #[derive(Default)]
 struct Control {
     opens: Vec<usize>,

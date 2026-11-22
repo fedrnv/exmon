@@ -1,0 +1,41 @@
+Linux localhost 6.18.60-0-lts #1-Alpine SMP PREEMPT_DYNAMIC 2026-11-01 07:52:36 x86_64 Linux
+552b33d17779c4af984ff10d3cf07d45c3ac9b9a4742ce2aeca1cf9095636a86  /tmp/hid-tests
+/dev/hidraw0
+
+running 1 test
+test native_virtual::native_qemu_keyboard_permission_denied_is_explicit ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.20s
+
+EXMON_DENIED_RC=0
+
+running 1 test
+EXMON_HID_READY
+EXMON_HID_REMOVE
+test native_virtual::native_qemu_keyboard_input_and_output_fidelity ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.35s
+
+EXMON_NATIVE_RC=0
+
+running 6 tests
+test native_virtual::native_qemu_keyboard_input_and_output_fidelity ... ignored, requires isolated EXMON QEMU USB keyboard and monitor-injected synthetic key
+test native_virtual::native_qemu_keyboard_permission_denied_is_explicit ... ignored, requires unprivileged account in isolated EXMON QEMU USB keyboard fixture
+test report_mode_must_be_fixed_before_selecting_a_collection ... ok
+test removal_permission_cancellation_and_size_errors_do_not_open_other_devices ... ok
+test selection_and_numbered_report_fidelity_are_explicit ... ok
+test unnumbered_input_is_not_stripped_and_output_zero_id_is_not_duplicated ... ok
+
+test result: ok. 4 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.21s
+
+EXMON_FIXTURE_RC=0
+localhost:~#  * Stopping busybox syslog ... [ ok ]
+ * Unmounting loop devices
+ *   Remounting /.modloop read only ... [ ok ]
+ * Unmounting filesystems
+ *   Unmounting /test ... [ ok ]
+ *   Unmounting /media/cdrom ... [ ok ]
+ * Setting hardware clock using the system clock [UTC] ... [ ok ]
+ * Stopping busybox mdev ... [ ok ]
+ [ ok ]
+ * Terminating remaining processes ...[   29.409999] reboot: Power down

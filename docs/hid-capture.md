@@ -89,8 +89,8 @@ Numbered/Unnumbered format and capacity, then Open selected HID. A new collectio
 or discovery clears the previous format and output draft. Active selection is
 locked until Close HID completes. RX shows VID/PID/usage, report ID, direction and
 exact bytes. Native descriptor probing may itself query devices, so discovery
-and report access are separate explicit actions. No device was probed for these
-development checks.
+and report access are separate explicit actions. No physical device was probed
+for these development checks; the isolated Linux fixture below uses emulation.
 
 Send HID report accepts HEX with the HIDAPI ID byte once, including leading zero
 for unnumbered output. HEX parsing runs on the worker, bounded to 4096 decoded
@@ -134,3 +134,63 @@ physical hardware even in a feature-enabled build. It has an eight-second UI
 deadline and writes the screenshot from a separate thread. Approved real-device
 RX/TX fidelity, report descriptors, platform behavior and physical Stop latency
 still require explicit owner-provided hardware/access and exact evidence.
+
+## Native Linux emulated-device verification
+
+HIDAPI 2.6.7 with `linux-native-basic-udev` passed actual Linux HID report access
+in Alpine standard 3.23.8/Linux 6.18.60-0-lts, under portable QEMU 11.1.0 TCG.
+The only USB HID is an emulated keyboard. No host driver, physical passthrough,
+host keyboard event or physical USB operation is involved. This supplies native
+virtual evidence while retaining the accepted approved-physical-device criterion.
+
+Reuse the [isolated Alpine standard boot recipe](can.md), with networking
+disabled and these QEMU options:
+
+```text
+-smbios type=1,manufacturer=EXMON-QEMU,product=EXMON-HID-FIXTURE
+-device qemu-xhci
+-device usb-kbd,id=synthetic-hid,serial=EXMON-SYNTHETIC-HID
+```
+
+The opt-in tests require `EXMON_TEST_HID=qemu-keyboard`, exact fixture DMI,
+exactly one hidraw collection, USB VID/PID 0627:0001 and the synthetic serial.
+All checks precede HID enumeration/open/output or selected-bus observation.
+The native adapter verifies usage page 1, keyboard usage 6 and the selected
+collection. Never remove fixture checks to run these tests on a physical device.
+
+Cross-link the test with Rust LLD/musl using features
+`native-hid,native-usbmon` and `--test hid`; share only the executable through a
+narrow read-only artifact drive. Copy it to `/tmp/hid-tests`, mode 755, then
+prepare the disposable guest and run:
+
+```sh
+modprobe usbmon
+modprobe usbhid
+su nobody -s /bin/sh -c 'EXMON_TEST_HID=qemu-keyboard /tmp/hid-tests --ignored --exact native_virtual::native_qemu_keyboard_permission_denied_is_explicit --nocapture'
+EXMON_TEST_HID=qemu-keyboard /tmp/hid-tests --ignored --exact native_virtual::native_qemu_keyboard_input_and_output_fidelity --nocapture
+/tmp/hid-tests --nocapture
+```
+
+The native Adapter sends unnumbered HIDAPI bytes `[0,2]`. Independent passive
+usbmon observation requires a control SET_REPORT with setup bytes
+`21 09 00 02 00 00 01 00`, exact payload `02`, and a matching successful URB
+callback. The leading zero is HIDAPI's report-ID convention and is not an extra
+payload byte. No wire-delivery claim is inferred from the write count alone.
+
+After the test prints `EXMON_HID_READY`, the manual harness sends `sendkey a 200`
+to this VM's loopback-only QEMU monitor. The Adapter must receive exactly
+`00 00 04 00 00 00 00 00`, with Rx direction, expected VID/PID/usage and report
+ID zero. The output observation deadline is two seconds and input deadline three;
+polling retains its ten-millisecond read timeout. After `EXMON_HID_REMOVE`, the
+harness issues `device_del synthetic-hid` only to this VM. Within three seconds,
+the Adapter must return Disconnected and revoke later transmission. Cancellation
+and close are checked separately. The whole VM harness has a 180-second watchdog and
+closes its serial/monitor connections on teardown.
+
+An actual unprivileged guest attempt returns PermissionDenied without opening a
+report session or sending output. Existing numbered/unnumbered, removal and
+two-device UI/mock tests remain separate evidence. Native numbered-report,
+physical removal, Windows/macOS driver behavior, and physical Stop timing are not
+proved by this keyboard. EXM-014 stays In Progress until approved physical
+fidelity is recorded. Exact native output and source/tool/binary hashes are in
+the immutable EXM-014 verification checkpoint.

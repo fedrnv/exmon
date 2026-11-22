@@ -1,0 +1,148 @@
+{
+  "task_id": "EXM-014",
+  "owner": "Codex exmon HID development",
+  "verified_at": "2026-11-22T20:40:58Z",
+  "state": "In Progress; native Linux emulated HID passed, approved physical-device fidelity still blocked",
+  "source_base": "4ce663bd36adab4c1734765acda2b419c7eaf73c",
+  "candidate_tree": "3e1fe3a70eac0ed7c06c69186c2d3570c27ef58b",
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "hash_basis": "SHA-256 of verified checkout bytes; candidate_tree identifies Git-normalized staged source before evidence",
+  "files": {
+    "crates/capture/tests/hid.rs": "593e9e0d27f5fb79c5477dd8264659b50cf086c1e72dd55cd979afa88c1a9342",
+    "crates/capture/src/native_hid.rs": "efff369df6a99e9220acbfd11ffd1ec66e9594b3c45dc7457dad5becffb941df",
+    "crates/capture/src/hid.rs": "7dc0611d1568c71e95706e433594094a846a70692f5e62e256af1217abe274dd",
+    "docs/hid-capture.md": "e0d8935fedfedf95d1aa785b19d76b238c7b30a028f9a29b79025ab6f383a842"
+  },
+  "outcomes": {
+    "AC-01": "PARTIAL overall, additional native Linux virtual PASS. Exact HIDAPI unnumbered input00 00 04 00 00 00 00 00, Rx metadata VID0627/PID0001/usage1:6/report0 and unknown original length asserted. Explicit output[0,2] independently observed by production NativeUsbmon as exact control SET_REPORT setup21 09 00 02 00 00 01 00, payload02 and successful matching callback. Actual unprivileged open PermissionDenied; emulated unplug yields Disconnected and revokes later output, cancellation/close checked. Approved physical-device criterion remains unsatisfied and cannot be replaced by this emulation.",
+    "AC-02": "Existing production UI/worker audited two-collection mock/visual evidence remains accepted at b079561. No GUI/worker/production boundary change this turn; native fixture validates selected single emulated collection, not additional physical/UI acceptance."
+  },
+  "environment": {
+    "host": "Windows x86_64; Rust/Cargo1.98.0 stable, Node24.22.1",
+    "guest": "Alpine standard3.23.8/Linux6.18.60-0-lts; HIDAPI2.6.7 linux-native-basic-udev, basic-udev0.1.3",
+    "qemu": "11.1.0 v11.1.0-12130-ge470268ff4; q35 TCG,2vCPU,512MiB RAM,no writable guest disk",
+    "isolation": "No guest network, physical passthrough, host drivers/elevation, host desktop input or private traffic. Only emulated QEMU USB keyboard. Narrow read-only binary drive, no repository/home sharing. Guest-only usbhid/usbmon provisioning outside application; loopback-only serial/monitor connections. Native test verifies explicit env, exact DMI and single hidraw USB0627:0001 synthetic serial before enumeration/open/output. Selected nonzero usbmon bus only.",
+    "resource_bounds": "Output observation2s,input3s,removal3s,read timeout10ms; report limit8 bytes; VM180s watchdog. Monitor sends only synthetic key and removes named emulated device. VM powered off; no QEMU process/listeners remain."
+  },
+  "fixture": {
+    "binary_sha256": "552b33d17779c4af984ff10d3cf07d45c3ac9b9a4742ce2aeca1cf9095636a86",
+    "qemu_additions": [
+      "-nic none",
+      "-smbios type=1,manufacturer=EXMON-QEMU,product=EXMON-HID-FIXTURE",
+      "-device qemu-xhci",
+      "-device usb-kbd,id=synthetic-hid,serial=EXMON-SYNTHETIC-HID"
+    ],
+    "monitor_actions": [
+      "On actual EXMON_HID_READY stdout marker: sendkey a 200",
+      "On actual EXMON_HID_REMOVE marker: device_del synthetic-hid"
+    ],
+    "image_tool_evidence": "Tasks/items/server/EXM-017-implement-can-capture-and-transmission/evidence/20261122T201237Z-can-verification.json",
+    "iso_sha256": "5d5b4fc2244b25170e915c05141b259fec5350499928eab21c4dd34b24e0dbe4"
+  },
+  "verification": [
+    {
+      "command": "CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=<sysroot>/lib/rustlib/x86_64-pc-windows-msvc/bin/rust-lld.exe; target RUSTFLAGS=-C linker-flavor=ld.lld; cargo test -p exmon-capture --features native-hid,native-usbmon --test hid --target x86_64-unknown-linux-musl --locked --no-run",
+      "result": "PASS; final static binary SHA matches guest"
+    },
+    {
+      "command": "node target/hid-vm/run.mjs",
+      "result": "PASS, denied/native/fixture RC0 and VM_EXIT0; exact source snapshot attached"
+    },
+    {
+      "command": "su nobody -s /bin/sh -c 'EXMON_TEST_HID=qemu-keyboard /tmp/hid-tests --ignored --exact native_virtual::native_qemu_keyboard_permission_denied_is_explicit --nocapture'",
+      "result": "PASS1 actual unprivileged selected native HID open"
+    },
+    {
+      "command": "EXMON_TEST_HID=qemu-keyboard /tmp/hid-tests --ignored --exact native_virtual::native_qemu_keyboard_input_and_output_fidelity --nocapture",
+      "result": "PASS1 exact native RX, independent output URB fidelity/status, cancellation and actual emulated removal"
+    },
+    {
+      "command": "/tmp/hid-tests --nocapture",
+      "result": "PASS4 default HID fixtures; native opt-ins ignored2 in ordinary invocation, separately executed above"
+    },
+    {
+      "command": "cargo test -p exmon-capture -p exmon-domain --locked",
+      "result": "PASS31 capture+6 domain and doctests, transport regressions"
+    },
+    {
+      "command": "cargo fmt --all -- --check; cargo clippy --workspace --all-targets --locked -- -D warnings",
+      "result": "PASS"
+    },
+    {
+      "command": "cargo clippy -p exmon-capture --features native-hid,native-usbmon --all-targets --locked -- -D warnings",
+      "result": "PASS Windows feature compilation/lint, not physical runtime"
+    },
+    {
+      "command": "cargo clippy -p exmon-capture --features native-hid,native-usbmon --target x86_64-unknown-linux-gnu --all-targets --locked -- -D warnings",
+      "result": "PASS Linux native compilation/lint"
+    },
+    {
+      "command": "node scripts/check-architecture.mjs; git diff --check; git diff --cached --check",
+      "result": "PASS"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "Tasks/items/server/EXM-014-implement-usb-hid-support/evidence/20261122T203745Z-guest-output.txt",
+      "sha256": "05e70f8904425bc7ce41949e6bd6c8746a3a444f8548a49f55396e50807a8c09",
+      "description": "Actual final guest serial from uname onward; ANSI controls/CR removed. No raw URB tags, real serials or physical report captures."
+    },
+    {
+      "path": "Tasks/items/server/EXM-014-implement-usb-hid-support/evidence/20261122T203745Z-manual-harness.txt",
+      "sha256": "09a8b1e7177a8dc6204a21db875135f909a1b3ab7b3639466d285cd79c0a0d45",
+      "description": "Exact one-off manual VM orchestration, not a canonical automated gate."
+    },
+    {
+      "path": "ignored target/hid-vm/serial.log",
+      "sha256": "682fb255f50732aa79e0c002b73b137da60fc4c58cea3c1c9a90708639476e69",
+      "description": "Raw source of attached normalized output"
+    }
+  ],
+  "reviewer": "Codex exmon HID development (author source and staged diff review; not independent Epic review)",
+  "review": "Only ignored native tests and truthful verification docs changed; existing native source and HID/worker/UI contracts unchanged. Reviewed fixture guards before device access, single exact collection validation, independent selected-bus TX byte/status observation, finite input/removal deadlines, cancellation/no output after close/remove, and no raw identifiers logged. Existing UI visuals unchanged; no new visual acceptance.",
+  "failures_and_recovery": [
+    "Initial temporary task projection printed errors for absent optional events directories and retained whitespace on initial status; corrected projection handles absent directories/quoted labels. Corrected result13Done,85Planned,2In Progress. Not used as evidence until corrected and relevant Epic memberships/prerequisites inspected.",
+    "First native fixture passed RX/TX/denial. Added actual emulated removal assertion and named-device monitor action; rebuilt and reran final affected guest scenarios and checks, all pass. No functional candidate failure or weakened test."
+  ],
+  "limitations": [
+    "Approved physical HID fidelity, physical descriptor/removal/Stop timing remain unqualified; no Done/version request.",
+    "Native emulated unnumbered keyboard only; numbered/other collections are mock-tested, not physically or natively generalized.",
+    "Single-collection native fixture does not replace audited two-device UI/mock selection evidence or authenticate real devices.",
+    "Windows/macOS native HID runtime untested here; existing compile-only limits retained.",
+    "EXM-008 Windows Npcap/macOS native acceptance still unavailable."
+  ],
+  "project_readiness": {
+    "published_task_counts": {
+      "Done": 13,
+      "Planned": 85,
+      "In Progress": 2
+    },
+    "task_dependency_ready_planned": [
+      "EXM-043",
+      "EXM-085"
+    ],
+    "effective_epic_blockers": {
+      "EXM-043": "Effective Epic002; its EPIC.md depends on unclosed Epic001",
+      "EXM-085": "EpicD001 explicitly accepted future planning, depends on unclosed Epic001 and002"
+    },
+    "active_epic": "Owner Epic001 migration includes001..039 plus048gate/049review. No remaining Planned member has all task prerequisites Done.",
+    "open_owned_tasks": [
+      "EXM-008 requires Windows/Npcap and macOS native smoke; Linux virtual now passed",
+      "EXM-014 requires approved physical-device fidelity; UI/mocks/native Linux virtual now passed"
+    ],
+    "history": "No accepted dependency, Epic, status or owner changed by this audit. Do not start future Epics or claim unsupported completion."
+  },
+  "blocker": "Remaining admitted development requires external Windows/Npcap+macOS verification environments for EXM-008 or approved physical HID collection/descriptor/known reports and explicit selected-device access for EXM-014. New Planned work is dependency-blocked; no safe remaining ready task was found after final virtual native checks.",
+  "owner_action": "Provide Windows/Npcap and macOS test environments for known synthetic Ethernet fidelity/BPF/snapshot/stop, or an approved physical HID collection with descriptor, expected synthetic RX/TX and selected-device read/output authorization. Closing EXM-008 first unblocks EXM-009 and EXM-011; retain all other dependencies.",
+  "cleanup": "No physical-device discovery/open/output, host installation/elevation or real input injection. VM powered off and loopback serial/monitor sockets closed. Only tests/docs/immutable evidence staged, no images/binaries/generated build/private captures/credentials. Ignored environment caches retained; unrelated .idea preserved.",
+  "checkpoint": {
+    "goal": "active, full all-tasks objective unchanged; current turn is concrete progress",
+    "task": "EXM-014 own In Progress claim retained; publish native virtual evidence and physical blocker immediately",
+    "next_action": "Fresh goal turn fetch/revalidate published state, both open claims and whole remaining dependency/Epic frontier. Reconcile any external environment/owner input. If same global external blocker remains with no meaningful safe work, record next bounded blocked audit rather than repeat unchanged native tests or invent a dependency exception.",
+    "global_blocker_audit": {
+      "consecutive_observations": 1,
+      "basis": "First end-of-turn global no-ready-work observation after completing the final available EXM-014 virtual runtime/removal boundary. Previous EXM-008 turn had safe HID work and does not count as global impasse. Mark goal blocked only after same global condition repeats for3 consecutive goal turns."
+    },
+    "resources": "No live process/job to wait for; caches are not evidence of a live wait. Physical/host-install authority unchanged."
+  }
+}

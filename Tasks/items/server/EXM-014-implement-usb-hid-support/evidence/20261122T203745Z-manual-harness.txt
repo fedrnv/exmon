@@ -1,0 +1,26 @@
+import {spawn} from 'node:child_process';
+import net from 'node:net';
+import fs from 'node:fs';
+const root='C:/GitHub/exmon/target/can-vm',fixture='C:/GitHub/exmon/target/hid-vm';
+async function port(){const s=net.createServer();await new Promise(r=>s.listen(0,'127.0.0.1',r));const p=s.address().port;await new Promise(r=>s.close(r));return p;}
+const serialPort=await port(),monitorPort=await port();
+const args=['-machine','q35,accel=tcg','-smp','2','-m','512','-display','none','-serial',`tcp:127.0.0.1:${serialPort},server=on,wait=on`,'-monitor',`tcp:127.0.0.1:${monitorPort},server=on,wait=off`,'-no-reboot','-kernel',`${root}/alpine-standard/boot/vmlinuz-lts`,'-initrd',`${root}/alpine-standard/boot/initramfs-lts`,'-append','console=ttyS0 alpine_dev=cdrom modules=loop,squashfs,sd-mod,usb-storage quiet','-cdrom',`${root}/downloads/alpine-standard.iso`,'-nic','none','-smbios','type=1,manufacturer=EXMON-QEMU,product=EXMON-HID-FIXTURE','-device','qemu-xhci','-device','usb-kbd,id=synthetic-hid,serial=EXMON-SYNTHETIC-HID','-drive',`file=fat:ro:${fixture}/share,format=raw,if=virtio,readonly=on`];
+const log=fs.createWriteStream(`${fixture}/serial.log`);
+const child=spawn(`${root}/qemu/qemu-system-x86_64.exe`,args,{windowsHide:true,stdio:['ignore','pipe','pipe']});
+child.stdout.pipe(process.stdout);child.stderr.pipe(process.stderr);
+let socket,monitor,transcript='',stage=0,injected=false,removed=false;
+const watchdog=setTimeout(()=>{socket?.destroy();monitor?.destroy();child.kill();process.exitCode=1;},180000);
+child.on('exit',code=>{clearTimeout(watchdog);socket?.destroy();monitor?.destroy();log.end();console.log('VM_EXIT',code);process.exitCode=code===0&&['EXMON_NATIVE_RC=0','EXMON_DENIED_RC=0','EXMON_FIXTURE_RC=0'].every(x=>transcript.includes(x))?0:1;});
+async function connect(p){for(let i=0;i<100;i++){const s=await new Promise(r=>{const c=net.connect(p,'127.0.0.1');c.once('connect',()=>r(c));c.once('error',()=>{c.destroy();r(null);});});if(s)return s;await new Promise(r=>setTimeout(r,100));}throw Error('connection failed');}
+monitor=await connect(monitorPort);monitor.on('data',()=>{});
+socket=await connect(serialPort);
+socket.on('data',data=>{
+ log.write(data);process.stdout.write(data);transcript+=data.toString();
+ if(stage===0&&transcript.includes('login: ')){stage=1;socket.write('root\n');}
+ if(stage===1&&transcript.includes('localhost:~# ')){
+  stage=2;
+  socket.write("stty -echo; trap 'poweroff' EXIT; set -e; uname -a; mkdir /test; mount -o ro /dev/vda1 /test; cp /test/hid-tests /tmp/hid-tests; chmod 755 /tmp/hid-tests; sha256sum /tmp/hid-tests; modprobe usbmon; modprobe usbhid; ls /dev/hidraw*; su nobody -s /bin/sh -c 'EXMON_TEST_HID=qemu-keyboard /tmp/hid-tests --ignored --exact native_virtual::native_qemu_keyboard_permission_denied_is_explicit --nocapture'; echo EXMON_DENIED_RC=0; EXMON_TEST_HID=qemu-keyboard /tmp/hid-tests --ignored --exact native_virtual::native_qemu_keyboard_input_and_output_fidelity --nocapture; echo EXMON_NATIVE_RC=0; /tmp/hid-tests --nocapture; echo EXMON_FIXTURE_RC=0; poweroff\n");
+ }
+ if(!removed&&transcript.includes('\nEXMON_HID_REMOVE\r')){removed=true;monitor.write('device_del synthetic-hid\n');}
+ if(!injected&&transcript.includes('\nEXMON_HID_READY\r')){injected=true;monitor.write('sendkey a 200\n');}
+});
