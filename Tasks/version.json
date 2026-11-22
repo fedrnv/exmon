@@ -1,9 +1,9 @@
 {
   "schema": "fdtasks-version-state/v1",
-  "version": "0.1.0.3",
+  "version": "0.1.0.4",
   "major": 0,
   "release": 1,
   "epic": 0,
-  "item": 3,
-  "sequence": 3
+  "item": 4,
+  "sequence": 4
 }
