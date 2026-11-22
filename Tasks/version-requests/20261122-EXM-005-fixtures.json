@@ -1,0 +1,11 @@
+{
+    "type":  "task_closed",
+    "schema":  "fdtasks-version-request/v1",
+    "request_id":  "ec41318a-30a9-492f-be32-c31fe009bafd",
+    "epic_id":  "EXM-EPIC-001",
+    "work_item_id":  "EXM-005",
+    "summary":  "Created reproducible synthetic transport and framing fixtures",
+    "verification":  [
+                         "Tasks/items/foundation/EXM-005-create-deterministic-traffic-fixtures/evidence/20261122T175114Z-fixtures-verification.json"
+                     ]
+}

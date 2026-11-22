@@ -1,0 +1,42 @@
+{
+    "source_base":  "4d7f278070384294ff0accbcc0a4f90ede9b9f5c",
+    "candidate_tree":  "463b440466b7c15c1342e5bae56a895d53d934e6",
+    "checkpoint":  {
+                       "next_action":  "Fresh turn: fetch published main; validate EXM-005 closure; read governance EXM-006-define-privilege-and-transmission-safety-policy task/events/evidence and dependencies; publish readiness and claim before implementation",
+                       "evidence_identity":  "Source and corpus SHA-256 in this immutable manifest",
+                       "task":  "EXM-005",
+                       "resources":  "No external blocker; owner development and main publication authorization active",
+                       "state":  "Verified Done upon successful publication"
+                   },
+    "commands":  [
+                     "node scripts/generate-traffic-fixtures.mjs --write: PASS (132 cases)",
+                     "node scripts/generate-traffic-fixtures.mjs --check: PASS",
+                     "cargo test -p exmon-storage --test traffic_fixtures --locked: PASS (2 tests, 0 failures)",
+                     "cargo fmt --all -- --check: PASS",
+                     "cargo clippy --workspace --all-targets --locked -- -D warnings: PASS",
+                     "node scripts/check-architecture.mjs: PASS",
+                     "git diff --cached --check: PASS"
+                 ],
+    "reviewer":  "Codex exmon fixtures development (author inspection)",
+    "environment":  "Windows; rustc/cargo 1.98.0; Node 24.22.1; synthetic constant corpus",
+    "limitations":  [
+                        "Fixtures represent post-adapter payloads, not wire headers/PCAP or real hardware",
+                        "Reference reader is test-only fixture integrity, not production framing/adapter acceptance; subsequent tasks must consume corpus through actual implementation",
+                        "No physical/native UI tests applicable",
+                        "First closure request follows accepted allocator compatibility boundary"
+                    ],
+    "files":  {
+                  "fixtures/traffic/corpus.json":  "e45111cc5c12aeb44e4843f6530f45ad716350e73ad05f197c9257b82d179295",
+                  "fixtures/traffic/LICENSE":  "a639372d320cdccf423f77746296d2c7bfaaee750e72bbfe645780ad0e749e31",
+                  "fixtures/traffic/README.md":  "da5310a601095c6b22b23013b67f0b0b61f48f6794b3bf1f33e71b0f5705e6f2",
+                  "scripts/generate-traffic-fixtures.mjs":  "852ae67ef3181865e73a69e03e5505ae24e7dddd007337315a3bc50d927192fd",
+                  "crates/storage/tests/traffic_fixtures.rs":  "5962b16e826a57c9b942b421b4448b3c65b17564d6c98373689387f61683959b"
+              },
+    "outcomes":  {
+                     "AC-02":  "PASS: offline Rust integration tests cover 6 transports x 4 applicable framing modes x 6 scenarios (132); independent reference verifies reconstructed bytes, classifications, big-endian value 42, truncation and datagram isolation",
+                     "AC-01":  "PASS: inspected generator uses only constants and deterministic loops; no capture/device/network/clock/random inputs; all 132 cases regenerate identically (canonical LF, checkout CRLF normalized); provenance/license recorded"
+                 },
+    "task_id":  "EXM-005",
+    "cleanup":  "No disposable temporary artifacts; generated corpus is intentional committed test source; ignored build cache and unrelated .idea preserved; no running sessions",
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8"
+}
