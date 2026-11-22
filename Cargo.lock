@@ -67,6 +67,7 @@ dependencies = [
  "exmon-domain",
  "serde",
  "serde_json",
+ "thiserror",
 ]
 
 [[package]]

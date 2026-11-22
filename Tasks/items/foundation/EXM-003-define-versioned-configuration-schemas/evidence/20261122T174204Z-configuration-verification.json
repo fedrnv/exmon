@@ -1,0 +1,47 @@
+{
+    "development_failures":  [
+                                 "Expanded negative test initially found unknown transport keys accepted by Serde unit variants: 7 passed, 1 failed. Replaced parameterless unit variants with empty struct variants under deny_unknown_fields. Same full storage integration suite then passed 8/8; functional source changed before rerun."
+                             ],
+    "outcomes":  {
+                     "AC-02":  "PASS: missing/future versions, malformed/unknown/duplicate data, redacted bounded errors, collection/payload/output caps, overflow, invalid references, invalid transport settings, nonfinite values and enabled schedules rejected",
+                     "AC-01":  "PASS: deterministic project and binding roundtrips; all six transport kinds, four framing variants, field representations, USB/parity variants and documentation examples"
+                 },
+    "source_base":  "ecc51cb2015dc204aaba2b39af0d95c41b8f372e",
+    "files":  {
+                  "crates/domain/src/lib.rs":  "5c8d7ecb602962500a928f3e74ffb95ee644e76e9dcfec9aa6d93d042506083f",
+                  "crates/storage/src/lib.rs":  "968ea43b6bc0c4d52530fe9e962fc77ea0a60219f984e2824f682b7e94caad37",
+                  "docs/configuration.md":  "c78a9a522f267e14269f2b4e6fa4d55a77c36c6124459c2eb653b98b56dbb9c4",
+                  "crates/domain/src/config.rs":  "0a861324919f839028cbaae794f641fc7bf409fc8f5a2b6ab3a8c14038fd7964",
+                  "crates/storage/src/config.rs":  "12831fffce3f6a830247e9b2a5f14df4404df004588c8ff8385e4c4661f0e294",
+                  "Cargo.lock":  "943f97b088b5553fdb0a53de8dec89b515ee98310b5550f0512600ac721e1dfc",
+                  "crates/storage/tests/configuration.rs":  "6f49f46ae0525de3c62efb53c28eee5b141f28c27a938ff6492685108caf1f84",
+                  "crates/storage/Cargo.toml":  "0327e7ea48842a51ad7132a770e07582fdf1bdc8ae45c4a7b2e722ba976ba133"
+              },
+    "commands":  [
+                     "cargo test -p exmon-storage --locked: PASS (8 integration tests, 0 failures)",
+                     "cargo test -p exmon-domain --locked: PASS (2 tests, 0 failures)",
+                     "cargo fmt --all -- --check: PASS",
+                     "cargo clippy --workspace --all-targets --locked -- -D warnings: PASS",
+                     "node scripts/check-architecture.mjs: PASS",
+                     "git diff --cached --check: PASS"
+                 ],
+    "task_id":  "EXM-003",
+    "environment":  "Windows; rustc/cargo 1.98.0; Node 24.22.1; synthetic in-memory JSON fixtures",
+    "limitations":  [
+                        "Schema validation only; no device open, framing execution, physical TX, runtime scheduler or disk I/O",
+                        "Adapters still validate actual supported settings and frame submission before explicit physical TX",
+                        "No prior schema version exists; unsupported versions are explicitly rejected, never migrated implicitly",
+                        "First-closure request uses accepted allocation compatibility boundary; no native automation relabelled 5.7"
+                    ],
+    "checkpoint":  {
+                       "next_action":  "Fresh turn: fetch published main, validate EXM-003 closure and EXM-004 readiness; read EXM-004 all events and evidence; publish claim before structured metrics/redaction implementation",
+                       "evidence_identity":  "Exact source file SHA-256 values in this immutable evidence",
+                       "task":  "EXM-003",
+                       "resources":  "Reusable ignored target cache; no external blockers; owner authorization for development and ordinary main pushes remains active",
+                       "state":  "Verified Done upon successful publication"
+                   },
+    "reviewer":  "Codex exmon configuration development (author diff inspection)",
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "cleanup":  "No temporary files, build artifacts ignored; unrelated .idea preserved; no running command sessions",
+    "candidate_tree":  "c2c3572e5cf147e1b59cd5d6bcb81a6c68b4e964"
+}

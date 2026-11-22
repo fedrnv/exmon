@@ -1,0 +1,11 @@
+{
+    "type":  "task_closed",
+    "schema":  "fdtasks-version-request/v1",
+    "request_id":  "444efdbb-f65e-49d1-9768-bc57dd9e7dad",
+    "epic_id":  "EXM-EPIC-001",
+    "work_item_id":  "EXM-003",
+    "summary":  "Implemented validated portable versioned configuration schemas",
+    "verification":  [
+                         "Tasks/items/foundation/EXM-003-define-versioned-configuration-schemas/evidence/20261122T174204Z-configuration-verification.json"
+                     ]
+}
