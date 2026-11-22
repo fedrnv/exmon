@@ -9,3 +9,11 @@ workspace = true
 
 [dependencies]
 exmon-domain.workspace = true
+pcap = { version = "2.5", optional = true }
+
+[features]
+native-pcap = ["dep:pcap"]
+
+[[example]]
+name = "ethernet_smoke"
+required-features = ["native-pcap"]

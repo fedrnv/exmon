@@ -60,6 +60,7 @@ impl fmt::Debug for Metadata {
 #[derive(Clone)]
 pub struct Observation {
     timestamp_ns: u64,
+    source_timestamp_ns: Option<u64>,
     direction: Direction,
     metadata: Metadata,
     original_length: Option<usize>,
@@ -76,6 +77,14 @@ impl fmt::Debug for Observation {
     }
 }
 impl Observation {
+    /// Preserve capture clock separately; it must never drive monotonic schedules.
+    pub fn with_source_timestamp(mut self, timestamp_ns: u64) -> Self {
+        self.source_timestamp_ns = Some(timestamp_ns);
+        self
+    }
+    pub fn source_timestamp_ns(&self) -> Option<u64> {
+        self.source_timestamp_ns
+    }
     pub fn timestamp_ns(&self) -> u64 {
         self.timestamp_ns
     }
@@ -109,6 +118,7 @@ impl Observation {
         }
         Ok(Self {
             timestamp_ns,
+            source_timestamp_ns: None,
             direction,
             metadata,
             original_length,

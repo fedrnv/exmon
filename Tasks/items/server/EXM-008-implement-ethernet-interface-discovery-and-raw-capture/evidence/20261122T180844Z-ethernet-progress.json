@@ -1,0 +1,57 @@
+{
+    "sdk":  {
+                "url":  "https://npcap.com/dist/npcap-sdk-1.17.zip",
+                "sha256":  "ab7e1a6cb8d07427e0071ec11be380bd9d2bb19ae6ab3f5ede0698c301638258",
+                "location":  "target/npcap-sdk-1.17 (ignored build tooling, not committed)"
+            },
+    "blocker":  "Windows Npcap runtime DLL/driver absent; physical capture not authorized; Linux/macOS environments absent. No live capture run and no driver installed. SDK linker dependency resolved, runtime/platform evidence remains unavailable.",
+    "owner_action":  "Provide an authorized Npcap test environment/interface and Linux/macOS verification hosts (or independently recorded exact smoke evidence) for known synthetic traffic, filter/truncation and stop under load.",
+    "source_base":  "19600f58a20fa5f6fb0fc8a8e190ffe4b4cc8480",
+    "checkpoint":  {
+                       "next_action":  "Fresh turn: fetch main; preserve EXM-008 blocker checkpoint; inspect and select dependency-ready EXM-013 (EXM-006/007 Done), read complete records/rules, publish claim before serial/virtual implementation. Resume EXM-008 when external platform smoke conditions change.",
+                       "evidence_identity":  "Changed-source hashes in this immutable manifest",
+                       "task":  "EXM-008",
+                       "resources":  "No global goal blocker because safe dependency-ready work remains; owner authorizes ordinary main publication; no physical TX/capture authority expanded",
+                       "state":  "Own published claim retained, acceptance blocked on native platform evidence"
+                   },
+    "outcomes":  {
+                     "AC-02":  "PARTIAL: fixture runs 400 records then cancels, verifies no further read and close; native stop-under-load unverified",
+                     "AC-01":  "PARTIAL: production Ethernet generic adapter fixture verifies exact synthetic frame bytes, truncation, source timestamp and options; native code checks and links. Actual Windows/macOS/Linux smoke absent, so AC not fully satisfied"
+                 },
+    "commands":  [
+                     "cargo test -p exmon-capture --locked: adapter 4 PASS; initial Ethernet test expectation FAIL then corrected count bound",
+                     "cargo test -p exmon-capture --test ethernet --locked: PASS (3 tests)",
+                     "cargo test -p exmon-domain --locked: PASS (6 tests)",
+                     "cargo check -p exmon-capture --features native-pcap --locked: PASS",
+                     "cargo fmt --all -- --check: PASS",
+                     "cargo clippy --workspace --all-targets --locked -- -D warnings: PASS",
+                     "cargo clippy -p exmon-capture --features native-pcap --all-targets --locked -- -D warnings: PASS",
+                     "node scripts/check-architecture.mjs: PASS",
+                     "git diff --cached --check: PASS",
+                     "cargo test -p exmon-capture --features native-pcap --no-run --locked: initial LINK LNK1181 wpcap.lib missing; after SDK and correct LIBPCAP_LIBDIR: PASS",
+                     "cargo build -p exmon-capture --features native-pcap --example ethernet_smoke --locked with LIBPCAP_LIBDIR pointing target/npcap-sdk-1.17/Lib/x64: PASS"
+                 ],
+    "reviewer":  "Codex exmon Ethernet development (author source/diff review)",
+    "scope_note":  "Added optional source_timestamp_ns getter/builder in domain observation so libpcap wall timestamp is preserved separately from monotonic ingest, as required by accepted domain contract. This directly affected API is covered by production Ethernet fixture tests. No immutable specification or accepted record edited.",
+    "candidate_tree":  "dce0055d011d0e4d014e3f04fbb78416b9abc5c9",
+    "cleanup":  "No raw captures, device identities, credentials or build outputs staged; target cache/SDK ignored; unrelated .idea preserved; no running sessions",
+    "state":  "In Progress; platform acceptance externally blocked, not Done",
+    "files":  {
+                  "crates/capture/examples/ethernet_smoke.rs":  "770813644c8f253d2a9bfa934814de6d8138d008420843f4c5c77eaceb6fa4f5",
+                  "docs/ethernet-capture.md":  "413c7e4b8f77d18bb17d47901f5d21226cb9a7043ff20713231b59ed248327ac",
+                  "crates/capture/src/ethernet.rs":  "3fef17ef23e1151d1a182d18402f350b9904e8f3e28e3e74e6070eba7a57068c",
+                  "crates/capture/src/native_pcap.rs":  "2040aa79288d6067f9adb4f313a78471277d708cbd81db7c8c7723bea3270dad",
+                  "crates/capture/Cargo.toml":  "1615091f6ba0566b365bfcba599baae2fc12cb8d55102055c07ae2349ba7c39f",
+                  "crates/domain/src/observation.rs":  "b607bbd44f7aa3cfe77e327c545352f9d4cc357208a7161a82b057f68c9a6e87",
+                  "Cargo.lock":  "e3c29b79504f8d80ecf9d9654405fe8f71291e5189ed846f5c4ee0c27f7a14dc",
+                  "crates/capture/tests/ethernet.rs":  "0646ad4324347ef05745ab3a437bd6b36d01fc99ff2d461b994176730ccf5019",
+                  "crates/capture/src/lib.rs":  "54dd6f2314836bcbab455ad8f0f9039001f47b228c53aa30b4cca15fb84fdc69"
+              },
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "task_id":  "EXM-008",
+    "development_failures":  [
+                                 "Fixture test initially expected 64/snapshot ignoring max_items=4; source respected both bounds. Corrected expected min(4,64/snapshot), same meaningful limit assertion passes.",
+                                 "Native linker initially lacked SDK. Downloaded/extracted official SDK without driver installation. First attempt used incorrect PCAP_LIBDIR; inspected upstream build.rs, corrected to LIBPCAP_LIBDIR and linked successfully."
+                             ],
+    "environment":  "Windows x64; Rust/Cargo 1.98.0; Node 24.22.1; no Npcap runtime; SDK 1.17 extracted into ignored target"
+}
