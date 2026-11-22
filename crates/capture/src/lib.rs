@@ -8,4 +8,7 @@ pub mod native_hid;
 #[cfg(feature = "native-pcap")]
 pub mod native_pcap;
 pub mod native_serial;
+#[cfg(feature = "native-usb")]
+pub mod native_usb;
 pub mod serial;
+pub mod usb_transfers;

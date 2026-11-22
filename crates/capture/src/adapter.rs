@@ -20,6 +20,7 @@ pub enum Error {
     Disconnected,
     Cancelled,
     Backend,
+    Busy,
     Exhausted,
 }
 impl std::fmt::Display for Error {
@@ -32,6 +33,7 @@ impl std::fmt::Display for Error {
             Self::Disconnected => "interface disconnected; explicit reconnect required",
             Self::Cancelled => "capture cancelled",
             Self::Backend => "adapter failed or violated its bounded event contract",
+            Self::Busy => "device or interface is busy; kernel driver ownership may conflict",
             Self::Exhausted => "capture epoch or sequence exhausted",
         })
     }

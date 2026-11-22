@@ -1,0 +1,54 @@
+{
+    "checkpoint":  {
+                       "next_action":  "Fresh turn: fetch main, verify EXM-015 closure; preserve EXM-008/014 checkpoints. Read server EXM-016 passive USB capture complete records/dependencies/rules and publish readiness/claim before implementation.",
+                       "evidence_identity":  "Exact changed-source SHA-256 values in this immutable manifest",
+                       "task":  "EXM-015",
+                       "resources":  "Goal active: safe dependency-ready work remains; no physical I/O authorization expanded",
+                       "state":  "Verified virtual prototype Done upon publication; conditional physical OS behavior remains unavailable"
+                   },
+    "outcomes":  {
+                     "AC-02":  "Conditional physical-device testing recorded UNAVAILABLE, not PASS: no approved test hardware/physical authorization. Accepted criterion requests OS-specific physical evidence when hardware is available; virtual prototype implementation verified without claiming hardware support.",
+                     "AC-01":  "PASS: descriptor/transfer fixtures exercise production controller for Bulk/Interrupt selection, exact IN and partial OUT, bounded pending operations, wrong direction/interface/config, unsupported isochronous endpoint, duplicate/bad descriptors, claim Busy, stall/disconnect/cancel/fault partial data; deterministic unit test verifies timeout with unknown actual count"
+                 },
+    "source_base":  "7b8bb71bc5c03344e40dac6a3b16f2ed0bf59253",
+    "files":  {
+                  "crates/capture/src/adapter.rs":  "70e94f2b045180814ba5304ad1a0da50c90799269d5e18391e6e76b901f77086",
+                  "crates/capture/src/usb_transfers.rs":  "a3a9eabedd89a727947789103c640b3d5dd32ecff3e65d031507425b492c01a0",
+                  "crates/capture/tests/usb_transfers.rs":  "079c945c21dc566dc479769c3581164a751e97218a5716a6aca1b5439b5d8ce8",
+                  "docs/usb-transfers.md":  "9a43997bfee63cdd31c8559ff8fdc756698cdda2e00d005ef6e2de3b58dbd08a",
+                  "crates/capture/Cargo.toml":  "d6e3548a6fa1f3c33692c4a3f89c9fa79efe559ac79fbf0349d5508adbfd1c83",
+                  "Cargo.lock":  "a193577bc514acaf252110531bb28a8af3cd988e445e04509ab1abd55ac9390c",
+                  "crates/capture/src/native_usb.rs":  "d7f0b272a619e7fb104ac82acc9dcc13244f18689442b3d3a254fabaaef7dce5",
+                  "crates/capture/src/lib.rs":  "6e2b63f61b74d1850b45ecc0189ab2523b83fb0c3316967bcd59c551a9eb3b24"
+              },
+    "review_details":  "Inspected native source for submit/zero-time wait completion, one pending transfer per endpoint, per-buffer 65536 bound, descriptor collection limits, no auto-detach/reset/set_configuration. Endpoint/interface/device released in ownership order. Partial completions preserve actual bytes/status; cancellation without count uses None. Wrong/inactive configuration selection fails. Failed re-inspection invalidates cached descriptors. Cancelled completion slots cannot be silently overwritten by re-claim.",
+    "commands":  [
+                     "cargo test -p exmon-capture --locked: PASS (1 unit + 17 integration tests)",
+                     "cargo test -p exmon-capture --test usb_transfers --locked: PASS (4 tests, final descriptor assertions)",
+                     "cargo test -p exmon-capture --features native-usb --test usb_transfers --locked: PASS (4 fixture tests linked with native backend; no hardware accessed)",
+                     "cargo check -p exmon-capture --features native-usb --locked: PASS (Windows)",
+                     "cargo check -p exmon-capture --features native-usb --target x86_64-unknown-linux-gnu --locked: PASS",
+                     "cargo fmt --all -- --check: PASS",
+                     "cargo clippy --workspace --all-targets --locked -- -D warnings: PASS",
+                     "cargo clippy -p exmon-capture --features native-usb --all-targets --locked -- -D warnings: PASS",
+                     "node scripts/check-architecture.mjs: PASS",
+                     "git diff --cached --check: PASS"
+                 ],
+    "task_id":  "EXM-015",
+    "environment":  "Windows x64; Rust/Cargo 1.98.0; Linux GNU compile target; nusb 0.2.9; synthetic descriptors and completions only",
+    "limitations":  [
+                        "Completion-based async USB API is separate from synchronous Adapter::transmit; submitting is not completion. Application integration must consume completion events and explicitly authorize every OUT.",
+                        "Physical Windows WinUSB, Linux permissions/kernel-driver conflicts, macOS behavior, transfer timing and cancellation latency not tested",
+                        "Physical USB stand tests require approved device, explicit read/write permission, descriptors and known synthetic expected data; record exact OS/backend behavior when available",
+                        "No driver installation, automatic detach, device reset, configuration change or physical I/O performed",
+                        "EXM-008 and EXM-014 acceptance blockers remain unchanged"
+                    ],
+    "sources":  [
+                    "https://docs.rs/nusb/0.2.9/nusb/",
+                    "https://docs.rs/nusb/0.2.9/nusb/struct.Endpoint.html"
+                ],
+    "reviewer":  "Codex exmon USB transfers development (author source/diff review)",
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "cleanup":  "No raw USB identifiers/captures or generated build outputs staged; ignored target/.idea preserved; all command sessions complete",
+    "candidate_tree":  "4f3251acc87095018a4b0ce0f891984475b15ffb"
+}
