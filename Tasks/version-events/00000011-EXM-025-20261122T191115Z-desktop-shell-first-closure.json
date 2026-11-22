@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 11,
+  "version": "0.1.0.11",
+  "request_id": "EXM-025-20261122T191115Z-desktop-shell-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-025",
+  "summary": "Verified responsive native egui shell with bounded background mock capture and safe layout persistence",
+  "verification": [
+    "Tasks/items/web/EXM-025-build-the-main-application-shell/evidence/20261122T191115Z-shell-verification.json"
+  ],
+  "request_file": "Tasks/version-requests/20261122-EXM-025-desktop-shell.json",
+  "request_sha256": "aa04ea0611eaa0424aa1037737950fe9386d0da7c44f2162b3563649f14e02de"
+}
