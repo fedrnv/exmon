@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 12,
+  "version": "0.1.0.12",
+  "request_id": "EXM-017-20261122T201237Z-native-vcan-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-017",
+  "summary": "Verified classic CAN virtual and native SocketCAN RX/TX/filtering with explicit capability errors",
+  "verification": [
+    "Tasks/items/server/EXM-017-implement-can-capture-and-transmission/evidence/20261122T201237Z-can-verification.json"
+  ],
+  "request_file": "Tasks/version-requests/20261122-EXM-017-native-vcan.json",
+  "request_sha256": "5b830e2f3f7aa9fec92355d73785edd6d607b94e0562cf0f66da29fd52da5610"
+}
