@@ -1,0 +1,85 @@
+{
+  "task_id": "EXM-025",
+  "state": "Verified Done upon publication",
+  "source_base": "c68eab8f1f95a0d8352698ff05ef6878136bf152",
+  "candidate_tree": "482aba2e221aba01fb88ed2d42634a43256eb2b2",
+  "hash_basis": "SHA-256 of verified checkout bytes; candidate_tree identifies Git-normalized staged implementation before evidence",
+  "files": {
+    "crates/app/src/shell.rs": "15d15229cba74071c0d516aa83597f40e617c2a354240c0485ae9d618e92aa71",
+    "crates/app/src/lib.rs": "6d3e3c0038f38bfcdc40708420d733bbcbe10de976ae7d11ad6a1bdf32dbe08c",
+    "crates/gui/examples/native_shell_smoke.rs": "e2d0c5d46b5dc39f8ec70f105ceb2b56127fd09d35c062ad6d80b5deae6510f6",
+    "README.md": "b05df31f6c4da431438eaa489e9b6b49113cb9a8dd93aff117f6278ee315c8d2",
+    "crates/storage/src/layout.rs": "23e7e3bdfedf0be6b5a5660cc9625acd4af2683b55ab31d985f60fff5db7ea67",
+    "crates/storage/src/lib.rs": "b96128a807eb952045282872e9777982980960dd20608f117c4a077458abee09",
+    "Cargo.lock": "d62dad039ac5a116640f5cd7f39044397b52afd04d2a2eebf5a0d17ad9cddeff",
+    "crates/capture/src/lib.rs": "2addf030017bbefe7f7024b92897e0be0e97c1bd27475e3ee920cf89a550da8b",
+    "crates/gui/src/main.rs": "3c69d0041cce710f8aa3507d054655c013c81fab9ee2203c0db755833faa9545",
+    "crates/gui/Cargo.toml": "4194f6c0525feed78cf189eeef88a18985e693f917640df22e8414a5701c9b2e",
+    "crates/gui/tests/shell.rs": "296a48a9c407929fba93be7ff20c4d36e541b0c58628022d84a58216530d9ffd",
+    "crates/gui/src/lib.rs": "0c92ad877c9bc349318b9e36dca391bc8cd09c2372eff16022a411577f97b3fd",
+    "crates/app/tests/shell.rs": "54c2465c8c14102b0b0ae427a3ba742212911eb8761b89770e1af7b2565602cf",
+    "crates/storage/tests/layout.rs": "d6a5571a84d7f4f5865aaf30035a8c6323c2a67ef698c9b58124125706e72296",
+    "crates/capture/tests/synthetic.rs": "e52ba970ab5ec4f94c3d7890f2a443e8f2cbcf59044dfc25d90d48dd349b2564",
+    "docs/desktop-shell.md": "beb74c14a9f9b4b2091f41a6360546c4fcf47537e2d6f10b061611cc4c1a2a7d",
+    "crates/gui/src/shell.rs": "daef17180b0144d23bba6cb30001f3d23817da904f2308c466bd9a024127b609",
+    "crates/capture/src/synthetic.rs": "cdd713dd0b0a3f9a11bce4de54c0a4d7ab0666a80d2c01b1369a4f62c497f1bc"
+  },
+  "visuals": {
+    "Tasks/items/web/EXM-025-build-the-main-application-shell/evidence/20261122T191115Z-shell-900x600-1.5-light.png": "e9d78107ecb0c0af9b9d64beae1b165f5bcdccb7c3335d491477c4e320a9c4a1",
+    "Tasks/items/web/EXM-025-build-the-main-application-shell/evidence/20261122T191115Z-shell-1360x900-1-dark.png": "85595a17eea903a9e96eae9ec1a395989c2172146b764bf1498d4db2cedcef11",
+    "Tasks/items/web/EXM-025-build-the-main-application-shell/evidence/20261122T191115Z-shell-1360x900-1.5-light.png": "46e1fb14ef2df5456f0682d3920f200d28745ec50c13701b254fca717070272c",
+    "Tasks/items/web/EXM-025-build-the-main-application-shell/evidence/20261122T191115Z-native-windows.png": "b45f799ce5dca5723d924274751672ded4289a13e92534fadce032014e4b8f9e",
+    "Tasks/items/web/EXM-025-build-the-main-application-shell/evidence/20261122T191115Z-shell-900x600-1-dark.png": "1ab594ab34ba2ac7ac8ca8401292728802d2dbee939c9eef97c99b0d4f50a8a3"
+  },
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "environment": "Windows x64; Rust/Cargo 1.98.0; egui/eframe/egui_kittest 0.37.0; WGPU 30.0.2; compilation bounded to four jobs",
+  "outcomes": {
+    "AC-01": "PASS: production view with real CaptureWorker sustained batches, Start/Stop, selection, clear, theme and actual splitter resize. Bounded one-second UI scenario progressed 96 frames; slowest warmed frame 12.0957 ms below declared 200 ms ceiling. Packet snapshot after interactions 14976, not a throughput benchmark. Native Windows WGPU startup/render/close and inspected screenshot passed.",
+    "AC-02": "PASS: synthetic source rejects polling off construction thread. Worker test proves distinct ThreadId and stop with full result queue. Separate preference worker proves off-caller disk load/save. GUI only submits nonblocking commands/drains bounded batches; no GUI capture, decoding, storage writes or TX scheduling."
+  },
+  "scope_acceptance": [
+    "Six named synthetic transports/two interfaces and explicit all-synthetic effective filter; no physical source opening or TX.",
+    "Left Incoming/right Outgoing resizable panels, at most 1024 retained observations with visible-row rendering; Outgoing disabled until separate editor/TX tasks.",
+    "Safe validated schema persists only width/height/split/theme; actual UI restores split/theme while idle. Framework persistence disabled; unknown fields including running state rejected."
+  ],
+  "commands": [
+    "cargo test -p exmon-capture -p exmon-app -p exmon-storage --locked: PASS (capture 1 unit + 29 integration; app 1 unit + 4 integration; storage 11 integration)",
+    "cargo test -p exmon-app --test shell -p exmon-gui --test shell --locked -- --nocapture: final PASS after worker correction (2 app + 2 GUI)",
+    "cargo build -p exmon-gui --bin exmon-gui --example native_shell_smoke --locked: final PASS",
+    "Start-Process target/debug/examples/native_shell_smoke.exe -WindowStyle Hidden with redirected local output and 15-second bound: final PASS marker; internal 8-second deadline and screenshot inspected",
+    "cargo fmt --all -- --check: PASS",
+    "cargo clippy --workspace --all-targets --locked -- -D warnings: PASS",
+    "node scripts/check-architecture.mjs: PASS",
+    "git diff --cached --check: PASS"
+  ],
+  "visual_review": "All five exact PNGs inspected after final checks: 900x600/1360x900 logical, dark 1x/light 1.5x, plus native Windows 1200x760. Controls/effective filter/panels/disabled TX/loss counters visible; minimum-size text wraps without control overlap. Partial first row at scroll clip is normal. No real captures, device identifiers or paths displayed.",
+  "development_failures": [
+    "Preferences match-arm semicolon corrected before focused checks.",
+    "Native example IO-to-eframe error conversion corrected by returning boxed error.",
+    "Initial glow/OpenGL native run failed (host OpenGL below 2.0). Changed implementation to WGPU; final native rendering and close PASS. Failed GL run is not acceptance.",
+    "Clippy while-let coalescing loop correction and saturating display counter; affected app/GUI checks passed afterward.",
+    "README patch context mismatch had no partial mutation; corrected exact patch."
+  ],
+  "reviewer": "Codex exmon desktop shell development (author source/staged diff/visual review, not independent Epic review)",
+  "review_details": "Reviewed source, safe worker/queue/generation/Stop boundaries and layout new-file/sync/rename. All baseline lock package versions retained; added native GUI/WGPU/accessibility dependencies. No GUI reachability from backend crates; six-layer check passes. Source construction/poll/cleanup and disk I/O live in workers. Re-launch is idle without TX/schedule authority; existing accepted records unchanged.",
+  "limitations": [
+    "Shell integrates synthetic observations only; network-labelled patterns are not qualified Ethernet/IP fixtures.",
+    "Editors, framing/classification/decoding/charts and transmission remain separate accepted tasks.",
+    "Windows source/native rendering verified, not a packaged release. Linux/macOS display behavior and signing/install/packaging belong to EXM-035/037 and remain untested here.",
+    "Preference-worker join at teardown can wait on OS filesystem latency; normal GUI frames perform no file I/O.",
+    "EXM-008/014/016/017 acceptance blockers unchanged."
+  ],
+  "sources": [
+    "https://docs.rs/eframe/0.37.0/eframe/",
+    "https://docs.rs/egui_kittest/0.37.0/egui_kittest/",
+    "Downloaded exact crate sources inspected for App::ui/logic, hidden screenshot, panel state and AccessKit APIs"
+  ],
+  "cleanup": "All test/native helpers ended. Tests clean preference files; five initial test-owned temp files explicitly removed. target cache/bounded logs ignored, .idea preserved. No compiled binaries/captures/credentials staged.",
+  "checkpoint": {
+    "task": "EXM-025",
+    "state": "Verified main shell Done upon publication; first closure request only",
+    "evidence_identity": "Exact source/inspected visual SHA-256 and candidate_tree in this manifest",
+    "next_action": "Fresh turn: fetch main; verify EXM-025 closure/allocator and preserve EXM-008/014/016/017. Revalidate dependency-ready Tasks/items/ai/EXM-043-connect-ai-provider-accounts complete rules/task/events, then publish readiness/claim before implementation.",
+    "resources": "Global goal active; safe provider abstraction work remains. No physical TX or external account/network authority expanded."
+  }
+}

@@ -25,8 +25,11 @@ The accepted starting architecture is Rust with `egui/eframe`. Platform capture 
 The domain contract is documented in [docs/domain-model.md](docs/domain-model.md).
 Platform permissions, capture privacy and explicit transmission requirements are
 defined in [the product safety policy](docs/security-and-transmission.md).
-The six-layer Rust workspace is initialized; transport and GUI functionality
-will be implemented in subsequent tasks. No physical adapter support is claimed.
+The six-layer Rust workspace includes a native egui shell with bounded background
+mock capture, interface selection, incoming/outgoing panels and safe layout
+preferences. Run it with `cargo run -p exmon-gui --locked`; see
+[desktop shell details](docs/desktop-shell.md). Physical adapters are not connected
+to this shell, and no physical qualification is claimed.
 
 ## Local development
 
@@ -46,5 +49,6 @@ domain. Capture, protocol and storage cannot depend on each other or on the GUI.
 All crates inherit workspace lints. Cargo.lock is committed for reproducibility;
 target directories, local IDE files and sensitive capture files are ignored.
 Synthetic fixtures requiring capture file extensions must be explicitly reviewed
-before adding them. The GUI crate is a library boundary at this stage; the native
-egui/eframe entry point and screens belong to subsequent GUI tasks.
+before adding them. The GUI crate contains the native egui/eframe entry point
+and main shell. Message editors, classification, charts and physical adapter
+integration remain separate accepted tasks.
