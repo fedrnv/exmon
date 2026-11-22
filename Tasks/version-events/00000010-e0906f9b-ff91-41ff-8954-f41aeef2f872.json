@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 10,
+  "version": "0.1.0.10",
+  "request_id": "e0906f9b-ff91-41ff-8954-f41aeef2f872",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-015",
+  "summary": "Implemented bounded asynchronous USB Bulk/Interrupt transfers with verified descriptor and completion fixtures",
+  "verification": [
+    "Tasks/items/server/EXM-015-implement-usb-bulk-and-interrupt-communication/evidence/20261122T182927Z-usb-verification.json"
+  ],
+  "request_file": "Tasks/version-requests/20261122-EXM-015-usb-transfers.json",
+  "request_sha256": "2c546d8ebfa3eb2746c73acadb198fd44e071e84596ff762be2fb07e4f16473f"
+}
