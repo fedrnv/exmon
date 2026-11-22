@@ -1,0 +1,50 @@
+Linux localhost 6.18.60-0-lts #1-Alpine SMP PREEMPT_DYNAMIC 2026-11-01 07:52:36 x86_64 Linux
+/test/libpcap-dev.apk: OK
+EXMON_APK_RC=0
+a9498a700cc497f97276ac4f6fae6b0a5b22d0559be8234985dd7b60ce82f06f  /tmp/ethernet-tests
+[guest package-install progress omitted]
+[{"ifindex":3,"link":"exmontx","ifname":"exmonrx","flags":["BROADCAST","MULTICAST","UP","LOWER_UP"],"mtu":1500,"qdisc":"noqueue","operstate":"UP","linkmode":"DEFAULT","group":"default","txqlen":1000,"link_type":"ether","address":"[synthetic-veth-mac]","broadcast":"[synthetic-veth-mac]","promiscuity":0,"allmulti":0,"min_mtu":68,"max_mtu":65535,"linkinfo":{"info_kind":"veth"},"inet6_addr_gen_mode":"eui64","num_tx_queues":2,"num_rx_queues":2,"gso_max_size":65536,"gso_max_segs":65535,"tso_max_size":524280,"tso_max_segs":65535,"gro_max_size":65536,"gso_ipv4_max_size":65536,"gro_ipv4_max_size":65536}]
+
+running 1 test
+test native_virtual::native_veth_permission_denied_is_explicit ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 0.17s
+
+EXMON_DENIED_RC=0
+
+running 1 test
+test native_virtual::native_veth_fidelity_filter_snapshot_and_stop_under_load ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 4 filtered out; finished in 1.12s
+
+EXMON_NATIVE_RC=0
+
+running 5 tests
+test native_virtual::native_veth_fidelity_filter_snapshot_and_stop_under_load ... ignored, requires isolated EXMON QEMU veth fixture; never physical Ethernet
+test native_virtual::native_veth_permission_denied_is_explicit ... ignored, requires unprivileged account in isolated EXMON QEMU veth fixture
+test exact_bytes_capture_time_truncation_and_options ... ok
+test stop_under_synthetic_load_is_finite_and_does_not_read_after_cancel ... ok
+test unsupported_links_and_permission_denial_remain_explicit ... ok
+
+test result: ok. 3 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+EXMON_FIXTURE_RC=0
+e4e20d03ca6e28afb33a925f4879947eca6a1973bae22531209e12569631a6bc  /tmp/capture-unit-tests
+
+running 2 tests
+test native_pcap::tests::native_permission_messages_are_fixed_errors_without_losing_other_failures ... ok
+test usb_transfers::tests::expired_deadline_is_timeout_not_zero_byte_success ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+EXMON_UNIT_RC=0
+localhost:~#  * Stopping busybox syslog ... [ ok ]
+ * Unmounting loop devices
+ *   Remounting /.modloop read only ... [ ok ]
+ * Unmounting filesystems
+ *   Unmounting /test ... [ ok ]
+ *   Unmounting /media/cdrom ... [ ok ]
+ * Setting hardware clock using the system clock [UTC] ... [ ok ]
+ * Stopping busybox mdev ... [ ok ]
+ [ ok ]
+ * Terminating remaining processes ...[   33.117028] reboot: Power down

@@ -72,8 +72,8 @@ second, requests cancellation and closes, reporting count only. It does not send
 save or print packets. A nonzero count alone does not verify packet fidelity;
 platform acceptance must compare known synthetic traffic and metadata, test BPF
 and snapshot behavior, permission denial and stop under load in each supported
-environment. These live checks have not been run in this Windows environment:
-Npcap runtime is absent, and macOS/Linux hosts are unavailable.
+environment. Windows Npcap runtime is absent on this host, and a macOS verification
+host is unavailable. Linux virtual native acceptance is recorded below.
 
 Offline fixture tests use a synthetic complete Ethernet header with local
 addresses and an experimental EtherType. They verify exact bytes, truncation,
@@ -82,3 +82,57 @@ records, rejection of non-Ethernet links and explicit permission-denied results.
 They test the production generic adapter, not just a reference decoder, but
 cannot prove the native driver behavior. EXM-008 remains unclosed until the
 required platform evidence is available.
+
+## Linux virtual native acceptance
+
+The production native Adapter passed on Alpine standard 3.23.8/Linux
+6.18.60-0-lts in portable QEMU 11.1.0 with software-only TCG, two vCPUs and
+512 MiB RAM. Statically linked libpcap 1.10.7 came from Alpine's official
+`libpcap-dev-1.10.7-r0.apk`; the guest's trusted `apk verify` accepted that
+package before any test. No host driver or physical interface was used.
+
+The ignored native tests require `EXMON_TEST_ETHERNET=qemu-veth`, exact
+`EXMON-QEMU`/`EXMON-NET-FIXTURE` guest DMI identities, and iproute2 JSON proving
+that both fixed fixture interfaces are `veth` before capture or generation.
+Prepare the isolated guest externally, with no TAP, bridge or physical passthrough:
+
+```sh
+apk add iproute2 python3
+ip link add exmontx type veth peer name exmonrx
+ip link set exmontx up
+ip link set exmonrx up
+```
+
+Use the [manual Alpine standard boot recipe](can.md), adding QEMU
+`-smbios type=1,manufacturer=EXMON-QEMU,product=EXMON-NET-FIXTURE`.
+User-mode guest networking is needed only for public packages; application
+capture selects `exmonrx`, never the guest's Internet-facing adapter.
+
+Build the Linux musl test with Rust LLD as in the CAN recipe, feature
+`native-pcap`, test `ethernet` and `--lib` for its error-mapping regression.
+Set `LIBPCAP_LIBDIR` to a directory containing the verified Linux `libpcap.a`
+and `LIBPCAP_VER=1.10.7`; a Windows SDK library cannot substitute for it.
+Share only the binaries and APK on the narrow read-only artifact drive.
+After `apk verify`, copy the executable to `/tmp/ethernet-tests`, mode 755:
+
+```sh
+su nobody -s /bin/sh -c 'EXMON_TEST_ETHERNET=qemu-veth /tmp/ethernet-tests --ignored --exact native_virtual::native_veth_permission_denied_is_explicit --nocapture'
+EXMON_TEST_ETHERNET=qemu-veth /tmp/ethernet-tests --ignored --exact native_virtual::native_veth_fidelity_filter_snapshot_and_stop_under_load --nocapture
+/tmp/ethernet-tests --nocapture
+```
+
+The finite Python generator sends alternating experimental EtherTypes 0x88b5
+and 0x88b6 over `exmontx`. The production BPF filter accepts only 0x88b5; both
+64-byte and 16-byte snapshots match the exact expected prefix and retain original
+length 64, link type 1, Unknown direction and source timestamp. At least 32
+matching records are required per round. Cancellation and native close must finish
+within 500 ms while the generator remains live. Generator lifetime is four seconds,
+socket timeout one second, receive deadline two seconds and batch limit eight.
+The fixture owns and reaps its generator even if an assertion fails.
+
+An actual unprivileged attempt exposed libpcap's message
+`Attempt to create packet socket failed - CAP_NET_RAW may be required`, which
+previously mapped to Backend. It now maps to PermissionDenied; regression tests
+preserve Backend for unrelated failures. No raw backend error is logged by the
+application and no privilege grant is attempted. Windows/macOS smoke remains
+unverified; this Linux evidence does not close EXM-008 or qualify a release.

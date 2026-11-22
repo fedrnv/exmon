@@ -2,6 +2,160 @@ use exmon_capture::{adapter::*, ethernet::*};
 use exmon_domain::{Direction, observation::Metadata};
 use std::sync::{Arc, Mutex};
 
+#[cfg(all(target_os = "linux", feature = "native-pcap"))]
+mod native_virtual {
+    use super::*;
+    use exmon_capture::native_pcap::NativePcap;
+    use std::{
+        fs,
+        process::{Child, Command, Stdio},
+        time::{Duration, Instant},
+    };
+
+    fn fixture() {
+        assert_eq!(
+            std::env::var("EXMON_TEST_ETHERNET").as_deref(),
+            Ok("qemu-veth")
+        );
+        for (file, expected) in [
+            ("product_name", "EXMON-NET-FIXTURE"),
+            ("sys_vendor", "EXMON-QEMU"),
+        ] {
+            assert_eq!(
+                fs::read_to_string(format!("/sys/class/dmi/id/{file}"))
+                    .unwrap()
+                    .trim(),
+                expected
+            );
+        }
+        for name in ["exmonrx", "exmontx"] {
+            let output = Command::new("ip")
+                .args(["-details", "-json", "link", "show", "dev", name])
+                .output()
+                .unwrap();
+            assert!(output.status.success());
+            let link: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+            assert_eq!(
+                link[0]["linkinfo"]["info_kind"], "veth",
+                "refuse non-virtual interface before opening capture or generating traffic"
+            );
+        }
+    }
+
+    fn selected(snapshot: usize) -> Ethernet<NativePcap> {
+        let mut adapter = Ethernet::new(
+            NativePcap::default(),
+            Options {
+                promiscuous: true,
+                timeout_ms: 10,
+                filter: "ether proto 0x88b5".into(),
+            },
+        )
+        .unwrap();
+        let interfaces = adapter.enumerate(64).unwrap();
+        let id = interfaces
+            .iter()
+            .find(|d| adapter.interface_name(d.id) == Some("exmonrx"))
+            .unwrap()
+            .id;
+        adapter.open(id).unwrap();
+        adapter.configure(snapshot).unwrap();
+        adapter
+    }
+
+    struct Generator(Child);
+    impl Drop for Generator {
+        fn drop(&mut self) {
+            let _ = self.0.kill();
+            let _ = self.0.wait();
+        }
+    }
+
+    #[test]
+    #[ignore = "requires isolated EXMON QEMU veth fixture; never physical Ethernet"]
+    fn native_veth_fidelity_filter_snapshot_and_stop_under_load() {
+        fixture();
+        let mut bytes = vec![2, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 2, 0x88, 0xb5];
+        bytes.extend(14..64);
+        let script = format!(
+            "import socket,time\ns=socket.socket(socket.AF_PACKET,socket.SOCK_RAW)\ns.settimeout(1)\ns.bind(('exmontx',0))\nf=bytearray({bytes:?})\ndeadline=time.monotonic()+4\ni=0\nwhile time.monotonic()<deadline:\n f[13]=0xb5 if i%2 else 0xb6\n s.send(f)\n i+=1\n time.sleep(0.0002)\n"
+        );
+        for snapshot in [64, 16] {
+            let mut adapter = selected(snapshot);
+            adapter.start().unwrap();
+            assert_eq!(adapter.transmit(&bytes), Err(Error::Unsupported));
+            let mut generator = Generator(
+                Command::new("python3")
+                    .args(["-c", &script])
+                    .stdout(Stdio::null())
+                    .stderr(Stdio::null())
+                    .spawn()
+                    .unwrap(),
+            );
+            let deadline = Instant::now() + Duration::from_secs(2);
+            let mut count = 0;
+            while count < 32 && Instant::now() < deadline {
+                let batch = adapter.poll(&Cancellation::default(), 8, 512).unwrap();
+                assert!(batch.len() <= 8);
+                for observation in batch {
+                    assert_eq!(observation.bytes(), &bytes[..snapshot]);
+                    assert_eq!(observation.original_length(), Some(64));
+                    assert_eq!(observation.direction(), Direction::Unknown);
+                    assert!(matches!(
+                        observation.metadata(),
+                        Metadata::Ethernet { link_type: 1 }
+                    ));
+                    assert!(observation.source_timestamp_ns().unwrap() > 0);
+                    count += 1;
+                }
+                std::thread::sleep(Duration::from_millis(1));
+            }
+            assert!(
+                count >= 32,
+                "native capture did not receive expected filtered traffic"
+            );
+            assert!(
+                generator.0.try_wait().unwrap().is_none(),
+                "generator ended before stop-under-load check"
+            );
+            let cancellation = Cancellation::default();
+            let stop = Instant::now();
+            cancellation.cancel();
+            assert_eq!(
+                adapter.poll(&cancellation, 8, 512).err(),
+                Some(Error::Cancelled)
+            );
+            adapter.stop().unwrap();
+            assert!(
+                stop.elapsed() < Duration::from_millis(500),
+                "native cancel/close exceeded fixture stop budget"
+            );
+            assert_eq!(
+                adapter.poll(&Cancellation::default(), 8, 512).err(),
+                Some(Error::InvalidState)
+            );
+            adapter.close().unwrap();
+            drop(generator);
+        }
+    }
+
+    #[test]
+    #[ignore = "requires unprivileged account in isolated EXMON QEMU veth fixture"]
+    fn native_veth_permission_denied_is_explicit() {
+        fixture();
+        let uid = Command::new("id").arg("-u").output().unwrap();
+        assert!(uid.status.success());
+        assert_ne!(String::from_utf8(uid.stdout).unwrap().trim(), "0");
+        let mut adapter = selected(64);
+        assert_eq!(adapter.start(), Err(Error::PermissionDenied));
+        assert_eq!(
+            adapter.poll(&Cancellation::default(), 8, 512).err(),
+            Some(Error::InvalidState)
+        );
+        adapter.close().unwrap();
+    }
+}
+
 #[derive(Default)]
 struct Control {
     active: bool,

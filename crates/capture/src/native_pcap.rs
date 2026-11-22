@@ -14,7 +14,10 @@ fn map_error(error: pcap::Error) -> Error {
         pcap::Error::PcapError(message)
             if message.to_ascii_lowercase().contains("permission denied")
                 || message.to_ascii_lowercase().contains("not permitted")
-                || message.to_ascii_lowercase().contains("access is denied") =>
+                || message.to_ascii_lowercase().contains("access is denied")
+                || message.eq_ignore_ascii_case(
+                    "Attempt to create packet socket failed - CAP_NET_RAW may be required",
+                ) =>
         {
             Error::PermissionDenied
         }
@@ -24,6 +27,7 @@ fn map_error(error: pcap::Error) -> Error {
         _ => Error::Backend,
     }
 }
+
 impl Source for NativePcap {
     fn list(&mut self, maximum: usize) -> Result<Vec<String>, Error> {
         Ok(pcap::Device::list()
@@ -86,6 +90,36 @@ impl Source for NativePcap {
                 Some(delta.map(u64::from))
             }
             Err(_) => Some(None),
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn native_permission_messages_are_fixed_errors_without_losing_other_failures() {
+        for message in [
+            "Attempt to create packet socket failed - CAP_NET_RAW may be required",
+            "socket: Operation not permitted",
+            "permission denied",
+            "Access is denied",
+        ] {
+            assert_eq!(
+                map_error(pcap::Error::PcapError(message.into())),
+                Error::PermissionDenied
+            );
+        }
+        for message in [
+            "invalid filter expression",
+            "no such interface",
+            "filter mentions CAP_NET_RAW",
+        ] {
+            assert_eq!(
+                map_error(pcap::Error::PcapError(message.into())),
+                Error::Backend
+            );
         }
     }
 }

@@ -1,0 +1,29 @@
+import {spawn} from 'node:child_process';
+import net from 'node:net';
+import fs from 'node:fs';
+const root='C:/GitHub/exmon/target/can-vm'; const fixture='C:/GitHub/exmon/target/ethernet-vm';
+const serial=net.createServer();
+await new Promise(r=>serial.listen(0,'127.0.0.1',r));
+const port=serial.address().port;
+await new Promise(r=>serial.close(r));
+const args=['-machine','q35,accel=tcg','-smp','2','-m','512','-display','none','-serial',`tcp:127.0.0.1:${port},server=on,wait=on`,'-monitor','none','-no-reboot','-kernel',`${root}/alpine-standard/boot/vmlinuz-lts`,'-initrd',`${root}/alpine-standard/boot/initramfs-lts`,'-append','console=ttyS0 alpine_dev=cdrom modules=loop,squashfs,sd-mod,usb-storage quiet','-cdrom',`${root}/downloads/alpine-standard.iso`,'-nic','user,model=virtio-net-pci','-smbios','type=1,manufacturer=EXMON-QEMU,product=EXMON-NET-FIXTURE','-drive',`file=fat:ro:${fixture}/share,format=raw,if=virtio,readonly=on`];
+const log=fs.createWriteStream(`${fixture}/serial.log`);
+const child=spawn(`${root}/qemu/qemu-system-x86_64.exe`,args,{windowsHide:true,stdio:['ignore','pipe','pipe']});
+child.stdout.pipe(process.stdout);child.stderr.pipe(process.stderr);
+let socket, transcript='', stage=0;
+const timeout=setTimeout(()=>{console.error('VM watchdog expired');socket?.destroy();child.kill();process.exitCode=1;},240000);
+child.on('exit',(code)=>{clearTimeout(timeout);socket?.destroy();log.end();console.log('VM_EXIT',code);process.exitCode=code===0&&transcript.includes('EXMON_NATIVE_RC=0')&&transcript.includes('EXMON_FIXTURE_RC=0')&&transcript.includes('EXMON_DENIED_RC=0')&&transcript.includes('EXMON_APK_RC=0')&&transcript.includes('EXMON_UNIT_RC=0')?0:1;});
+for(let attempt=0;attempt<100;attempt++){
+  socket=await new Promise(r=>{const s=net.connect(port,'127.0.0.1');s.once('connect',()=>r(s));s.once('error',()=>{s.destroy();r(null);});});
+  if(socket)break;
+  await new Promise(r=>setTimeout(r,100));
+}
+if(!socket){child.kill();throw new Error('Serial connection failed');}
+socket.on('data',data=>{
+ log.write(data);process.stdout.write(data);transcript+=data.toString();
+ if(stage===0&&transcript.includes('login: ')){stage=1;socket.write('root\n');}
+ if(stage===1&&transcript.includes('localhost:~# ')){
+  stage=2;
+  socket.write("stty -echo; trap \u0027poweroff\u0027 EXIT; set -e; uname -a; mkdir /test; mount -o ro /dev/vda1 /test; apk verify /test/libpcap-dev.apk; echo EXMON_APK_RC=0; cp /test/ethernet-tests /tmp/ethernet-tests; chmod 755 /tmp/ethernet-tests; sha256sum /tmp/ethernet-tests; ip link set eth0 up; timeout 20 udhcpc -i eth0 -q -t 5; printf \u0027https://dl-cdn.alpinelinux.org/alpine/v3.23/main\\n\u0027 \u003e /etc/apk/repositories; timeout 90 apk add iproute2 python3; ip link add exmontx type veth peer name exmonrx; ip link set exmontx up; ip link set exmonrx up; ip -details -json link show dev exmonrx; su nobody -s /bin/sh -c \"EXMON_TEST_ETHERNET=qemu-veth /tmp/ethernet-tests --ignored --exact native_virtual::native_veth_permission_denied_is_explicit --nocapture\"; echo EXMON_DENIED_RC=0; EXMON_TEST_ETHERNET=qemu-veth /tmp/ethernet-tests --ignored --exact native_virtual::native_veth_fidelity_filter_snapshot_and_stop_under_load --nocapture; echo EXMON_NATIVE_RC=0; /tmp/ethernet-tests --nocapture; echo EXMON_FIXTURE_RC=0; cp /test/capture-unit-tests /tmp/capture-unit-tests; chmod 755 /tmp/capture-unit-tests; sha256sum /tmp/capture-unit-tests; /tmp/capture-unit-tests --nocapture; echo EXMON_UNIT_RC=0; poweroff\n");
+ }
+});

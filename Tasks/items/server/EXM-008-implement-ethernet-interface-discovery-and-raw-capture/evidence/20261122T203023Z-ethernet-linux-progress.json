@@ -1,0 +1,116 @@
+{
+  "task_id": "EXM-008",
+  "owner": "Codex exmon Ethernet development",
+  "verified_at": "2026-11-22T20:30:23Z",
+  "state": "In Progress; Linux virtual native acceptance passed, Windows/macOS pending",
+  "source_base": "7ee290dbf5dac694e369e53c851cf983fa3bf3e8",
+  "candidate_tree": "9359f7137543d5c6ae7805df55785b295b145d52",
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "hash_basis": "SHA-256 of verified checkout bytes; candidate_tree identifies staged Git-normalized source before evidence",
+  "files": {
+    "crates/capture/src/native_pcap.rs": "e06ff370f3fe2463be17ede63306fdcf9d7bbf3aaba00399baffa22fd098290a",
+    "crates/capture/tests/ethernet.rs": "aeb232c2218dde4974170fdc88e67e55340bb0e1ca2e0a871a56734e7d18b13f",
+    "crates/capture/src/ethernet.rs": "3fef17ef23e1151d1a182d18402f350b9904e8f3e28e3e74e6070eba7a57068c",
+    "docs/ethernet-capture.md": "5ecd977929cf68300f02f27df7ae4099873da74491a576c47e1c56983da3971f",
+    "Cargo.lock": "d62dad039ac5a116640f5cd7f39044397b52afd04d2a2eebf5a0d17ad9cddeff"
+  },
+  "outcomes": {
+    "AC-01": "PARTIAL globally; Linux PASS. Actual production NativePcap/Ethernet Adapter over guest veth: exact64-byte and16-byte prefixes, original64, DLT_EN10MB1, directionUnknown, source time present; alternating EtherTypes excluded by actual BPF. Promisc=true and timeout10ms applied. Actual nobody activation returns PermissionDenied and cannot poll; unit mapping regression passes. Windows/macOS native runtime smoke unavailable, never inferred from compilation.",
+    "AC-02": "PARTIAL globally; Linux PASS. At least32 known filtered frames each snapshot round; batch<=8, finite polling, generator still live at cancellation. Cancel/poll and Stop within500ms, stopped poll InvalidState, close and generator kill/reap. Other platform native stop remains unverified."
+  },
+  "change": "New ignored native virtual tests and capability-string regression. Linux libpcap1.10.7 returns 'Attempt to create packet socket failed - CAP_NET_RAW may be required'; old mapping produced Backend. Exact case-insensitive match now produces PermissionDenied without logging raw errors or changing privilege. Existing permission patterns retained; unrelated errors stay Backend. No transport/API/schema/dependency change.",
+  "environment": {
+    "host": "Windows x86_64; Rust/Cargo1.98.0 stable; Node24.22.1",
+    "guest": "Alpine standard3.23.8, Linux6.18.60-0-lts, iproute2 6.17.0-r0, Python3.12.16-r0",
+    "qemu": "11.1.0 v11.1.0-12130-ge470268ff4; q35 TCG,2vCPU,512MiB RAM,no writable guest disk",
+    "isolation": "Only guest-only exmontx/exmonrx veth capture/generation. Exact DMI EXMON-QEMU/EXMON-NET-FIXTURE and both veth-kind guards precede open/TX. No physical host capture/TX, host driver/elevation, TAP/bridging or passthrough. Public packages via guest user networking, no capture of that interface. Narrow read-only binaries/APK drive, no repository/home share. VM240s watchdog, Python4s lifetime/socket1s timeout,2s receive deadlines, generator owned/reaped; VM powered off and no QEMU remains."
+  },
+  "library": {
+    "url": "https://dl-cdn.alpinelinux.org/alpine/v3.23/main/x86_64/libpcap-dev-1.10.7-r0.apk",
+    "apk_sha256": "55e1c806f8fa6107b2fda4940f4ccbba938583b67e0e46ebf259362f69cf9003",
+    "archive_sha256": "f0c33d6d7902cf05c90b8c7a48b5e24e04a7a6be05cafdc5517ad24b4a7bb250",
+    "trust": "Official HTTPS download; exact APK mounted read-only and apk verify accepted using trusted keys in verified Alpine ISO before tests. Extracted static libpcap.a and pkg-config metadata; actual version1.10.7, no private link libraries. LIBPCAP_VER records actual extracted version, not an invented ABI.",
+    "base_image_tool_evidence": "Tasks/items/server/EXM-017-implement-can-capture-and-transmission/evidence/20261122T201237Z-can-verification.json",
+    "iso_sha256": "5d5b4fc2244b25170e915c05141b259fec5350499928eab21c4dd34b24e0dbe4"
+  },
+  "binaries": {
+    "ethernet-tests": "a9498a700cc497f97276ac4f6fae6b0a5b22d0559be8234985dd7b60ce82f06f",
+    "capture-unit-tests": "e4e20d03ca6e28afb33a925f4879947eca6a1973bae22531209e12569631a6bc"
+  },
+  "verification": [
+    {
+      "command": "LIBPCAP_LIBDIR=<verified Linux archive dir>; LIBPCAP_VER=1.10.7; CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER=<sysroot>/lib/rustlib/x86_64-pc-windows-msvc/bin/rust-lld.exe; target RUSTFLAGS=-C linker-flavor=ld.lld; cargo test -p exmon-capture --features native-pcap --test ethernet --lib --target x86_64-unknown-linux-musl --locked --no-run",
+      "result": "PASS; both final static binary SHA values match guest"
+    },
+    {
+      "command": "node target/ethernet-vm/run.mjs",
+      "result": "PASS; APK,denied,native,fixture,unit markers0 and VM_EXIT0, actual final candidate. Exact manual harness attached."
+    },
+    {
+      "command": "su nobody -s /bin/sh -c 'EXMON_TEST_ETHERNET=qemu-veth /tmp/ethernet-tests --ignored --exact native_virtual::native_veth_permission_denied_is_explicit --nocapture'",
+      "result": "PASS1; actual unprivileged libpcap source"
+    },
+    {
+      "command": "EXMON_TEST_ETHERNET=qemu-veth /tmp/ethernet-tests --ignored --exact native_virtual::native_veth_fidelity_filter_snapshot_and_stop_under_load --nocapture",
+      "result": "PASS1; both64/16 snapshots and native stop under ongoing synthetic load"
+    },
+    {
+      "command": "/tmp/ethernet-tests --nocapture; /tmp/capture-unit-tests --nocapture",
+      "result": "PASS3 Ethernet fixtures with2 native tests ignored in ordinary invocation (executed separately above); PASS2 native-feature unit tests including fixed permission mapping"
+    },
+    {
+      "command": "cargo test -p exmon-capture -p exmon-domain --locked",
+      "result": "PASS31 capture +6 domain and doctests, implemented transport regressions"
+    },
+    {
+      "command": "cargo fmt --all -- --check; cargo clippy --workspace --all-targets --locked -- -D warnings",
+      "result": "PASS"
+    },
+    {
+      "command": "LIBPCAP_LIBDIR=target/npcap-sdk-1.17/Lib/x64; cargo clippy -p exmon-capture --features native-pcap --all-targets --locked -- -D warnings",
+      "result": "PASS Windows compilation/lint; not runtime acceptance"
+    },
+    {
+      "command": "LIBPCAP_LIBDIR=<verified Linux archive dir>; LIBPCAP_VER=1.10.7; cargo clippy -p exmon-capture --features native-pcap --target x86_64-unknown-linux-gnu --all-targets --locked -- -D warnings",
+      "result": "PASS Linux native compilation/lint"
+    },
+    {
+      "command": "node scripts/check-architecture.mjs; git diff --check; git diff --cached --check",
+      "result": "PASS"
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/evidence/20261122T203023Z-guest-output.txt",
+      "sha256": "4f537455ea7aee5c909f6be053c08afa7cac6e26e920d251b278648d4747de42",
+      "description": "Actual serial output from uname onward; ANSI/CR removed, package-install progress omitted, generated veth MAC/broadcast strings redacted. No packet payload capture file committed."
+    },
+    {
+      "path": "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/evidence/20261122T203023Z-manual-harness.txt",
+      "sha256": "4d6dc7842dbee57c4973994b267ec01b7b4cfbf729e4ff296b49d6ca7d37ac19",
+      "description": "Exact one-off manual VM orchestration source; not a canonical automated gate."
+    },
+    {
+      "path": "ignored target/ethernet-vm/serial.log",
+      "sha256": "0aece2b1ef876ee120b9e80f4ed976703c1bd101aa7214d01f6d770a862dc0cf",
+      "description": "Raw source of attached normalized output"
+    }
+  ],
+  "failures_corrected": [
+    "Native denied test initially failed Backend vs PermissionDenied; temporary controlled-fixture diagnostic identified actual libpcap CAP_NET_RAW message. Added exact classifier and positive/negative unit regression; removed diagnostic output. Final real denial passed; test expectation never weakened.",
+    "Clippy found test module before production impl; moved unit module to file end, reran lint and final native binary/unit checks. Final candidate passes.",
+    "First passing native candidate lacked executed unit binary; copied built unit executable into next narrow fixture and reran final-source native phases plus explicit unit test. No earlier fail is silently promoted to PASS."
+  ],
+  "reviewer": "Codex exmon Ethernet development (author source and actual staged diff review; not independent Epic review)",
+  "review": "Reviewed production message mapping, existing nonblocking/read-only/no-TX source, guards before virtual socket operations, exact filter/snapshot assertions, finite generator and RAII cleanup. No accepted records changed. GUI unchanged, no visual acceptance required.",
+  "blocker": "Windows Npcap runtime/driver is unavailable and no macOS verification host exists here. Linux virtual evidence resolves only Linux native smoke. EXM-008 must remain In Progress; no Done/version request.",
+  "owner_action": "Provide an authorized Windows Npcap test environment and macOS verification host with known synthetic Ethernet traffic; record byte/metadata/BPF/snapshot and native stop-under-load evidence against this source. Physical traffic/host driver installation requires the corresponding explicit authorization; none inferred here.",
+  "cleanup": "Only source/tests/docs/new task evidence staged, no binary/APK/generated build/private capture/credentials. Ignored tool and fixture caches retained; VM shut down and loopback serial listener closed. Unrelated .idea preserved.",
+  "checkpoint": {
+    "goal": "active; current turn concrete Linux verification and production error fix, not a no-progress turn",
+    "task": "EXM-008 In Progress under existing owner; publish partial native evidence immediately",
+    "next_action": "Fresh turn fetch main and verify this EXM-008 checkpoint. Revalidate remaining dependency-ready tasks and Epic scope; preserve Windows/macOS blockers. If no new Planned task is ready, investigate own EXM-014 native Linux HID using emulated USB fixture after renewed readiness, retaining mandatory physical-device acceptance as blocked. Never replace physical acceptance with emulation or start dependent Epic002/EXM-043.",
+    "authority": "Only virtual guest work; host drivers/elevation and physical capture/TX still unauthorized.",
+    "remaining": "All-tasks objective unchanged; other accepted tasks/gates not claimed completed."
+  }
+}
