@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 7,
+  "version": "0.1.0.7",
+  "request_id": "647008e9-4b93-4503-a34e-aed10baff9d0",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-006",
+  "summary": "Defined platform privileges, capture privacy and explicit transmission safety policy",
+  "verification": [
+    "Tasks/items/governance/EXM-006-define-privilege-and-transmission-safety-policy/evidence/20261122T175519Z-safety-verification.json"
+  ],
+  "request_file": "Tasks/version-requests/20261122-EXM-006-safety.json",
+  "request_sha256": "f65c8ec12936c687cb82a5dec50a369eeeab737efba1a19c5301aa43dab6bcb2"
+}
