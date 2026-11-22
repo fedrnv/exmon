@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 3,
+  "version": "0.1.0.3",
+  "request_id": "6c6adfd8-437c-4d27-8599-64f24c46dbcc",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-002",
+  "summary": "Initialized verified six-layer Rust workspace",
+  "verification": [
+    "Tasks/items/foundation/EXM-002-initialize-the-rust-workspace/evidence/20261122T173548Z-workspace-verification.json"
+  ],
+  "request_file": "Tasks/version-requests/20261122-EXM-002-workspace.json",
+  "request_sha256": "959a93e0b65aedf4543e9f4dfdd1ad94178cb3a6ed24931ffad3ba41ee10f352"
+}
