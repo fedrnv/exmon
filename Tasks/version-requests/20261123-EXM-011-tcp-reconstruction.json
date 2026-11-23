@@ -1,0 +1,11 @@
+{
+  "schema": "fdtasks-version-request/v1",
+  "request_id": "EXM-011-20261123T105420Z-bounded-tcp-reconstruction-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-011",
+  "summary": "Bounded bidirectional TCP reconstruction with explicit gaps, overlap policy and lifecycle/resource boundaries",
+  "verification": [
+    "Tasks/items/server/EXM-011-implement-bounded-tcp-stream-reconstruction/evidence/20261123T105420Z-tcp-verification.json"
+  ]
+}

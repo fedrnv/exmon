@@ -2,3 +2,4 @@
 
 pub mod network;
 pub mod network_filter;
+pub mod tcp_reassembly;

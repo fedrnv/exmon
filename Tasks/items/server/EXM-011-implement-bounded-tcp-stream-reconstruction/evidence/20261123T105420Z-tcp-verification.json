@@ -1,0 +1,129 @@
+{
+  "task_id": "EXM-011",
+  "owner": "Codex exmon TCP reconstruction",
+  "verified_at": "2026-11-23T10:54:20Z",
+  "source_base": "6b8d08f777e2ef89f41a5d6caeb7a1dfb0c0ca6d",
+  "candidate_tree": "29b565cdb94271d344d00d20caa218368689f783",
+  "task_sha256": "66cb7f8aee5c6cee77fa48893c496115733635716fedcfd3b0746d636fc9f1e2",
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "owner_exception": "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+  "hash_basis": "SHA256 of verified checkout bytes; candidate_tree is staged Git-normalized product source before closure records. Detailed logs/test binary remain in ignored bounded local store; compact exact commands/outcomes and hashes committed.",
+  "environment": {
+    "host": "Windows Server2025 Datacenter x64 build26100, x86_64-pc-windows-msvc",
+    "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)",
+    "cargo": "cargo 1.98.0 (797e8a9bc 2026-08-05)",
+    "node": "v24.22.1",
+    "devices": "None required or touched; no capture/injection/socket operation, installer, credentials or platform privilege used by this pure protocol task."
+  },
+  "files": {
+    "crates/protocol/src/lib.rs": "6013ff7328d27c3d4e412d44bd66f24a2a87fd31f36555aa9615b033f94e7acf",
+    "crates/protocol/src/tcp_reassembly.rs": "233a3af4d5ee52e8e40a03076fa6041d8daa1b5d9eb2d4794b0e463b5b6d94ef",
+    "crates/protocol/tests/tcp_reassembly.rs": "7f9a1d83835bdbc3daa9a39b52cda9f5d7e96c0c3a185a28f8f70b87befd62ab",
+    "docs/tcp-reconstruction.md": "fea767cf06907a4c9e62bedf86e9e4ac1c20251fd4177038ba9c16c1b2440298"
+  },
+  "unchanged_inputs": {
+    "crates/protocol/src/network.rs": "2a237e672e4d5aa732ac582204ea0ebc94f42c1be8d3bcb00cfb7f5ab8639fef",
+    "crates/protocol/tests/support/filter_wire.rs": "d32f231e81c02d7d9c63279b0fbaf247d7f9aab0c223314219d86ab8705429a8",
+    "Cargo.lock": "03dc9c4e50920b7c60e95272525257d26945859dff72be326f8b15118edb8402"
+  },
+  "acceptance": {
+    "AC-01": "PASS19 focused tests: deterministic independent per-byte first-seen reference over128 overlap orders with96 input steps each plus final fill; bidirectional ordering/fragmentation, exact/conflicting/partial/unverifiable past retransmission, recovered and permanent gaps with Gap-before-Data order, ACK evidence, truncation, SYN data and delayed/reused SYN, wrap/half-space, independent half-close/FIN/RST, conflicting FIN extent, valid ACK at FIN+1, idle/gap exact deadline/u64MAX/end-of-capture. Context/interface/epoch/VLAN isolation. Actual EXM009 IPv4/IPv6 TCP wire decoding including IPv4 options, IPv6 extensions,0/2/8 VLAN tags, capture-truncated FIN payload and all input prefixes. Original observation/timestamps remain unchanged; socket/unsupported metadata rejected rather than misinterpreted.",
+    "AC-02": "PASS hard payload+metadata saturation:8MiB queued globally,1MiB per bidirectional flow,4096 chunks and1024 flows reached, then explicit rejection/eviction and complete cleanup. Limits, backward clocks, bounded serial distance and malformed input reject before unsafe state. A1GiB ACK-inferred hole produces only metadata, no payload allocation.8000 deterministic hostile normalized segments plus all selected wire-byte mutations stay within live stats/output bounds without panic. Debug tests exercise actual Opened endpoints and Data payload and confirm redaction. No unbounded history/output queue or recursion."
+  },
+  "verification": [
+    {
+      "command": "cargo test -p exmon-protocol --test tcp_reassembly --locked",
+      "result": "PASS19,0 failed/ignored, final0.06s. This is targeted engine/parser acceptance, not EXM034 full fuzz/security gate.",
+      "log": "target/exm011-evidence/focused.txt"
+    },
+    {
+      "command": "cargo test -p exmon-protocol --test network --test network_filters --locked; cargo test -p exmon-capture -p exmon-domain --locked",
+      "result": "PASS49 (9 decoder+3 filters+31 implemented capture transport regressions+6 domain), plus doctests. All selected commands exit0.",
+      "log": "target/exm011-evidence/regressions.txt"
+    },
+    {
+      "command": "cargo fmt --all -- --check; cargo clippy --workspace --all-targets --locked -- -D warnings; node scripts/check-architecture.mjs; git diff --check",
+      "result": "PASS workspace format/lint, six-layer resolved graph+3 negative dependency fixtures, diff whitespace. Final staged diff check also passed.",
+      "log": "target/exm011-evidence/quality.txt"
+    },
+    {
+      "command": "git diff --cached --check; git diff --cached --stat/--numstat; read staged full engine, tests, docs and lib wiring; git write-tree; git fetch origin main; git rev-parse HEAD origin/main",
+      "result": "PASS4 intended product paths only; claim6b8d08f remains authoritative, source frozen at candidate tree, no task/spec/dependency/policy ownership change. Closure records checked separately before publication."
+    }
+  ],
+  "local_artifacts": [
+    {
+      "path": "target/exm011-evidence/focused.txt",
+      "sha256": "d6243458cc603ff31416378f849d44b7c966473095b300a1d26e607fdc137fd8",
+      "bytes": 4182
+    },
+    {
+      "path": "target/exm011-evidence/regressions.txt",
+      "sha256": "9f60a53da6f8d4d64661c7b118ff202039162949d0736554cc38fa68ac368412",
+      "bytes": 14816
+    },
+    {
+      "path": "target/exm011-evidence/quality.txt",
+      "sha256": "26c95a1480cf081b0209d51ebc35bb5e7c7637e5828cda8ea77a9fb54e9b2fab",
+      "bytes": 2422
+    },
+    {
+      "path": "target/debug/deps/tcp_reassembly-35d662012ff743cf.exe",
+      "sha256": "407c37937c8b41355c168e01b5d4b8bdc777d88e17285453c61fc53f72487a53",
+      "bytes": 1272320
+    }
+  ],
+  "policy": {
+    "overlap": "First observed data wins; compare buffered bytes, report identical/conflicting overlaps, never rewrite committed frontier. UnverifiablePast includes late bytes for committed gaps and has no unbounded payload history. Separate incomplete/ambiguous closure indicators.",
+    "sequence": "Checked unwrapped64-bit coordinates with32-bit serial arithmetic; SYN/FIN consume numbers, half-space/window bounds enforced. Unknown prefix and tuple-reuse boundary explicit; ACK/sequence evidence separated from declared payload extent for FIN validation.",
+    "loss": "Missing bytes remain recoverable until deadline/closure. Permanent Gap precedes later Data, no zero fill or concatenation through loss. Pressure rejects new queued holes before copying and retains extent; deterministic LRU capacity boundary flushes. In-order data bypasses pending storage.",
+    "output": "Returned data<=previous queued bytes+one bounded input; event count<=2*total_chunks+8*flows+2*direction_chunks+32. Fixed keys and bounded nodes/hole lists/event capacity bound metadata separately. Caller must consume/move results through its own bounded channel.",
+    "clock": "Caller monotonic processing time, no source/device timestamp or wall-clock dependency; timers precede input at the same timestamp, gap timer not refreshed while hole remains. Backward time rejected.",
+    "defaults": {
+      "flows": 256,
+      "total_bytes": 4194304,
+      "flow_bytes": 131072,
+      "total_chunks": 2048,
+      "direction_chunks": 64,
+      "input_bytes": 65536,
+      "sequence_window": 1048576,
+      "gap_timeout_ns": 2000000000,
+      "idle_timeout_ns": 60000000000
+    },
+    "hard_ceilings": {
+      "flows": 1024,
+      "total_bytes": 8388608,
+      "flow_bytes": 1048576,
+      "total_chunks": 4096,
+      "direction_chunks": 128,
+      "input_bytes": 65536,
+      "sequence_window": 1073741824
+    }
+  },
+  "failures_corrected": [
+    "Prior accepted checkpoint/final prose mislabelled011 as sockets. Read immutable TASK:011 is reconstruction,012 active TCP/UDP sockets. Corrected current readiness/checkpoint append-only; old accepted records/specifications unchanged and no012 implementation/claim in this turn.",
+    "Review optimized expiry to scan bounded metadata and remove/reinsert only due flows, avoiding whole-map reconstruction per packet; functional ordering retained and focused tests rerun.",
+    "Clippy1.98 rejected one-element Range arrays and field reassignments after Default in new tests. Replaced expected range construction with iter::once and direct struct initializers, preserving exact assertions. No lint allow or test weakening.",
+    "Review found different later FIN could be classified as generic after-FIN data; explicit contradictory FIN now closes ControlConflict, tested for both earlier/later positions.",
+    "New behavioral test half_closed_ack_controls_and_fin_against_prior_extent_are_distinguished FAILED1 on initial candidate: valid ACK at FIN+1 was rejected. Source corrected zero-length ACK/control handling and separately tracks declared payload extent versus ACK/sequence evidence, so FIN cannot truncate previously observed missing payload and reordered ACK including FIN does not fabricate a data gap. Exact failing test PASS after source change; all19 focused PASS final. This is a corrected candidate failure, not an unchanged retry/flaky pass.",
+    "Local PowerShell redirection formats ordinary Cargo stderr progress/Git CRLF warnings as NativeCommandError records. Actual selected command exits0 and test/lint/architecture summaries inspected; those records are not runtime functional failures."
+  ],
+  "reviewer": "Codex exmon TCP reconstruction (author source review; separate Epic independent review not claimed)",
+  "review": "Reviewed all staged4 product paths, bridge through actual decoder, canonical context/VLAN/endpoints, private state invariants and guarded unwraps, checked serial/extent arithmetic, positive bounded holes and first-seen insertion, independent payload/ACK/FIN evidence, per-flow/global byte+chunk accounting, LRU and timer cleanup, deterministic finite output and per-instance metadata bound, Debug redaction, unchanged captures/metadata and architecture. All existing accepted source outside lib module wiring unchanged. No new dependency, GUI, socket mode, storage schema or unsafe API.",
+  "limitations": [
+    "Passive observation policy is not a complete endpoint TCP state machine or authentication. RST acceptance at endpoints is not proven; checksum/offload handling remains available in existing decoder, no silent checksum-based drop here.",
+    "Capture without SYN has unknown prefix; a prior committed gap cannot be retroactively filled. Identical ISN reuse/late duplicates cannot always be distinguished without retained TCP history; no unbounded tombstone/TIME-WAIT database.",
+    "Unsupported link/protocol, IP fragments, incomplete TCP header, mixed-family or identical source/destination endpoints produce explicit unusable/invalid errors. Socket observations already contain application bytes and are not decoded as TCP wire data.",
+    "Per-instance pending payload/count bounds plus bounded per-call output/metadata are not an OS process RSS ceiling. Callers must bound downstream retention and finish before drop to receive pending boundaries.",
+    "No GUI behavior changed; visual inspection N/A. Windows pure processing qualification only; no new macOS/Linux-native, physical stand, packaging/release or independent fuzz/security pass claimed. General035/036/037 and Epic gate/review obligations remain separate."
+  ],
+  "cleanup": "Only4 intended product paths plus new011 records/request staged; no accepted TASK/event/evidence/ADR, Cargo.lock, shared fixture or unrelated .idea change. Verbose logs total<64KiB retained ignored along with bounded test executable cache; no generated binary/log/capture/image staged. No owned background process/thread or live device handle introduced.",
+  "checkpoint": {
+    "task": "EXM-011 verified Done after successful publication",
+    "goal": "ACTIVE; previous turn010 and this turn011 are product progress, not a global completion or stop",
+    "next": "Fresh turn fetch/reconcile published011 closure and allocator; read exact EXM012-implement-active-tcp-and-udp-socket-modes task and all records, validate007/009 prerequisites/current rules, publish012 claim before implementation. Test normal TCP client/server and UDP modes only on explicit local loopback during development.",
+    "authority": "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+    "resources": "Windows MSVC/Rust/Node and previously authorized Npcap/virtual fixture remain available; this task required no new installs or live platform process. Real devices and macOS are later stands; owner permits cross-Epic development without preceding Epic closure but functional dependencies and final Epic acceptance remain binding.",
+    "publication": "Commit this coherent implementation+verification+closure/request and immediately push main; reconcile uncertain/rejected push before any later commit/task. One first011 version request; allocator remains sole version writer under actual qualified adoption boundary."
+  }
+}
