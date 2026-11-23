@@ -1,0 +1,181 @@
+{
+  "task_id": "EXM-019",
+  "owner": "Codex exmon framing",
+  "verified_at": "2026-11-23T12:00:29Z",
+  "source_base": "a2f328cf92ba90ef00f9877f9468f30cd6e0b3d4",
+  "candidate_tree": "89455a78052fef328f84cae941b05ea98483b8ad",
+  "task_sha256": "7cd708f351cef603bc024722b04b8ff8d96225c94a3dec92cadcf130f3ba5db9",
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "owner_exception": "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+  "hash_basis": "SHA256 of verified checkout bytes. candidate_tree is Git-normalized staged product before closure records. Verbose logs/test binaries remain in ignored bounded local store.",
+  "environment": {
+    "host": "Windows Server2025 Datacenter x64 build26100 x86_64-pc-windows-msvc",
+    "rustc": "1.98.0 (88d9e12ae 2026-08-18)",
+    "cargo": "1.98.0 (797e8a9bc 2026-08-05)",
+    "node": "24.22.1",
+    "devices": "No new device, network, installer, privilege, credential or native platform operation; pure worker-side processing/configuration and existing synthetic/loopback regressions only."
+  },
+  "files": [
+    {
+      "path": "crates/domain/src/config.rs",
+      "sha256": "ee4c14b98cb5210bdae77f5bc9b8742d8d1dba2b6a2ec96a3c70a38d2cc37caa",
+      "bytes": 16706
+    },
+    {
+      "path": "crates/protocol/src/lib.rs",
+      "sha256": "e085d865a19d01dfe035306e7deed443745c1d8138f854699fde099dc4e922bf",
+      "bytes": 170
+    },
+    {
+      "path": "crates/protocol/src/framing.rs",
+      "sha256": "ed6495472fc503a70a1a003be20ec45f8b33693de65619718c2c3db1d9ea1d94",
+      "bytes": 23977
+    },
+    {
+      "path": "crates/protocol/tests/framing.rs",
+      "sha256": "a1e8274f29c26a0a4387f917d5111058d721287c2463228e8c9fc718e58b1d02",
+      "bytes": 23752
+    },
+    {
+      "path": "crates/storage/tests/configuration.rs",
+      "sha256": "edad529f062697827ffdd3ba3c6c11d0e05a2de68e8a4405a78c4c7b3f7f14ee",
+      "bytes": 13065
+    },
+    {
+      "path": "docs/configuration.md",
+      "sha256": "951d3cbab95a94f6cd76d75e6aa104469cc4801c0e636714b8ea2df3db05cccb",
+      "bytes": 6441
+    },
+    {
+      "path": "docs/framing.md",
+      "sha256": "9f887cb660a46e3f6fdf8f79d471f385e9b86fd929d35019867acb62e38e966c",
+      "bytes": 8340
+    }
+  ],
+  "unchanged_inputs": [
+    {
+      "path": "fixtures/traffic/corpus.json",
+      "sha256": "e45111cc5c12aeb44e4843f6530f45ad716350e73ad05f197c9257b82d179295",
+      "bytes": 73047
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "177947ec9fc79d0a1bd808158151fbae05a444534ced1a934ea310a519289cf1",
+      "bytes": 108514
+    }
+  ],
+  "local_artifacts": [
+    {
+      "path": "target/exm019-evidence/focused.log",
+      "sha256": "b5c30069ca373262f1978c8915cff7376028bb8b3de5759fd753eb2d01a40d8a",
+      "bytes": 3874
+    },
+    {
+      "path": "target/exm019-evidence/configuration.log",
+      "sha256": "6a99367ecbc13735b8ed62c76263f993a944cd5ece2f11049ae1349ce2fcdf25",
+      "bytes": 2546
+    },
+    {
+      "path": "target/exm019-evidence/regressions.log",
+      "sha256": "72c3e261e409a3c9543158402d5919012b0fbacd8aa157fc3aded5c80c25063a",
+      "bytes": 25668
+    },
+    {
+      "path": "target/exm019-evidence/quality.log",
+      "sha256": "b39c4ebe48307d38d58e1e81a611d5fc8e5b7eeaff7228625a3991c1e57420dc",
+      "bytes": 1914
+    },
+    {
+      "path": "target/exm019-evidence/marker-prefix-before.log",
+      "sha256": "8091751b3f5cfeba681b393007c47d975cbba539782fc45bb28d7ac7ee64b669",
+      "bytes": 2552
+    },
+    {
+      "path": "target/debug/deps/framing-8cb9b65e2aaff538.exe",
+      "sha256": "bf8fc0c996d2a5dfcf5be410a0f9c91935b346e58d20f1085392e966e6792251",
+      "bytes": 2192384
+    }
+  ],
+  "acceptance": {
+    "AC-01": "PASS12 integration+1 unit: independent expected vectors and all read split masks for fixed/delimiter/length/marker/idle streams including escaping and exact merged source spans/byte ranges. All196 pairs of binary markers lengths1..3 accept independently constructed frames under every partition. All length widths1/2/4, both orders, offset headers and zero payload. Escape pair spans actual different observation IDs. Native boundaries/empty frames and idle times explicit semantic input. All132 accepted005 cases pass through production observe/framer before expected-type prefix filtering; actual TCP reconstruction Data/Gap boundary tested. Shared domain config->engine and actual storage load/save roundtrips/old defaults verified by direct suites.",
+    "AC-02": "PASS explicit malformed/oversize recovery, invalid lengths slide one byte, delimiter discard-to-sync, marker noise/nested restart/overflow and overlapping end-prefix lookahead, idle overflow/deadline/empty reads/EOF, source truncation/incomplete USB/gaps, native unknown-length diagnostic and wrong stream/native mode, dangling escape, finished state, backwards clock and input/source/global offset errors before mutation. Max65536 normalized message from131072 escaped raw bytes, max65536 returned one-byte messages, bounded pending/source state, deterministic4-mode xorshift hostile input (512*47 bytes each) and independent per-byte unescape/source mapping assertions. Unit injects final u32/u64 coordinate and proves no wrap/no mutation on exhaustion.9 configuration tests preserve old compatibility/default-disabled schedules and reject invalid new fields."
+  },
+  "verification": [
+    {
+      "command": "cargo check -p exmon-protocol --locked; cargo test -p exmon-protocol --lib --test framing --locked",
+      "result": "PASS1 unit+12 integration,0 failed/ignored; final integration0.06s.",
+      "log": "target/exm019-evidence/focused.log"
+    },
+    {
+      "command": "cargo test -p exmon-storage --test configuration --locked",
+      "result": "PASS9,0 failed/ignored,0.18s; old examples/defaults plus marker/idle/escape roundtrips/negative input and launch-safe schedule/TX behavior.",
+      "log": "target/exm019-evidence/configuration.log"
+    },
+    {
+      "command": "cargo test -p exmon-protocol -p exmon-capture -p exmon-domain --locked; cargo test -p exmon-storage --test configuration --locked",
+      "result": "PASS103 (44 protocol including13 framing+31 existing network/filter/reassembly,44 existing capture,6 domain,9 configuration);0 failed/ignored and doctests. All selected commands exit0; default-feature transport scope, no live-native/physical qualification inferred.",
+      "log": "target/exm019-evidence/regressions.log"
+    },
+    {
+      "command": "cargo fmt --all -- --check; cargo clippy --workspace --all-targets --locked -- -D warnings; node scripts/check-architecture.mjs; git diff --check; git diff --cached --check",
+      "result": "PASS workspace format/lint, six layer resolved graph+3 negative fixtures and source/staged whitespace.",
+      "log": "target/exm019-evidence/quality.log"
+    },
+    {
+      "command": "Review staged7 product paths; git diff --cached --stat; git write-tree; git fetch origin main; git rev-parse HEAD origin/main; task/claim/dependency/rule revalidation",
+      "result": "PASS exact staged candidate bound above, HEAD/origin main botha2f328c, current019 ownership remains Codex exmon framing.003/005/011/013 Done; owner Windows/cross-Epic exception retained. TASK unchanged; first019 request absent before closure. No new dependency/Cargo.lock/corpus, capture/reassembly/GUI/CI/allocator or unrelated changes."
+    }
+  ],
+  "contract": {
+    "modes": [
+      "Native logical boundary",
+      "Fixed decoded frame length",
+      "Unsigned1/2/4-byte length field after offset; count excludes header",
+      "Unescaped start/end markers",
+      "Unescaped delimiter",
+      "Monotonic idle gap"
+    ],
+    "normalization": "Message payload excludes length header/delimiter/start/end markers; source spans include them and escape prefixes. Per-normalized-byte absolute raw ranges preserve escape pair mapping, including observation boundaries. Input observations never mutated.",
+    "configuration": "Existing schema1 keeps defaults and old four variants. Optional protocol.escape byte/xor defaultsNone and is omitted on save; markers/idle_gap variants added, shared Framing::limit enforces same config/runtime validation. Older readers reject unsupported new fields/variants explicitly; no false forward-compatibility claim or schema relabel.",
+    "recovery": "Bad declared length slides one decoded byte. Delimiter oversize discards until complete unescaped delimiter. Marker nested start restarts only when bounded end-prefix lookahead resolves; complete end wins, oversize resyncs to end/start. Idle oversize discards to gap. Explicit gap/truncated/incomplete source discards pending state; EOF finalizes valid idle burst, reports other incomplete/dangling states and seals instance.",
+    "time": "Caller monotonic processing/burst times, no source UTC. Tick precedes incoming bytes at exact deadline; completion timestamp is exact deadline even for late tick. Empty reads do not refresh burst. Source/stream offset and clock failures before state mutation.",
+    "source": "One Framer per ordered stream/direction/epoch/config revision, association owned by caller. Source IDs refer to retained input units; reconstructed TCP data IDs are derived units, not invented original packet offsets. wire coordinates count submitted captured bytes; missing bytes not assigned fabricated positions. Discarded tail diagnostics retain exact captured stream ranges without unbounded per-observation history.",
+    "bounds": {
+      "raw_input": 65536,
+      "decoded_frame": 65536,
+      "transient_overflow_cells": 1,
+      "raw_positions_per_cell": 2,
+      "escape_pending_positions": 1,
+      "marker_delimiter_bytes": 16,
+      "marker_recovery_cells": "start.len+end.len-1 <=31",
+      "output_events": "<=2*input_bytes+4; tick/finish constant-sized",
+      "returned_payload": "<=previous pending decoded bytes+input raw bytes",
+      "notes": "VecDeque capacity remains within fixed multiple of max frame; no chunk-count cap makes one-byte fragmentation change output. Caller bounds stream count and retained outputs; not an RSS ceiling."
+    }
+  },
+  "failures_corrected": [
+    "Initial10 framing and8 old configuration tests passed. Author review identified end-marker prefix ambiguity and added marker_prefixes_do_not_restart_inside_a_possible_end_marker. It FAILED on<X</>: premature nested start produced no X message. Source fixed bounded end-prefix lookahead and complete-end priority rather than rejecting valid overlapping marker definitions. Failing scenario, all partitions and196 binary marker pairs now PASS; no unchanged functional retry/flaky pass.",
+    "Clippy rejected a vec used only to repeat two bytes in the resource test. Replaced with array.repeat, preserving exact65536-byte payload/source assertions, no lint allow or weakened limit.",
+    "Two initial apply_patch attempts had stale context while moving domain validation and fixing a test. Patches failed atomically, source inspected and exact contexts used; no partial accepted/spec mutation. All relevant checks pass after actual edits.",
+    "A dependency read first searched quality/EXM005; actual immutable005 is foundation/EXM005. Located and verified published completion before claim; dependency identity unchanged.",
+    "PowerShell wraps normal Cargo stderr progress and cache/build lock waits in NativeCommandError records. Actual selected command exits0 and all summaries inspected. Live final gate handles were polled to completion; no restarted/duplicated running verification."
+  ],
+  "reviewer": "Codex exmon framing (author source review, not independent Epic review)",
+  "review": "Reviewed all7 staged product paths: shared domain validation extraction preserves previous field/classification checks, new default-none schema fields retain load/save and disabled schedules, per-stream state transitions/checked coordinates/time, bounded prefix/suffix matching and source lookup indexes, protected escape cells, normalized/raw provenance, gap/truncation/USB incomplete boundaries, native empty/unknown length, explicit finish/EOF, hard memory/output bounds, Debug redaction and no I/O/TX. Marker prefix failure corrected by production logic with added independent vectors, not a narrower configuration rule. Existing source outside declared config/lib wiring untouched.",
+  "limitations": [
+    "Pure Windows VPS processing qualification.035 cross-platform/native,036 physical/idle timing stand,034 broader fuzz/security, release and Epic gate/review remain separate unpassed obligations. No GUI changed, visualN/A.",
+    "Native boundaries and monotonic idle times are semantic inputs. Accurate physical inter-byte timing depends on later adapter/stand evidence; arbitrary OS read timing cannot prove on-wire gaps. One instance must not mix streams/directions/epochs/config revisions.",
+    "Framing yields candidates, not checksum/protocol validation or classification. Fixed alignment resets after a gap; length resync can find accidental candidates by its explicitly documented policy. Marker bytes are not shared between adjacent frames.",
+    "Source ranges map retained submitted units, not a complete upstream provenance index. TCP reconstruction source-unit mapping to original packets and downstream bounded retention belong to their caller. Lost source bytes remain unknown; source capture clock never drives timers.",
+    "observe native unknown original length emits UnknownOriginalLength with inspectable message, never proof of complete capture. Downstream must retain/display diagnostics and must call gap on loss not represented in a truncated observation.",
+    "New schema1 variants/escape are backward-readable for old data by current app, not supported by older executables; those reject unknown fields as before. Later GUI/classifier/field/encoder integration remains separate accepted work."
+  ],
+  "cleanup": "Only7 intended product paths plus new019 evidence/Done/request. No accepted task/event/evidence/ADR, fixture corpus, Cargo.lock/generated version state or unrelated .idea edits. Bounded local logs<64KiB including reproduced failure and normal test binary cache ignored; no generated payload/capture/log/binary staged. No background process/thread/socket/device was introduced; all verification handles completed.",
+  "checkpoint": {
+    "task": "EXM-019 verified Done upon successful publication",
+    "goal": "ACTIVE; this turn is product PROGRESS, no global blocker or overall completion",
+    "next": "Fresh turn fetch/reconcile019 closure and allocator. Read exact EXM020 automatic message classification TASK/all events/evidence/current rules and019 dependency; publish claim if Planned/unowned and ready. Implement accepted deterministic priority/fallback/group naming persistence/explanations with explicit ambiguous/unmatched outcomes. Do not claim020 in019 turn.",
+    "authority": "Owner authorizes all Windows/virtual work across Epics before earlier Epic closure; physical/macOS deferred to separate stands. Toolchain available; no blocker to next pure classification work. Functional dependencies, product safety and one task identity/turn remain binding.",
+    "publication": "Commit product+verification+Done+one first019 request, immediately pushmain; reconcile unknown/rejected result before another commit/task. Allocator remains sole version writer under actual qualified adoption boundary."
+  }
+}

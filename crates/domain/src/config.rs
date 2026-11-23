@@ -78,6 +78,8 @@ pub struct Protocol {
     pub id: String,
     pub name: String,
     pub framing: Framing,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub escape: Option<Escape>,
     #[serde(default)]
     pub classification: Classification,
     #[serde(default)]
@@ -100,6 +102,86 @@ pub enum Framing {
         endian: Endian,
         max_length: u32,
     },
+    Markers {
+        start: Vec<u8>,
+        end: Vec<u8>,
+        max_length: u32,
+    },
+    IdleGap {
+        gap_ns: u64,
+        max_length: u32,
+    },
+}
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Escape {
+    pub byte: u8,
+    pub xor: u8,
+}
+
+impl Framing {
+    /// Shared validation for stored configuration and incremental framing entry points.
+    pub fn limit(&self, escape: Option<Escape>) -> Result<u32, ConfigError> {
+        let control = |b: &[u8]| {
+            !b.is_empty() && b.len() <= 16 && escape.is_none_or(|e| !b.contains(&e.byte))
+        };
+        let limit = match self {
+            Self::Datagram {} => MAX_BYTES,
+            Self::Fixed { length } => *length,
+            Self::Delimiter { bytes, max_length } => {
+                check(
+                    control(bytes) && bytes.len() <= *max_length as usize,
+                    "framing.delimiter",
+                    "use 1..16 unescaped delimiter bytes within frame limit",
+                )?;
+                *max_length
+            }
+            Self::LengthPrefix {
+                offset,
+                width,
+                max_length,
+                ..
+            } => {
+                check(
+                    [1, 2, 4].contains(width)
+                        && offset
+                            .checked_add(u32::from(*width))
+                            .is_some_and(|end| end <= *max_length),
+                    "framing.length_prefix",
+                    "use width 1, 2 or 4 and header within frame limit",
+                )?;
+                *max_length
+            }
+            Self::Markers {
+                start,
+                end,
+                max_length,
+            } => {
+                check(
+                    control(start)
+                        && control(end)
+                        && start.len() + end.len() <= *max_length as usize,
+                    "framing.markers",
+                    "use 1..16 unescaped marker bytes within frame limit",
+                )?;
+                *max_length
+            }
+            Self::IdleGap { gap_ns, max_length } => {
+                check(
+                    *gap_ns > 0,
+                    "framing.idle_gap",
+                    "use a positive monotonic gap",
+                )?;
+                *max_length
+            }
+        };
+        check(
+            (1..=MAX_BYTES).contains(&limit),
+            "framing",
+            "frame limit must be 1..65536 bytes",
+        )?;
+        Ok(limit)
+    }
 }
 #[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -248,39 +330,7 @@ impl Protocol {
             "protocol.name",
             "use 1..128 bytes without control characters",
         )?;
-        let limit = match &self.framing {
-            Framing::Datagram {} => MAX_BYTES,
-            Framing::Fixed { length } => *length,
-            Framing::Delimiter { bytes, max_length } => {
-                check(
-                    !bytes.is_empty() && bytes.len() <= 16 && bytes.len() <= *max_length as usize,
-                    "framing.delimiter",
-                    "use 1..16 delimiter bytes within frame limit",
-                )?;
-                *max_length
-            }
-            Framing::LengthPrefix {
-                offset,
-                width,
-                max_length,
-                ..
-            } => {
-                check(
-                    [1, 2, 4].contains(width)
-                        && offset
-                            .checked_add(u32::from(*width))
-                            .is_some_and(|end| end <= *max_length),
-                    "framing.length_prefix",
-                    "use width 1, 2 or 4 and header within frame limit",
-                )?;
-                *max_length
-            }
-        };
-        check(
-            (1..=MAX_BYTES).contains(&limit),
-            "framing",
-            "frame limit must be 1..65536 bytes",
-        )?;
+        let limit = self.framing.limit(self.escape)?;
         check(
             self.classification.prefix.len() <= limit as usize
                 && self.classification.length.is_none_or(|n| {

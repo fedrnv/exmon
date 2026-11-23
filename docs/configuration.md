@@ -46,8 +46,8 @@ same project; no filesystem or external reference resolution occurs.
 
 | Section | Contract |
 | --- | --- |
-| Protocol | Reusable id/name, framing, optional classification and field list. No machine selectors. |
-| Framing | `datagram`; `fixed` with positive length; `delimiter` with 1..16 bytes and max_length; `length_prefix` with offset, width 1/2/4, endian and max_length. Positive limits at most 65536. TCP and serial require explicit stream framing. |
+| Protocol | Reusable id/name, framing, optional `escape` byte/xor, classification and field list. No machine selectors. Missing escape means None and is omitted on save. |
+| Framing | `datagram`; `fixed` with positive length; `delimiter` with 1..16 bytes and max_length; `length_prefix` with offset, width 1/2/4, endian and max_length; `markers` with start/end byte arrays and max_length; `idle_gap` with positive gap_ns and max_length. Positive decoded-frame limits at most 65536 include framing bytes. TCP and serial require explicit stream framing. See [runtime semantics](framing.md). |
 | Classification | Optional positive exact length and byte prefix, both within framing limit; omitted means no additional match constraints. A prefix cannot exceed specified exact length. |
 | Field | Byte offset/length within framing limit, representation unsigned/signed/float/bytes/ascii, explicit little/big endian. Integers allow widths 1/2/4/8; float allows 4/8. Finite scale/bias default 1/0, unit defaults empty and is at most 32 bytes without controls. |
 | Interface | Logical id, protocol reference, tagged transport, optional filter, TX permission default false. Permission alone never sends data. |

@@ -46,6 +46,8 @@ fn framing_and_numeric_variants_roundtrip() {
         json!({"kind":"fixed","length":16}),
         json!({"kind":"delimiter","bytes":[13,10],"max_length":16}),
         json!({"kind":"length_prefix","offset":0,"width":2,"endian":"little","max_length":16}),
+        json!({"kind":"markers","start":[60],"end":[62],"max_length":16}),
+        json!({"kind":"idle_gap","gap_ns":1000,"max_length":16}),
     ] {
         let mut value = fixture();
         value["interfaces"]
@@ -62,6 +64,69 @@ fn framing_and_numeric_variants_roundtrip() {
                 load_project(&save_project(&config).unwrap()).unwrap()
             );
         }
+    }
+}
+
+#[test]
+fn framing_escape_defaults_extensions_and_negative_inputs_preserve_launch_safety() {
+    let old = load(&fixture()).unwrap();
+    assert_eq!(old.protocols[0].escape, None);
+    assert!(
+        !String::from_utf8(save_project(&old).unwrap())
+            .unwrap()
+            .contains("\"escape\"")
+    );
+    for framing in [
+        json!({"kind":"markers","start":[60],"end":[62],"max_length":16}),
+        json!({"kind":"idle_gap","gap_ns":1,"max_length":16}),
+        json!({"kind":"delimiter","bytes":[10],"max_length":16}),
+    ] {
+        let mut value = fixture();
+        value["protocols"][0]["framing"] = framing;
+        value["protocols"][0]["escape"] = json!({"byte":125,"xor":32});
+        let config = load(&value).unwrap();
+        assert_eq!(
+            config.protocols[0].escape,
+            Some(Escape { byte: 125, xor: 32 })
+        );
+        assert_eq!(
+            load_project(&save_project(&config).unwrap()).unwrap(),
+            config
+        );
+        assert!(!config.schedules[0].enabled);
+        assert!(!config.interfaces[1].tx_allowed);
+    }
+    for (path, bad) in [
+        (
+            "/protocols/0/framing",
+            json!({"kind":"idle_gap","gap_ns":0,"max_length":16}),
+        ),
+        (
+            "/protocols/0/framing",
+            json!({"kind":"markers","start":[],"end":[62],"max_length":16}),
+        ),
+        (
+            "/protocols/0/framing",
+            json!({"kind":"markers","start":[60],"end":[62],"max_length":1}),
+        ),
+        (
+            "/protocols/0/framing",
+            json!({"kind":"markers","start":[60],"end":[62],"max_length":65537}),
+        ),
+        (
+            "/protocols/0/framing",
+            json!({"kind":"delimiter","bytes":[125],"max_length":16}),
+        ),
+        ("/protocols/0/escape", json!({"byte":256,"xor":32})),
+        (
+            "/protocols/0/escape",
+            json!({"byte":125,"xor":32,"unknown":true}),
+        ),
+    ] {
+        let mut value = fixture();
+        value["protocols"][0]["escape"] = json!({"byte":125,"xor":32});
+        *value.pointer_mut(path).unwrap() = bad;
+        assert!(load(&value).is_err(), "{path}");
     }
 }
 

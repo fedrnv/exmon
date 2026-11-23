@@ -1,0 +1,11 @@
+{
+  "schema": "fdtasks-version-request/v1",
+  "request_id": "EXM-019-20261123T120029Z-configurable-framing-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-019",
+  "summary": "Configurable bounded native and stream message framing with escaping, source ranges and explicit recovery",
+  "verification": [
+    "Tasks/items/server/EXM-019-implement-configurable-message-framing/evidence/20261123T120029Z-framing-verification.json"
+  ]
+}
