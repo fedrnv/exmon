@@ -1,0 +1,6 @@
+
+running 2 tests
+test native_windows::native_npcap_loopback_remains_unsupported_by_ethernet_contract ... ok
+test native_windows::native_km_test_fidelity_filter_snapshot_and_stop_under_load ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.46s

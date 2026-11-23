@@ -1,0 +1,11 @@
+{
+  "schema": "fdtasks-version-request/v1",
+  "request_id": "EXM-008-20261123T092814Z-windows-development-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-008",
+  "summary": "Verified Windows Npcap Ethernet capture and native stop with owner-authorized deferred macOS qualification",
+  "verification": [
+    "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/evidence/20261123T092814Z-windows-verification.json"
+  ]
+}

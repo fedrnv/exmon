@@ -2,6 +2,191 @@ use exmon_capture::{adapter::*, ethernet::*};
 use exmon_domain::{Direction, observation::Metadata};
 use std::sync::{Arc, Mutex};
 
+#[cfg(all(target_os = "windows", feature = "native-pcap"))]
+mod native_windows {
+    use super::*;
+    use exmon_capture::native_pcap::NativePcap;
+    use std::{
+        process::Command,
+        sync::atomic::{AtomicBool, Ordering},
+        thread::{self, JoinHandle},
+        time::{Duration, Instant},
+    };
+
+    fn fixture_name() -> String {
+        assert_eq!(
+            std::env::var("EXMON_TEST_WINDOWS_ETHERNET").as_deref(),
+            Ok("km-test")
+        );
+        // Only the explicitly provisioned root-enumerated test device is eligible.
+        let output=Command::new("powershell.exe").args(["-NoProfile","-NonInteractive","-Command", "Get-CimInstance Win32_NetworkAdapter | Where-Object { $_.PNPDeviceID -eq 'ROOT\\DEVGEN\\EXMON_ETHERNET_TEST' } | Select-Object GUID,ProductName,ServiceName | ConvertTo-Json -Compress"]).output().unwrap();
+        assert!(output.status.success());
+        let info: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+        assert!(
+            info.is_object(),
+            "exactly one explicitly created test adapter required"
+        );
+        assert_eq!(info["ProductName"], "Microsoft KM-TEST Loopback Adapter");
+        assert_eq!(info["ServiceName"], "kmloop");
+        let guid = info["GUID"].as_str().unwrap();
+        let inner = guid
+            .strip_prefix('{')
+            .and_then(|s| s.strip_suffix('}'))
+            .unwrap();
+        assert_eq!(inner.len(), 36);
+        assert!(
+            inner
+                .bytes()
+                .enumerate()
+                .all(|(i, b)| if [8, 13, 18, 23].contains(&i) {
+                    b == b'-'
+                } else {
+                    b.is_ascii_hexdigit()
+                })
+        );
+        format!("\\Device\\NPF_{guid}")
+    }
+
+    struct Generator {
+        stop: Arc<AtomicBool>,
+        handle: Option<JoinHandle<()>>,
+    }
+    impl Generator {
+        fn finish(mut self) {
+            self.stop.store(true, Ordering::Release);
+            self.handle.take().unwrap().join().unwrap();
+        }
+    }
+    impl Drop for Generator {
+        fn drop(&mut self) {
+            self.stop.store(true, Ordering::Release);
+            if let Some(handle) = self.handle.take() {
+                let _ = handle.join();
+            }
+        }
+    }
+
+    #[test]
+    #[ignore = "requires installed Npcap and explicit Windows virtual fixture opt-in"]
+    fn native_npcap_loopback_remains_unsupported_by_ethernet_contract() {
+        fixture_name();
+        let mut adapter = Ethernet::new(NativePcap::default(), Options::default()).unwrap();
+        let interfaces = adapter.enumerate(64).unwrap();
+        let id = interfaces
+            .iter()
+            .find(|d| adapter.interface_name(d.id) == Some("\\Device\\NPF_Loopback"))
+            .expect("Npcap loopback not discovered")
+            .id;
+        adapter.open(id).unwrap();
+        adapter.configure(64).unwrap();
+        assert_eq!(adapter.start(), Err(Error::Unsupported));
+        assert_eq!(
+            adapter.poll(&Cancellation::default(), 8, 512).err(),
+            Some(Error::InvalidState)
+        );
+        adapter.close().unwrap();
+    }
+
+    #[test]
+    #[ignore = "requires installed Npcap and explicitly provisioned Microsoft KM-TEST adapter; no physical interface"]
+    fn native_km_test_fidelity_filter_snapshot_and_stop_under_load() {
+        let name = fixture_name();
+        let mut expected = vec![2, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 2, 0x88, 0xb5];
+        expected.extend(14..64);
+        for snapshot in [64, 16] {
+            let mut adapter = Ethernet::new(
+                NativePcap::default(),
+                Options {
+                    promiscuous: true,
+                    timeout_ms: 10,
+                    filter: "ether proto 0x88b5".into(),
+                },
+            )
+            .unwrap();
+            let interfaces = adapter.enumerate(64).unwrap();
+            let id = interfaces
+                .iter()
+                .find(|d| {
+                    adapter
+                        .interface_name(d.id)
+                        .is_some_and(|s| s.eq_ignore_ascii_case(&name))
+                })
+                .expect("selected virtual adapter not discovered")
+                .id;
+            adapter.open(id).unwrap();
+            adapter.configure(snapshot).unwrap();
+            adapter.start().unwrap();
+            assert_eq!(adapter.transmit(&expected), Err(Error::Unsupported));
+            let stop = Arc::new(AtomicBool::new(false));
+            let finished = Arc::new(AtomicBool::new(false));
+            let (worker_stop, worker_finished) = (stop.clone(), finished.clone());
+            let (worker_name, mut frame) = (name.clone(), expected.clone());
+            let generator = Generator {
+                stop,
+                handle: Some(thread::spawn(move || {
+                    let mut injector = pcap::Capture::from_device(worker_name.as_str())
+                        .unwrap()
+                        .promisc(false)
+                        .timeout(10)
+                        .open()
+                        .unwrap();
+                    assert_eq!(injector.get_datalink(), pcap::Linktype::ETHERNET);
+                    for i in 0..4000 {
+                        if worker_stop.load(Ordering::Acquire) {
+                            break;
+                        }
+                        frame[13] = if i % 2 == 0 { 0xb6 } else { 0xb5 };
+                        injector.sendpacket(frame.as_slice()).unwrap();
+                        thread::sleep(Duration::from_millis(1));
+                    }
+                    worker_finished.store(true, Ordering::Release);
+                })),
+            };
+            let deadline = Instant::now() + Duration::from_secs(3);
+            let mut count = 0;
+            while count < 32 && Instant::now() < deadline {
+                let batch = adapter.poll(&Cancellation::default(), 8, 512).unwrap();
+                assert!(batch.len() <= 8);
+                for record in batch {
+                    assert_eq!(record.bytes(), &expected[..snapshot]);
+                    assert_eq!(record.original_length(), Some(64));
+                    assert!(matches!(
+                        record.metadata(),
+                        Metadata::Ethernet { link_type: 1 }
+                    ));
+                    assert_eq!(record.direction(), Direction::Unknown);
+                    assert!(record.source_timestamp_ns().unwrap() > 0);
+                    count += 1;
+                }
+                thread::sleep(Duration::from_millis(1));
+            }
+            assert!(
+                count >= 32,
+                "native Windows capture did not receive expected filtered frames"
+            );
+            assert!(
+                !finished.load(Ordering::Acquire),
+                "generator ended before stop-under-load check"
+            );
+            let cancel = Cancellation::default();
+            let begin = Instant::now();
+            cancel.cancel();
+            assert_eq!(adapter.poll(&cancel, 8, 512).err(), Some(Error::Cancelled));
+            adapter.stop().unwrap();
+            assert!(
+                begin.elapsed() < Duration::from_millis(500),
+                "native Windows cancellation/close exceeded budget"
+            );
+            assert_eq!(
+                adapter.poll(&Cancellation::default(), 8, 512).err(),
+                Some(Error::InvalidState)
+            );
+            adapter.close().unwrap();
+            generator.finish();
+        }
+    }
+}
+
 #[cfg(all(target_os = "linux", feature = "native-pcap"))]
 mod native_virtual {
     use super::*;

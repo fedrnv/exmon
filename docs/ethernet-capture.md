@@ -72,16 +72,63 @@ second, requests cancellation and closes, reporting count only. It does not send
 save or print packets. A nonzero count alone does not verify packet fidelity;
 platform acceptance must compare known synthetic traffic and metadata, test BPF
 and snapshot behavior, permission denial and stop under load in each supported
-environment. Windows Npcap runtime is absent on this host, and a macOS verification
-host is unavailable. Linux virtual native acceptance is recorded below.
+environment. Windows Npcap and Linux virtual native acceptance are recorded below;
+macOS runtime qualification remains deferred to the separate platform stand.
 
 Offline fixture tests use a synthetic complete Ethernet header with local
 addresses and an experimental EtherType. They verify exact bytes, truncation,
 capture-time preservation, option propagation, cancellation under 400 synthetic
 records, rejection of non-Ethernet links and explicit permission-denied results.
 They test the production generic adapter, not just a reference decoder, but
-cannot prove the native driver behavior. EXM-008 remains unclosed until the
-required platform evidence is available.
+cannot prove the native driver behavior. The owner's 2026-11-23 Windows VPS
+phase amendment permits development closure after Windows/Linux verification;
+macOS qualification remains an explicit EXM-035 obligation rather than a PASS.
+
+## Windows VPS native acceptance
+
+The owner authorized required Windows development installations and postponed
+real-device/macOS validation to separate stands. Npcap 1.90 was installed on
+Windows Server 2025 x64 from the official signed installer using its standard
+Free Edition wizard. The driver runs with administrator-only access; optional
+wireless monitor support and WinPcap compatibility replacement are disabled.
+No OEM-only silent mode or driver-signing bypass is used. Installed wpcap.dll
+reports libpcap 1.10.7. This is a local development prerequisite, not permission
+to redistribute Npcap with this application.
+
+A dedicated Microsoft KM-TEST Loopback Adapter provides real Ethernet framing
+without a physical device. Microsoft-signed WDK DevGen/DevCon tools provisioned
+the exact root test instance, using Windows' inbox netloop.inf/loop.sys driver.
+The management adapter is not changed. For reproduction with trusted WDK tools:
+
+```powershell
+devgen.exe /add /bus ROOT /instanceid EXMON_ETHERNET_TEST /hardwareid '*MSLOOP'
+devcon.exe update C:\Windows\INF\netloop.inf '*MSLOOP'
+$env:LIBPCAP_LIBDIR = '<Npcap SDK>\Lib\x64'
+$env:PATH = 'C:\Windows\System32\Npcap;' + $env:PATH
+$env:EXMON_TEST_WINDOWS_ETHERNET = 'km-test'
+cargo test -p exmon-capture --features native-pcap --test ethernet --locked native_windows:: -- --ignored --nocapture
+```
+
+Provision the named fixture once; reuse it instead of creating duplicate adapters.
+The test derives the Npcap name only from the exact root instance's GUID and
+requires the Microsoft KM-TEST product and kmloop service. It never takes a
+caller-supplied interface name. Use trusted installed DLLs; do not place downloaded
+or copied DLLs beside the executable. Scope PATH changes to the invoking session.
+
+Independent test-only injection sends bounded alternating EtherTypes over this
+virtual adapter. The production RX-only Adapter captures only filtered 0x88b5
+frames, preserving exact 64/16-byte snapshots, original length 64, Ethernet link
+type, Unknown direction and source timestamp. At least 32 matching frames per
+round and native cancellation/close below 500 ms while traffic continues are
+required. The generator is bounded to 4000 sends with one-millisecond sleeps,
+stops atomically and is joined on cleanup. Run the opt-in process under a
+30-second external watchdog when automating fixture execution.
+
+Npcap's built-in NPF_Loopback is separately checked to return Unsupported from
+the Ethernet adapter, because its link type is not Ethernet. The implementation
+does not invent Ethernet headers to make loopback pass. Native Windows tests,
+feature-enabled error unit tests, ordinary regressions and lint passed. No
+physical interface capture/transmission or macOS runtime PASS is claimed.
 
 ## Linux virtual native acceptance
 
@@ -134,5 +181,6 @@ An actual unprivileged attempt exposed libpcap's message
 `Attempt to create packet socket failed - CAP_NET_RAW may be required`, which
 previously mapped to Backend. It now maps to PermissionDenied; regression tests
 preserve Backend for unrelated failures. No raw backend error is logged by the
-application and no privilege grant is attempted. Windows/macOS smoke remains
-unverified; this Linux evidence does not close EXM-008 or qualify a release.
+application and no privilege grant is attempted. Windows results are recorded
+above. macOS smoke remains deferred to EXM-035; these development results do not
+qualify macOS or a release.

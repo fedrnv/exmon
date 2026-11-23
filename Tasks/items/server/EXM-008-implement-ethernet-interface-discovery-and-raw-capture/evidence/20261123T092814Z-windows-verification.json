@@ -1,0 +1,120 @@
+{
+  "task_id": "EXM-008",
+  "owner": "Codex exmon Ethernet development",
+  "verified_at": "2026-11-23T09:28:14Z",
+  "state": "Done for explicitly owner-authorized Windows VPS development phase after publication",
+  "source_base": "40e3b0d96c9fbb4a7c657351691538e989a225de",
+  "candidate_tree": "7e36aa8a32bc99e06ca08c00faf56e33b68f580c",
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "owner_exception": "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+  "hash_basis": "SHA-256 of verified checkout bytes; candidate_tree identifies staged Git-normalized source before closure records",
+  "files": {
+    "crates/capture/tests/ethernet.rs": "29d84f2e1178d81541854b4fdb652514c383c8016d653ffcbe9bf6c7fa30f72b",
+    "docs/ethernet-capture.md": "2f05900a91e18e278c2480d43cabc48f5a8b49e1386655ac6511c54c869cdf92",
+    "crates/capture/src/native_pcap.rs": "e06ff370f3fe2463be17ede63306fdcf9d7bbf3aaba00399baffa22fd098290a",
+    "crates/capture/src/ethernet.rs": "3fef17ef23e1151d1a182d18402f350b9904e8f3e28e3e74e6070eba7a57068c",
+    "Cargo.lock": "d62dad039ac5a116640f5cd7f39044397b52afd04d2a2eebf5a0d17ad9cddeff"
+  },
+  "acceptance": {
+    "AC-01": "PASS current owner-amended development boundary: actual Windows Npcap native production adapter on dedicated Microsoft KM-TEST Ethernet loopback. Alternating experimental EtherTypes 0x88b5/0x88b6; actual BPF accepts only 0x88b5, at least32 exact matches for64/16-byte snapshots, original length64, DLT1, Unknown direction, source timestamp. Separate actual NPF_Loopback returns Unsupported from Ethernet contract. Default negative/metadata/option fixtures and feature error unit tests pass. Prior real Linux veth/native source evidence retained. macOS is DEFERRED to EXM-035, not PASS.",
+    "AC-02": "PASS Windows: generator remains live through cancellation; poll Cancelled, native close<500ms, stopped poll InvalidState; max8 frames/512-byte batch, bounded generation4000 iterations, stop/join on cleanup. Actual Linux bounded stop evidence retained. Physical/Mac timing remains later stand qualification."
+  },
+  "setup": {
+    "authorization": "Owner explicitly authorized installing required Windows VPS components, deferring physical/macOS tests and switching development Epics before earlier closure. No additional install permission inferred from old standing rules; this newer explicit instruction supplies it.",
+    "host": "Microsoft Windows Server2025 Datacenter x64 build26100; administrator token; Rust/Cargo1.98.0 stable, Node24.22.1; existing Visual Studio Windows SDK/Npcap SDK1.17 reused",
+    "npcap": {
+      "url": "https://npcap.com/dist/npcap-1.90.exe",
+      "installer_sha256": "682b57e1c05ef375931975c9d6ded40888f4bfdf9f4b11571e654f962f1199b6",
+      "trust": "Valid Authenticode, Nmap Software LLC. Reviewed standard Free Edition EULA and ordinary wizard; no redistribution or OEM-only silent mode.",
+      "options": "admin_only=yes,winpcap_mode=no,dot11_support=no",
+      "installation": "Standard signed installer, hidden process. Process-scoped UI Automation/control notification advanced normal I Agree/Install/Next/Finish pages. Successful completion observed; process exited, service running. No /S or license/certificate bypass.",
+      "runtime": "npcap service Running/System; signed npcap.sys, Packet.dll1.90 and wpcap.dll1.10.7; native API actually enumerated and captured. Trusted installed DLL directory added only to test shell PATH.",
+      "wpcap_sha256": "332f81cc1671a6d12ab4d20264a00ee16d12f6883745e05c92ee4030b3896a9f",
+      "packet_sha256": "6f9116d9747dd356db97f6dfaf02fe1b9b0859ea3214856f17ced84d790658c2",
+      "driver_sha256": "fc31a31243ff0dc2427ebe6b429ade2aed33a336cd767d6f403d2ed96738a07b"
+    },
+    "virtual_adapter": {
+      "package_url": "https://api.nuget.org/v3-flatcontainer/microsoft.windows.wdk.x64/10.0.26100.6584/microsoft.windows.wdk.x64.10.0.26100.6584.nupkg",
+      "package_sha256": "c393d03dfb640b5c92f546b32f6770ef68cd3aaf691956e7d66d8e2c28a1b55e",
+      "tools": "Official Microsoft WDK x64 package, only DevGen/DevCon extracted into ignored cache; both valid Microsoft Corporation Authenticode.",
+      "devgen_sha256": "ad37b38853566b750bf4b6cb21eefe771e567e6cdb9c7a79c716a0e64bd23170",
+      "devcon_sha256": "282ff232c35fcb82dad2fdae56c775523409494b175a5a83d7441b5fa65cb3f9",
+      "commands": [
+        "devgen.exe /add /bus ROOT /instanceid EXMON_ETHERNET_TEST /hardwareid '*MSLOOP'",
+        "devcon.exe update C:/Windows/INF/netloop.inf '*MSLOOP'"
+      ],
+      "result": "Dedicated root test instance Microsoft KM-TEST Loopback Adapter, kmloop service Running, driver providerMicrosoft, inbox netloop.inf with signed Microsoft Windows loop.sys. No physical/management adapter setting changed, no reboot.",
+      "loop_driver_sha256": "9c57b73e6aa751680d1d588aba374f8fa31592d834d6fe669003d6285f3dfd1c",
+      "guard": "Opt-in EXMON_TEST_WINDOWS_ETHERNET=km-test. Derive only exact root instance GUID using local CIM; require exact product/service and valid GUID. No caller-supplied or physical interface accepted. Independent test-only raw injection uses same validated virtual adapter; production Adapter remains RX-only."
+    }
+  },
+  "verification": [
+    {
+      "command": "LIBPCAP_LIBDIR=<SDK1.17>/Lib/x64; PATH=C:/Windows/System32/Npcap;<existing>; EXMON_TEST_WINDOWS_ETHERNET=km-test; cargo test -p exmon-capture --features native-pcap --test ethernet --locked native_windows:: -- --ignored --nocapture",
+      "result": "PASS2 actual Windows native tests"
+    },
+    {
+      "command": "Standalone final native test executable native_windows:: --ignored --nocapture with System.Diagnostics.Process, CreateNoWindow, inherited trusted test env, 30000ms WaitForExit watchdog, cached owned process handle, captured stdout/stderr",
+      "result": "PASS2, exit0 in0.46s, no stderr. Executable SHA25603401c1cee9dc523f7416639b56f902aedaa998228f209b3f2cc4d14b895544b."
+    },
+    {
+      "command": "cargo test -p exmon-capture --features native-pcap --lib --test ethernet --locked",
+      "result": "PASS2 feature unit tests +3 Ethernet fixtures; native tests ignored2 in ordinary invocation but executed separately above"
+    },
+    {
+      "command": "cargo test -p exmon-capture -p exmon-domain --locked",
+      "result": "PASS31 capture +6 domain and doctests; implemented transport regressions"
+    },
+    {
+      "command": "cargo fmt --all -- --check; cargo clippy --workspace --all-targets --locked -- -D warnings; cargo clippy -p exmon-capture --features native-pcap --all-targets --locked -- -D warnings",
+      "result": "PASS"
+    },
+    {
+      "command": "node scripts/check-architecture.mjs; git diff --check; git diff --cached --check",
+      "result": "PASS"
+    },
+    {
+      "command": "Get-Service npcap; Authenticode checks; local root fixture CIM/PnP properties; native enumeration and virtual packet exchange",
+      "result": "PASS actual installed runtime/service and inbox virtual Ethernet, not inferred solely from installer exit"
+    }
+  ],
+  "retained_evidence": {
+    "linux": "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/evidence/20261122T203023Z-ethernet-linux-progress.json",
+    "basis": "Native production source and Linux virtual test bodies unchanged; new module is cfg(windows), docs/owner acceptance only. Retain hash-bound actual Linux veth RX/filter/snapshot/permission/stop and native error-unit evidence; no fabricated macOS pass."
+  },
+  "artifacts": [
+    {
+      "path": "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/evidence/20261123T092814Z-windows-native-output.txt",
+      "sha256": "03d5763e3d220ab794aefade1eda82b9419daf0b148721dfb2cb840388fc48ac",
+      "description": "Actual final native Windows harness stdout; no interface GUID/MAC/private payload identifiers logged."
+    }
+  ],
+  "failures_corrected": [
+    "Goal create API rejected unfinished existing blocked Goal; did not falsely complete/replace it. Existing Goal later observed active; auto continuation available again. New owner phase recorded append-only; no EXM-101 task was created.",
+    "Npcap UIA lacked InvokePattern; synchronous BM_CLICK advanced page but helper waited. Used ordinary scoped WM_COMMAND notifications for installer controls, verified page/options/success and installer exit. No silent-license bypass.",
+    "Initial Windows guard expected service msloop; actual signed inbox root fixture reports kmloop. Verified PnP hardware/provider/INF and corrected exact expected service. Final native tests pass; no physical adapter guard weakened.",
+    "Initial driver-signature probe used nonexistent kmloop.sys; actual system driver path loop.sys verified valid Microsoft Windows signature. No missing-file result claimed as success.",
+    "PowerShell Start-Process wrapper ExitCode was null after refresh; discarded that exit-code check, reran final binary with owned System.Diagnostics.Process handle and observed exit0 under watchdog."
+  ],
+  "reviewer": "Codex exmon Ethernet development (author source and staged diff review)",
+  "review": "Production capture/source APIs unchanged. Reviewed exact Windows fixture identity gates before capture/injection, trusted DLL use, two different link-type results, independent injector vs production RX-only source, byte/BPF/snapshot/time metadata assertions and RAII worker teardown. Existing Linux behavior, layer invariants, bounded queues and physical interface safeguards preserved. No GUI change.",
+  "deferred": [
+    {
+      "task": "EXM-035",
+      "scope": "macOS runtime/native capture/filter/snapshot/stop, wider cross-platform driver/permissions/profile qualification",
+      "status": "DEFERRED, not passed; owner explicitly moved stand validation later"
+    },
+    {
+      "task": "EXM-036",
+      "scope": "Physical interface/electrical/real-device validation",
+      "status": "Later physical stand, no physical capture/injection performed"
+    }
+  ],
+  "cleanup": "Installer/helpers and native tests exited; generator handles closed/reaped. Required installed Npcap service and isolated root Ethernet fixture retained for ongoing Windows development. Ignored signed tools/installer/cache only, no redistributed binaries/licenses/drivers, credentials or sensitive captures staged. Unrelated .idea preserved.",
+  "checkpoint": {
+    "task": "EXM-008 first verified development Done under explicit owner phase; immediately publish",
+    "goal": "Active observed after earlier API rejection; objective remains all tasks with owner's Windows-first/deferred-stand and cross-Epic exception. Current turn made concrete setup+native qualification progress.",
+    "next_action": "Fresh auto turn fetch/verify closure/allocation; select EXM-009 (or EXM-011) with actual task dependencies now ready. Read records/rules; link owner amendment before claim. Future cross-Epic tasks043/085 may be admitted without waiting Epic001 closure if functional dependencies ready. Keep all deferred macOS/physical obligations explicit in035/036; do not close stand-only items or Epic gates without actual acceptance.",
+    "authority": "Owner authorizes trusted required Windows setup, virtual fixtures and multiple development Epics; no physical-device access, purchases/credentials/signing/release or fake qualification."
+  }
+}
