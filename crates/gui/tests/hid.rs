@@ -72,14 +72,128 @@ fn advance(h: &mut Harness<'_, Shell>, label: &str, mut condition: impl FnMut() 
     }
     h.run_steps(2);
 }
+#[track_caller]
 fn advance_view(h: &mut Harness<'_, Shell>, mut ready: impl FnMut(&Harness<'_, Shell>) -> bool) {
     let deadline = Instant::now() + Duration::from_secs(2);
     while !ready(h) {
-        assert!(Instant::now() < deadline, "HID view completion deadline");
+        assert!(
+            Instant::now() < deadline,
+            "HID view completion deadline at {}: session {:?}, notice {:?}, local {:?}",
+            std::panic::Location::caller(),
+            h.state().sessions.snapshot.state,
+            h.state().sessions.snapshot.notice,
+            h.state().sessions.notice
+        );
         h.step();
         std::thread::sleep(Duration::from_millis(2));
     }
     h.run_steps(2);
+}
+#[test]
+fn recording_controls_stay_available_during_selected_hid_and_recovery_never_reopens() {
+    use exmon_app::sessions::{Event, HID_INTERFACE_BASE, State};
+    let audit = Arc::new(Mutex::new(Audit::default()));
+    let source = audit.clone();
+    let worker = HidWorker::spawn(move || Fixture(source)).unwrap();
+    let app = Shell::with_hid(
+        None,
+        HidPanel::with_worker(worker, "Recorded synthetic HID"),
+    )
+    .unwrap();
+    let path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(format!(
+        "../../target/exm031-hid-gui-{}-{}.sqlite",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ));
+    let mut h = Harness::builder()
+        .with_size(egui::vec2(1360., 900.))
+        .build_ui_state(|ui, s: &mut Shell| s.show(ui), app);
+    h.run_steps(3);
+    h.get_by_label("Sessions").click();
+    h.run_steps(3);
+    h.get_by_label("Session file path").focus();
+    h.run_steps(1);
+    h.get_by_label("Session file path")
+        .type_text(path.to_str().unwrap());
+    h.run_steps(3);
+    h.get_by_label("Start recording").click();
+    advance_view(&mut h, |h| {
+        h.state().sessions.snapshot.state == State::Recording
+    });
+    assert!(audit.lock().unwrap().opens.is_empty());
+    assert!(audit.lock().unwrap().writes.is_empty());
+    h.get_by_label("HID reports").click();
+    h.run_steps(3);
+    h.get_by_label("Discover HID").click();
+    advance_view(&mut h, |h| {
+        !h.get_by_label("HID collection")
+            .accesskit_node()
+            .is_disabled()
+    });
+    h.get_by_label("HID collection").click();
+    h.run_steps(3);
+    h.get_by_label("Collection 1 | 1209:0002 | usage FF00:0001")
+        .click();
+    h.run_steps(3);
+    h.get_by_label("Report format").click();
+    h.run_steps(3);
+    h.get_by_label("Numbered").click();
+    h.run_steps(3);
+    h.get_by_label("Open selected HID").click();
+    advance(&mut h, "selected recorded open", || {
+        audit.lock().unwrap().selected == Some(1)
+    });
+    h.get_by_label("Sessions").click();
+    advance_view(&mut h, |h| {
+        h.state()
+            .sessions
+            .snapshot
+            .summary
+            .as_ref()
+            .is_some_and(|s| s.records > 10)
+    });
+    assert_eq!(audit.lock().unwrap().opens, [1]);
+    h.get_by_label("Stop recording").click();
+    advance_view(&mut h, |h| !h.state().recorder.busy());
+    assert_eq!(audit.lock().unwrap().selected, Some(1));
+    h.get_by_label("Sessions").click();
+    h.run_steps(3);
+    h.get_by_label("Close HID").click();
+    advance(&mut h, "recorded HID close", || {
+        audit.lock().unwrap().selected.is_none()
+    });
+    h.get_by_label("Sessions").click();
+    h.run_steps(3);
+    h.get_by_label("Recover session").click();
+    advance_view(&mut h, |h| {
+        h.state().sessions.snapshot.state == State::Recovered
+    });
+    assert!(h.state().sessions.snapshot.entries.iter().any(|e|matches!(e.event.as_ref(),Event::Raw(raw)if raw.bytes==[3,165,0,42]&&raw.source.interface==HID_INTERFACE_BASE|1)));
+    let raw = h
+        .state()
+        .sessions
+        .snapshot
+        .entries
+        .iter()
+        .find(|e| matches!(e.event.as_ref(), Event::Raw(_)))
+        .unwrap()
+        .clone();
+    h.get_by_label(&format!("#{} Raw observation", raw.id))
+        .click();
+    h.run_steps(3);
+    h.render()
+        .unwrap()
+        .save(
+            std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join("../../target/exm031-hid-session.png"),
+        )
+        .unwrap();
+    assert_eq!(audit.lock().unwrap().opens, [1]);
+    assert!(audit.lock().unwrap().writes.is_empty());
+    assert_eq!(h.state().recorder.client().token(), 0);
 }
 #[test]
 fn actual_shell_opens_and_sends_only_the_explicitly_selected_hid_collection() {

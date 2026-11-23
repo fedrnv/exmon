@@ -18,6 +18,16 @@ fn wait(mut f: impl FnMut() -> bool) {
         thread::sleep(Duration::from_millis(1));
     }
 }
+fn status(worker: &Worker) -> Status {
+    let end = Instant::now() + Duration::from_secs(3);
+    loop {
+        if let Some(status) = worker.status() {
+            return status;
+        }
+        assert!(Instant::now() < end, "incoming status observation timeout");
+        thread::sleep(Duration::from_millis(1));
+    }
+}
 fn worker() -> Worker {
     let w = Worker::prototype().unwrap();
     wait(|| w.status().is_some_and(|s| s.ready));
@@ -77,7 +87,7 @@ fn rows(w: &mut Worker) -> Vec<Arc<Row>> {
 fn actual_worker_classifies_decodes_counts_rates_and_copies_without_authority() {
     let mut w = worker();
     assert_ne!(w.worker_thread().unwrap(), thread::current().id());
-    assert_eq!(w.status().unwrap().processed, 0);
+    assert_eq!(status(&w).processed, 0);
     let bytes = sample(1234);
     send(&w, vec![record(1, &bytes, false, true)]);
     let r = rows(&mut w);
@@ -93,7 +103,7 @@ fn actual_worker_classifies_decodes_counts_rates_and_copies_without_authority() 
     assert_eq!(draft.row.sequence, 1);
     assert_eq!(draft.row.protocol.as_ref().unwrap().fields.len(), 2);
     wait(|| w.status().is_some_and(|s| s.groups.len() == 1));
-    let g = w.status().unwrap().groups.remove(0);
+    let g = status(&w).groups.remove(0);
     assert_eq!(g.count, 1);
     assert_eq!(g.bytes, 32);
     assert!(g.per_second.unwrap().is_finite());
@@ -240,7 +250,7 @@ fn automatic_group_capacity_and_slow_consumer_are_explicit_and_bounded() {
         );
     }
     wait(|| w.status().is_some_and(|s| s.processed == 160));
-    let s = w.status().unwrap();
+    let s = status(&w);
     assert_eq!(s.groups.len(), 64);
     assert_eq!(s.group_overflow, 96);
     let mut view = View::default();
@@ -263,7 +273,7 @@ fn automatic_group_capacity_and_slow_consumer_are_explicit_and_bounded() {
         }
     }
     assert!(failures > 0);
-    assert!(w.status().unwrap().input_dropped > 0);
+    assert!(status(&w).input_dropped > 0);
     wait(|| w.status().is_some_and(|s| s.output_decimation > 0));
 }
 #[test]
@@ -274,7 +284,7 @@ fn invalid_configuration_fails_closed_and_missing_framing_preserves_raw() {
     };
     let w = Worker::configured(config, None).unwrap();
     wait(|| w.status().is_some_and(|s| s.failed));
-    assert!(!w.status().unwrap().ready);
+    assert!(!status(&w).ready);
     let mut w = Worker::configured(exmon_domain::config::ProjectConfig::default(), None).unwrap();
     wait(|| w.status().is_some_and(|s| s.ready));
     w.begin(1).unwrap();

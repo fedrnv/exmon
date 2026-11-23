@@ -8,6 +8,7 @@ pub mod inspection;
 pub mod network_filters;
 pub mod outgoing;
 pub mod scheduler;
+pub mod sessions;
 pub mod settings;
 pub mod shell;
 pub mod transmission;

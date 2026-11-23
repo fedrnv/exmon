@@ -19,6 +19,9 @@ pub struct HidPanel {
     source: &'static str,
 }
 impl HidPanel {
+    pub fn record_to(&self, client: exmon_app::sessions::Client) {
+        self.worker.record_to(client);
+    }
     pub fn native() -> Result<Self, exmon_app::hid_worker::Error> {
         Ok(Self::with_worker(
             HidWorker::native()?,

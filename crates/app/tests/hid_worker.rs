@@ -86,6 +86,81 @@ fn snapshot(w: &HidWorker) -> Snapshot {
     }
 }
 #[test]
+fn session_records_hid_before_view_decimation_without_implicit_open_or_send() {
+    use exmon_app::sessions::{Controller, Event, HID_INTERFACE_BASE, Limits, Recovery, State};
+    let path = std::env::temp_dir().join(format!(
+        "exmon031-hid-{}-{}.sqlite",
+        std::process::id(),
+        std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)
+            .unwrap()
+            .as_nanos()
+    ));
+    let (worker, a) = setup();
+    let recorder = Controller::new().unwrap();
+    worker.record_to(recorder.client());
+    recorder
+        .start(
+            path.to_str().unwrap(),
+            Limits::default(),
+            Arc::new(exmon_domain::config::ProjectConfig::default()),
+            vec![],
+        )
+        .unwrap();
+    until(|| {
+        recorder
+            .snapshot()
+            .is_some_and(|s| s.state == State::Recording)
+    });
+    assert!(a.lock().unwrap().opens.is_empty());
+    assert!(a.lock().unwrap().writes.is_empty());
+    worker.discover().unwrap();
+    until(|| !worker.pending() && snapshot(&worker).collections.len() == 2);
+    let enumeration = snapshot(&worker).enumeration;
+    worker
+        .open_selected(1, enumeration, ReportMode::Numbered, 64)
+        .unwrap();
+    until(|| snapshot(&worker).open);
+    let epoch = snapshot(&worker).epoch;
+    until(|| {
+        snapshot(&worker).dropped > 0
+            && recorder
+                .snapshot()
+                .is_some_and(|s| s.summary.as_ref().is_some_and(|s| s.records > 32))
+    });
+    worker.close();
+    until(|| !snapshot(&worker).open);
+    recorder.stop();
+    until(|| !recorder.busy());
+    let recovered = Recovery::open(&path).unwrap();
+    let mut after = 0;
+    let mut count = 0;
+    loop {
+        let entries = recovered.page(after).unwrap();
+        if entries.is_empty() {
+            break;
+        }
+        after = entries.last().unwrap().id;
+        for entry in entries {
+            if let Event::Raw(raw) = entry.event.as_ref() {
+                assert_eq!(raw.bytes, [3, 165, 0, 42]);
+                assert_eq!(raw.source.interface, HID_INTERFACE_BASE | 1);
+                assert_eq!(raw.source.epoch, epoch);
+                assert_eq!(raw.source.generation, epoch);
+                assert!(raw.source.sequence > 0);
+                count += 1;
+            }
+        }
+    }
+    assert!(count > 8);
+    assert_eq!(a.lock().unwrap().opens, [1]);
+    assert!(a.lock().unwrap().writes.is_empty());
+    drop(recovered);
+    drop(recorder);
+    drop(worker);
+    std::fs::remove_file(path).unwrap();
+}
+#[test]
 fn exact_selected_worker_reports_and_stale_generations_never_fall_back() {
     let (mut worker, a) = setup();
     worker.discover().unwrap();

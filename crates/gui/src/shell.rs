@@ -29,6 +29,10 @@ pub struct Shell {
     pub settings: crate::settings::Settings,
     pub packet_view: bool,
     pub inspection: crate::inspection::Inspector,
+    pub recorder: exmon_app::sessions::Controller,
+    pub sessions: crate::sessions::Sessions,
+    pub session_view: bool,
+    recorded_charts: Option<(u64, Vec<exmon_app::charts::Spec>)>,
     incoming_copy: u64,
     running_config: Option<std::sync::Arc<exmon_domain::config::ProjectConfig>>,
     notice: Option<&'static str>,
@@ -44,16 +48,23 @@ impl Shell {
         )
     }
     pub fn with_hid(path: Option<PathBuf>, hid: crate::hid::HidPanel) -> Result<Self, ShellError> {
+        let recorder =
+            exmon_app::sessions::Controller::new().map_err(|_| ShellError::Unavailable)?;
+        let capture = CaptureWorker::spawn()?;
+        capture.record_to(recorder.client());
+        let incoming = crate::incoming::Incoming::new().map_err(|_| ShellError::Unavailable)?;
+        incoming.worker.record_to(recorder.client());
+        hid.record_to(recorder.client());
         Ok(Self {
             network_filter: Default::default(),
             hid,
             hid_view: false,
-            capture: CaptureWorker::spawn()?,
+            capture,
             preferences: PreferencesWorker::spawn(path)?,
             layout: Layout::default(),
             selected: 0,
             interface: 1,
-            incoming: crate::incoming::Incoming::new().map_err(|_| ShellError::Unavailable)?,
+            incoming,
             outgoing: crate::outgoing::Outgoing::new().map_err(|_| ShellError::Unavailable)?,
             incoming_copy: 0,
             running_config: None,
@@ -63,6 +74,10 @@ impl Shell {
             settings: crate::settings::Settings::new().map_err(|_| ShellError::Unavailable)?,
             packet_view: false,
             inspection: Default::default(),
+            recorder,
+            sessions: Default::default(),
+            session_view: false,
+            recorded_charts: None,
             notice: None,
             loaded: false,
             dirty: false,
@@ -145,6 +160,7 @@ impl Shell {
         }
         self.incoming.poll();
         self.inspection.poll(&self.incoming.inspection, &ctx);
+        self.sessions.poll(&self.recorder);
         if let Some(config) = self.incoming.worker.configuration()
             && self
                 .running_config
@@ -159,6 +175,16 @@ impl Shell {
         }
         self.settings.poll();
         self.charts.poll(&self.incoming.charts);
+        let recording = self.recorder.client().token();
+        if recording != 0
+            && self
+                .recorded_charts
+                .as_ref()
+                .is_none_or(|(id, specs)| *id != recording || *specs != self.charts.specs)
+        {
+            self.recorder.charts(&self.charts.specs);
+            self.recorded_charts = Some((recording, self.charts.specs.clone()));
+        }
         let before = self.layout;
         let size = ctx.input(|i| {
             i.viewport()
@@ -197,11 +223,15 @@ impl Shell {
                             .clicked()
                         {
                             self.hid_view = !self.hid_view;
+                            self.session_view=false;
                             self.outgoing.disconnect();
                         }
                         if ui
                             .selectable_label(
-                                !self.settings_view && !self.chart_view && !self.packet_view,
+                                !self.settings_view
+                                    && !self.chart_view
+                                    && !self.packet_view
+                                    && !self.session_view,
                                 "Traffic",
                             )
                             .clicked()
@@ -209,10 +239,14 @@ impl Shell {
                             self.chart_view = false;
                             self.settings_view = false;
                             self.packet_view = false;
+                            self.session_view = false;
                         }
                         if ui
                             .selectable_label(
-                                !self.settings_view && self.chart_view && !self.packet_view,
+                                !self.settings_view
+                                    && self.chart_view
+                                    && !self.packet_view
+                                    && !self.session_view,
                                 "Charts",
                             )
                             .clicked()
@@ -220,14 +254,19 @@ impl Shell {
                             self.chart_view = true;
                             self.settings_view = false;
                             self.packet_view = false;
+                            self.session_view = false;
                         }
                         if ui
-                            .selectable_label(self.packet_view && !self.settings_view, "Packets")
+                            .selectable_label(
+                                self.packet_view && !self.settings_view && !self.session_view,
+                                "Packets",
+                            )
                             .clicked()
                         {
                             self.packet_view = true;
                             self.chart_view = false;
                             self.settings_view = false;
+                            self.session_view = false;
                         }
                         if ui
                             .add_enabled(
@@ -237,6 +276,11 @@ impl Shell {
                             .clicked()
                         {
                             self.settings_view = !self.settings_view;
+                            self.session_view = false;
+                        }
+                        let recording_color=if self.sessions.snapshot.state==exmon_app::sessions::State::Failed{Color32::from_rgb(230,140,90)}else if self.recorder.requested(){Color32::from_rgb(65,185,140)}else{ui.visuals().text_color()};
+                        if ui.selectable_label(self.session_view,RichText::new("Sessions").color(recording_color)).on_hover_text("Recording and recovery; green while recording, orange after an error").clicked(){
+                            self.session_view = !self.session_view;self.settings_view=false;self.chart_view=false;self.packet_view=false;
                         }
                         let title = if self.layout.theme == Theme::Dark {
                             "Light theme"
@@ -323,13 +367,28 @@ impl Shell {
             self.outgoing.disconnect();
             self.incoming.view.clear();
         }
-        if self.hid_view && !self.settings_view && !self.packet_view {
+        if self.hid_view && !self.settings_view && !self.packet_view && !self.session_view {
             self.hid.show(ui, &mut self.layout);
         } else {
             egui::Panel::bottom("app-status")
                 .resizable(false)
                 .show(ui, |ui| {
                     ui.horizontal_wrapped(|ui| {
+                        if self.recorder.requested() {
+                            ui.strong(if self.recorder.client().token() != 0 {
+                                "RECORDING"
+                            } else {
+                                "RECORDER STARTING"
+                            });
+                        } else if self.sessions.snapshot.state == exmon_app::sessions::State::Failed
+                        {
+                            ui.colored_label(Color32::from_rgb(230, 140, 90), "RECORDING ERROR");
+                        } else if self.sessions.snapshot.dropped > 0 {
+                            ui.label(format!(
+                                "Recording loss: {}",
+                                self.sessions.snapshot.dropped
+                            ));
+                        }
                         ui.label(format!(
                             "RX {} observations / {} bytes",
                             status.packets, status.bytes
@@ -357,7 +416,17 @@ impl Shell {
                         ui.label("Layout saving unavailable; current session remains usable.");
                     }
                 });
-            if self.settings_view {
+            if self.session_view {
+                egui::CentralPanel::default().show(ui, |ui| {
+                    self.sessions.show(
+                        ui,
+                        &self.recorder,
+                        self.incoming.worker.configuration(),
+                        &self.charts.specs,
+                        &self.incoming.view,
+                    )
+                });
+            } else if self.settings_view {
                 egui::CentralPanel::default()
                     .show(ui, |ui| self.settings.show(ui, &self.incoming.view));
             } else if self.packet_view {
@@ -418,6 +487,7 @@ impl Shell {
                             }
                         }
                         self.network_filter = Default::default();
+                        activation.worker.record_to(self.recorder.client());
                         let old = std::mem::replace(&mut self.incoming.worker, activation.worker);
                         self.settings.controller.retire(old);
                         self.incoming.draft = None;

@@ -121,7 +121,10 @@ fn actual_field_error_cancel_preview_apply_and_schedule_revocation() {
         frames += 1;
         std::thread::sleep(Duration::from_millis(3));
     }
-    assert!(frames > 20 && worst < Duration::from_millis(200));
+    assert!(
+        frames > 20 && worst < Duration::from_millis(200),
+        "settings frames={frames},slowest={worst:?}"
+    );
     assert!(h.state().status().packets > before);
     println!(
         "settings frames={frames},slowest={worst:?},packets={}",

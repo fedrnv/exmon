@@ -4,4 +4,5 @@ pub mod config;
 pub mod inspection_files;
 pub mod layout;
 pub mod pcap;
+pub mod sessions;
 pub mod settings_files;

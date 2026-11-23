@@ -29,6 +29,10 @@ The **Packets** view provides a [protocol tree and packet inspection tools](pack
 for shared live/imported raw frames, with bounded worker-side decoding and local
 file operations. It has an explicitly labelled network fixture for prototype use.
 
+Open **Sessions** in the header for [bounded local recording and recovery](sessions.md).
+Recording starts only on an explicit action. Stop finalizes committed data without
+stopping capture; recovery keeps saved definitions and schedules inert.
+
 The separate **HID reports** view connects the selected HID collection through
 its own worker when built with `native-hid`; otherwise it reports Unsupported.
 Discovery, open and one-shot report output each require explicit user actions.

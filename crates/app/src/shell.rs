@@ -45,6 +45,7 @@ struct Control {
     filtered_out: AtomicU64,
     effective_filter: Mutex<Option<FilterPlan>>,
     owner: OnceLock<ThreadId>,
+    recorder: Mutex<Option<crate::sessions::Client>>,
 }
 impl Default for Control {
     fn default() -> Self {
@@ -63,6 +64,7 @@ impl Default for Control {
             filtered_out: AtomicU64::new(0),
             effective_filter: Mutex::new(None),
             owner: OnceLock::new(),
+            recorder: Mutex::new(None),
         }
     }
 }
@@ -98,6 +100,11 @@ pub struct CaptureWorker {
     thread: Option<JoinHandle<()>>,
 }
 impl CaptureWorker {
+    pub fn record_to(&self, client: crate::sessions::Client) {
+        if let Ok(mut recorder) = self.control.recorder.lock() {
+            *recorder = Some(client);
+        }
+    }
     pub fn spawn() -> Result<Self, ShellError> {
         let control = Arc::new(Control::default());
         let worker = control.clone();
@@ -188,6 +195,11 @@ impl CaptureWorker {
                                 });
                             }
                             let count = records.len() as u64;
+                            if let Ok(recorder) = worker.recorder.try_lock()
+                                && let Some(recorder) = &*recorder
+                            {
+                                recorder.raw(active, &records);
+                            }
                             if tx
                                 .try_send(Batch {
                                     generation: active,

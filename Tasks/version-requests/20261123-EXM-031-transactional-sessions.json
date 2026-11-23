@@ -1,0 +1,11 @@
+{
+  "schema": "fdtasks-version-request/v1",
+  "request_id": "EXM-031-20261123T190504Z-transactional-sessions-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-031",
+  "summary": "Bounded transactional session recording and deterministic committed recovery, including pre-display capture/HID, definitions/names/annotations/chart samples and safe desktop controls",
+  "verification": [
+    "Tasks/items/sync/EXM-031-implement-session-recording-and-recovery/evidence/20261123T190504Z-session-verification.json"
+  ]
+}

@@ -60,6 +60,7 @@ enum Command {
     },
 }
 struct Shared {
+    recorder: Mutex<Option<crate::sessions::Client>>,
     snapshot: Mutex<Snapshot>,
     authority: AtomicU64,
     next: AtomicU64,
@@ -87,11 +88,17 @@ pub struct HidWorker {
     thread: Option<JoinHandle<()>>,
 }
 impl HidWorker {
+    pub fn record_to(&self, client: crate::sessions::Client) {
+        if let Ok(mut recorder) = self.shared.recorder.lock() {
+            *recorder = Some(client);
+        }
+    }
     /// Factory runs inside the worker; it must not discover/open during construction.
     pub fn spawn<S: Source + 'static>(
         factory: impl FnOnce() -> S + Send + 'static,
     ) -> Result<Self, Error> {
         let shared = Arc::new(Shared {
+            recorder: Mutex::new(None),
             snapshot: Mutex::new(Snapshot::default()),
             authority: AtomicU64::new(REVOKED),
             next: AtomicU64::new(0),
@@ -280,7 +287,32 @@ impl HidWorker {
                                     if worker.authority.load(Ordering::Acquire) != epoch {
                                         break;
                                     }
-                                    worker.update(|s| s.received = s.received.saturating_add(1));
+                                    let mut sequence = None;
+                                    worker.update(|s| {
+                                        if let Some(next) = s.received.checked_add(1) {
+                                            s.received = next;
+                                            sequence = Some(next);
+                                        }
+                                    });
+                                    let Some(sequence) = sequence else {
+                                        worker.error(Error::Exhausted);
+                                        worker.authority.fetch_or(REVOKED, Ordering::AcqRel);
+                                        break;
+                                    };
+                                    if let Ok(recorder) = worker.recorder.try_lock()
+                                        && let Some(recorder) = &*recorder
+                                    {
+                                        // Collection IDs are enumeration indices bounded by64, not device identities.
+                                        recorder.observation(
+                                            crate::sessions::Source {
+                                                generation: epoch,
+                                                interface: crate::sessions::HID_INTERFACE_BASE | id,
+                                                epoch,
+                                                sequence,
+                                            },
+                                            &observation,
+                                        );
+                                    }
                                     if tx
                                         .try_send(Report {
                                             id,

@@ -1,0 +1,416 @@
+{
+  "schema": "exmon-verification/v1",
+  "task_id": "EXM-031",
+  "owner": "Codex exmon sessions",
+  "verified_at": "2026-11-23T19:14:19Z",
+  "base_revision": "f47aac5cd96f45e2d0227c972daa998bb93c3f40",
+  "candidate_tree": "b987b22da0572bd97b9ac456492f6e2ffe25e76c",
+  "task_sha256": "718712793277e77833fe8d9a01f23f1f6eb50191dcee1b63ce5f31183962d00d",
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "policy_source": {
+    "repository": "fedrnv/FDOS",
+    "commit": "cd07d0d0f4bf0644321fd09a1375b0fd87d0bc1c",
+    "path": "Tasks/tasks_file_structure_v5_7.md",
+    "git_blob_sha": "269124fdc48926c0c5fb1a53b0ffa47f78699aed",
+    "sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8"
+  },
+  "native_activation": false,
+  "readiness_amendments": [
+    {
+      "path": "Tasks/items/sync/EXM-031-implement-session-recording-and-recovery/events/20261123T183101Z-codex-verification-amended-6a824364a88a4623b7563a05669da3d1.md",
+      "sha256": "6ba5e7a8c7fa232c0d4b7b021412fda0b726cc22461a59f20ac966fac56919ca"
+    },
+    {
+      "path": "Tasks/items/sync/EXM-031-implement-session-recording-and-recovery/events/20261123T183232Z-codex-observer-amended-eedd20e310e04e23acff1958e8317203.md",
+      "sha256": "9eec1c1d06c70b60e9f83cf0254ae3d2d3efc309faa7300515f422271ffeb37f"
+    },
+    {
+      "path": "Tasks/items/sync/EXM-031-implement-session-recording-and-recovery/events/20261123T184215Z-codex-hid-readiness-c7669a35b0c34adebae2659f2ae6b3f1.md",
+      "sha256": "c82c09f1f7394fc86fa3e041e4c12db834bcf91c3c75369e6a05e2b4d154b427"
+    }
+  ],
+  "environment": {
+    "platform": "win32",
+    "arch": "x64",
+    "node": "v24.22.1",
+    "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)",
+    "cargo": "cargo 1.98.0 (797e8a9bc 2026-08-05)",
+    "rusqlite": "0.43.0",
+    "libsqlite3_sys": "0.40.0",
+    "bundled_sqlite": "3.54.1",
+    "qualification": "Windows VPS local synthetic/virtual/loopback prototype; no physical device or macOS qualification"
+  },
+  "unique_selected_tests": 176,
+  "test_counts": {
+    "app": 54,
+    "gui": 28,
+    "storage": 40,
+    "domain": 6,
+    "transports": 48
+  },
+  "verification": [
+    {
+      "command": "cargo test -p exmon-app --lib --test sessions --test incoming --test shell --test settings --test charts --test network_filters --locked -- --nocapture",
+      "result": "50 PASS before later bounded refinements; retain unchanged32 charts/incoming/filters/settings/shell checks. The13lib/5sessions subset is replaced by current22 below.",
+      "log": "target/exm031-app-accepted.log",
+      "sha256": "1b52456169d0c692eafee0b5018a84749761d0ff4546ae412f4750b9ceb8f0ce"
+    },
+    {
+      "command": "cargo test -p exmon-app --lib --test sessions --test hid_worker --locked -- --nocapture",
+      "result": "Current22 PASS:14 internals including producer/Stop/cancel/full-queue fences,5 recording/recovery,3 HID including real mock source before GUI decimation. With retained32 =54 unique app checks.",
+      "log": "target/exm031-producers-sealed.log",
+      "sha256": "176cf05187ceccba4285818f381f814cc2c77c845976a39d9a0724219fe340ad"
+    },
+    {
+      "command": "cargo test -p exmon-gui --locked -- --nocapture --test-threads=1",
+      "result": "28 PASS after header/HID integration. Single desktop instance per measured test; identical200ms responsiveness bounds. Last storage-only catalog cap leaves valid two-table functional inputs unchanged; current HID/producer/native refreshes below.",
+      "log": "target/exm031-gui-integrated.log",
+      "sha256": "09ec16d7909fc15f268767a28f52ece0fd8fceed0cabf96e5679bebb25fd6542"
+    },
+    {
+      "command": "cargo test -p exmon-gui --test hid --locked -- --nocapture --test-threads=1",
+      "result": "Current3 HID PASS, including keyboard path entry, explicit selected mock open, Session Stop while HID stays open, explicit Close and recovery with zero reopen/send; added inspected source-namespace/raw-byte image. No additional unique tests.",
+      "log": "target/exm031-hid-visual-final.log",
+      "sha256": "31f5af29d1db352d79e5043756d289ff55a825335a295627fc740e5d6a5e00c9"
+    },
+    {
+      "command": "cargo test -p exmon-storage --test sessions --test configuration --test pcap --test settings_files --test inspection_files --locked -- --nocapture",
+      "result": "38 PASS initially; retain unchanged28 configuration/PCAP/local-file checks, replace10 sessions with latest12 below.",
+      "log": "target/exm031-storage-final.log",
+      "sha256": "cdd142546a895339120ff62590f9b04502eac0750c0e5eaf9b536a1b574eeba7"
+    },
+    {
+      "command": "cargo test -p exmon-storage --test sessions --locked -- --nocapture",
+      "result": "Current12 PASS including abrupt subprocess exit/actual hot journal/two deterministic recoveries, all typed metadata, budgets, exclusive writer, bad schema/version/length and catalog-object cap. One ignored helper is explicitly invoked by the passing subprocess test; no hardware/task acceptance skipped. Total40 unique storage checks. Multi-database super-journal footer rejected before SQLite open; database, side journal and unrelated referenced marker remain byte-identical.",
+      "log": "target/exm031-storage-sealed.log",
+      "sha256": "917848450ea28acce0f08c3c63f7a33d5703a6fe160de0f6034fb2d9b1a27c27"
+    },
+    {
+      "command": "cargo test -p exmon-domain --lib --locked",
+      "result": "6 domain validation/privacy/metrics checks PASS; serde metadata changes remain stable.",
+      "log": "target/exm031-domain-final.log",
+      "sha256": "ac798ea9964502178f2b84c5fdc89b53c46c19f31a0ab254161766462aca933c"
+    },
+    {
+      "command": "cargo test -p exmon-capture --locked",
+      "result": "48 implemented adapter/transport regressions PASS; no capture backend algorithm/permission/send changes.",
+      "log": "target/exm031-transports-final.log",
+      "sha256": "b7191da31a587b162ce67be66da8a7164ca4d0b3a52c4359df7f37f8bba022a2"
+    },
+    {
+      "command": "cargo run -p exmon-gui --example native_sessions_smoke --locked",
+      "result": "Current Windows hidden eframe/wgpu synthetic capture/record/Stop/recovery/selection render and clean-close PASS; app8s deadline, PNG write off GUI.",
+      "log": "target/exm031-native-sealed.log",
+      "sha256": "6d8bd9584674f05a18fff6c0da9bd9126f54f629cb0f495ced1e082a4662b00b"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets --locked -- -D warnings",
+      "result": "Complete workspace/all targets PASS, no lint suppression.",
+      "log": "target/exm031-clippy-store-sealed.log",
+      "sha256": "83c8cb084b4fba5d7d93069c1d23fe7e6315673a314ade4ee1d6ffbc011c56a4"
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "result": "Complete workspace PASS.",
+      "log": "target/exm031-fmt-publication.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "node scripts/check-architecture.mjs",
+      "result": "Six layers/resolved dependencies/three negative graph fixtures PASS.",
+      "log": "target/exm031-architecture-finalized.log",
+      "sha256": "4f389e2d9cdf167261ce323cd3ff4bfc6fb9335b6d69cac66fc14320ab8eaece"
+    },
+    {
+      "command": "git diff --check",
+      "result": "Reviewed diff whitespace PASS; final staged check repeated before commit.",
+      "log": "target/exm031-diff-final.log",
+      "sha256": "0376353f58380aceec85427f7514c982271aa737381ada6de272aa4349bbf968"
+    }
+  ],
+  "observed_failures": [
+    {
+      "log": "target/exm031-gui-final.log",
+      "sha256": "3259a4b2ac0f12fd47ad1b773da3ab7c03eac44dfcc7256998e02b89af063373",
+      "outcome": "FAIL for earlier candidate/fixture; not used as acceptance",
+      "resolution": "Existing Settings responsiveness assertion failed under concurrent GUI/compilers. Exact failed numeric latency unavailable in old assertion, never invented. Idle recorder polling replaced by event wakeups; final single-instance serial desktop checks retained the same200ms bound and added diagnostic text. See resource amendment."
+    },
+    {
+      "log": "target/exm031-app-current.log",
+      "sha256": "c6f7292b6e12fa5daac7c7c3ad08737ab8a089a12991585fa24be4caddaf6c8d",
+      "outcome": "FAIL for earlier candidate/fixture; not used as acceptance",
+      "resolution": "Existing incoming immediate status().unwrap raced the documented nonblocking try_lock observer and returned None; no wrong capacity/drop count observed."
+    },
+    {
+      "log": "target/exm031-app-fenced-final.log",
+      "sha256": "0d24e542e13eab1cafae7f1b6b6b298fdccc12b09501a6fceb6f150b62b87a61",
+      "outcome": "FAIL for earlier candidate/fixture; not used as acceptance",
+      "resolution": "Second observed incoming fixture panic retained as FAIL, not accepted as a retry. Bounded actual-Some observation helper corrected only the fixture; all original group/drop/decimation assertions retained."
+    },
+    {
+      "log": "target/exm031-app-final-observer.log",
+      "sha256": "b2db0d77fae662142622200db4dbc24accfefead929fa4bd77be3ca6743698b7",
+      "outcome": "FAIL for earlier candidate/fixture; not used as acceptance",
+      "resolution": "New deterministic session fixture sent its single batch before asynchronous incoming generation9 acknowledgement. Corrected fixture waits actual generation, then exact42.0 sample/time100 and persisted renamed definitions are verified without command retry."
+    },
+    {
+      "log": "target/exm031-gui-focus2.log",
+      "sha256": "f64d25dc757569997302b930a093dec5030a714f5045eafd151d1a6910ea3408",
+      "outcome": "FAIL for earlier candidate/fixture; not used as acceptance",
+      "resolution": "A full raw-data queue rejected a user annotation. Product corrected with bounded control-queue annotation priority and Stop draining accepted notes before final metadata."
+    },
+    {
+      "log": "target/exm031-gui-focus3.log",
+      "sha256": "7dbf4495be1ab18e9508ac4fcd88370cd174d56454330b46d0a7ac9b64e79acd",
+      "outcome": "FAIL for earlier candidate/fixture; not used as acceptance",
+      "resolution": "New first-raw selection could be beyond virtualized visible rows. Current bounded64-entry page renders all its small fixed page so real scroll/selection remains accessible."
+    },
+    {
+      "log": "target/exm031-gui-hid-final.log",
+      "sha256": "db4b4124422029da842821d5bf065a4d184ccd6416a16a6724374be918923074",
+      "outcome": "FAIL for earlier candidate/fixture; not used as acceptance",
+      "resolution": "New HID UI fixture omitted text-field focus, so its recording file path was not entered. Corrected actual keyboard focus/action and kept bounded2s observation; no production open/send fallback."
+    },
+    {
+      "log": "target/exm031-producers-hardened.log",
+      "sha256": "7b7b3bc25f5f9f4c2523d7cdb90c8fa0153dbdcab05e17ab99ab7d154a5ceac8",
+      "outcome": "FAIL for earlier candidate/fixture; not used as acceptance",
+      "resolution": "New raw-recording fixture counted two metadata records as raw when waiting for>512 total; current wait is stronger (>1026), verifies exact raw+2 metadata count, and measures capture totals after admission ends. Original>512 raw assertion remains."
+    }
+  ],
+  "acceptance": {
+    "AC-01": "Versioned SQLite transactional batches preserve exact source keys/raw bytes/typed metadata/u64 clock extrema, definitions/names, annotations and finite numeric field/chart samples with units, timestamps, spans and saved chart specifications. Abrupt child process exits23 without Drop, leaves actual hot rollback journal, excludes uncommitted rows and yields two identical committed recoveries. Distinguish unfinalized/clean/loss/budget/error. Explicit recovery is inert; actual GUI main/HID record/stop/recover/selection/paging/no-overwrite and failed-recovery-page retention verified.",
+    "AC-02": "Data queue8 bounded batches<=96rows/1MiB; controls8 bounded commands. Full-queue barrier, late loss producer fence and immediate Stop/no stale-token admission/new-Start-until-finalized plus cancelled queued Start acknowledged without file creation. Priority annotations commit despite a full data queue. Actual capture continues after record Stop/budget failure and raw recording continues without GUI drains; separate HID worker records before view drops with disjoint namespace. Count/byte/physical-page budgets stop recording; recovery pages<=64/1MiB serialized bytes and one pin. Current schema-object cap8/catalog LIMIT3/SQL/caches/progress/busy bounds reject hostile input before unbounded catalog collection."
+  },
+  "evidence_reuse": "No whole-project gate or automatic broad test run. Impact-selected unchanged contract checks reused as described; source/controller/direct boundaries refreshed after material changes. Final schema/catalog and single-database journal-boundary hardening tested with current12 storage,22 app producer and native Windows checks. Typed valid two-table GUI inputs and GUI interaction/render handlers are unchanged; previous28 GUI PASS retained and current3 HID refreshed. Earlier FAIL artifacts are retained and never relabelled PASS. Final journal change only rejects unsupported multi-database footer references before opening SQLite; valid single-database GUI inputs are unchanged. Latest current12 storage,22 app and native checks include genuine single-database hot-journal recovery.",
+  "responsiveness": {
+    "gui_command": "cargo test -p exmon-gui --locked -- --nocapture --test-threads=1",
+    "session_frames": 95,
+    "session_slowest_ms": 7.69,
+    "settings_frames": 75,
+    "settings_slowest_ms": 20.7919,
+    "threshold_ms": 200,
+    "other_frames": {
+      "charts": 101,
+      "incoming": 61,
+      "inspection": 61,
+      "shell": 85
+    }
+  },
+  "screenshots": [
+    {
+      "path": "target/exm031-visual/sessions-1360x900-1-dark.png",
+      "sha256": "cf50c4f72b3f6b347e03ae73f758f2b01a8632c65e76de383d0ae477d19c7ffb",
+      "inspected": true
+    },
+    {
+      "path": "target/exm031-visual/sessions-1360x900-1-light.png",
+      "sha256": "48c7c5d07fa6ddfb23031c0c31e9dbda6e4df7d5654e17e3bcc536afe1acbc73",
+      "inspected": true
+    },
+    {
+      "path": "target/exm031-visual/sessions-1360x900-1.5-dark.png",
+      "sha256": "424641abdf304764180673aa257a508efa52ef0b3e624649af1959b2df62e8ac",
+      "inspected": true
+    },
+    {
+      "path": "target/exm031-visual/sessions-1360x900-1.5-light.png",
+      "sha256": "b111a26bff8cc18f8ee7abbbbd2e4cf8c7e6ddd52098a5cd5f166b94f21fa3a7",
+      "inspected": true
+    },
+    {
+      "path": "target/exm031-visual/sessions-900x600-1-dark.png",
+      "sha256": "020d1df2aaf3698f5274091cb064dcf5ca602d10429549cedc1f2baae61a8be5",
+      "inspected": true
+    },
+    {
+      "path": "target/exm031-visual/sessions-900x600-1-light.png",
+      "sha256": "1b1a5888e149f4daa3c4de1d290bde2debbaa6783bd970a71d8b2e28c60b872b",
+      "inspected": true
+    },
+    {
+      "path": "target/exm031-visual/sessions-900x600-1.5-dark.png",
+      "sha256": "08420b8b1342411fe9fff9f6b2d30642539bcd96284e9fa81f2f818c5a05ff9d",
+      "inspected": true
+    },
+    {
+      "path": "target/exm031-visual/sessions-900x600-1.5-light.png",
+      "sha256": "5673ca7d7524e772eea451d73574c00a874ef432cba5dd746f37ed68af56e3f3",
+      "inspected": true
+    },
+    {
+      "path": "target/exm031-native.png",
+      "sha256": "a3b6c5eaeef04132c48eb8ac664d74db8521990bbaec6c53805b99df2eac3a67",
+      "inspected": true
+    },
+    {
+      "path": "target/exm031-hid-session.png",
+      "sha256": "a538542f431036d7eac9bf52251bfa9d7a31b448e363f6413b70e8d744c7512d",
+      "inspected": true
+    }
+  ],
+  "visual_review": "All8 current900x600/1360x900 dark/light1x/1.5x matrix images plus current native and selected mock-HID recovery images inspected. Always-available header Sessions action fits supported sizes, controls/status/raw selection remain legible; smaller viewport uses scrolling for lower preview content. Raw previews bounded256 bytes, list64. HID4-byte03 A5 00 2A and high-bit interface namespace visible; no real device source. Native current capture/record/Stop/recovery completed and rendered without auto TX/open, in8s app deadline.",
+  "bounds": {
+    "database": "1..256MiB, default64MiB; records1..1000000 default100000; stop visibly at any budget, no unbounded rotation",
+    "queue": "8 data batches<=96rows/1MiB referenced data;8 bounded controls; one active/new-file recording; token/busy/producers fence finalization",
+    "encoding": "record<=1MiB; transaction<=4MiB; recovery<=64 records/1MiB serialized data plus one pin, typed/allocator overhead separate",
+    "sqlite": "4096B pages; DELETE/EXTRA; exclusive writer;2MiB cache/no mmap; max8 schema objects; catalog LIMIT3; bounded lengths/columns/triggers/attachments/VM instructions/progress;100ms busy; selected hot-journal hard bound2*256MiB+1MiB; multi-database super-journal footer rejected before SQLite open"
+  },
+  "security_review": [
+    "SQL fixed/prepared only; no extension loading, source SQL, code execution, automatic repair/migration, elevation or credentials",
+    "Observation remains validated on restore, never Deserialize an unchecked Observation; metadata serde preserves existing redacted Debug",
+    "Portable definitions/group names persist, machine bindings/device serial selectors excluded; enabled schedules rejected; recovered data is inert",
+    "All writes/parsing/serialization of captured data on workers; GUI only bounded controls/presentation. Capture producers never wait for disk; annotation text/spec cloning bounded before queueing",
+    "HID recording sink only observes RX after existing selected-device authorization, before GUI queue. No adapter/discovery/open/send algorithm change; checked received sequence exhaustion revokes instead of wrapping",
+    "All26 product/test/doc paths reviewed, no protocol algorithms/active TX/scheduler/config schema/CI/allocator/normative or accepted-history edit",
+    "Pinned SQLite3.54.1 readSuperJournal/pager_delsuper source inspected locally. Single-database recovery preflights only selected bounded sidecar footer and rejects embedded super-journal references without resolving their filenames; negative fixture proves all files remain unchanged."
+  ],
+  "source_files": [
+    {
+      "path": "Cargo.lock",
+      "git_blob": "4e3cd722fd7d48d9b4440c7a626fce755248a495",
+      "sha256": "02ce926f073ddc0239107cd965a5c8fb5521f3a2fa69d67ed62072300996dd2d"
+    },
+    {
+      "path": "crates/storage/Cargo.toml",
+      "git_blob": "8c6f3d0711e207fd00288ff828a6748a19f7dfa9",
+      "sha256": "d92e9dfba5709f4a71f540670923eb6a03bbcc4007d3b305a506bd06e31b4153"
+    },
+    {
+      "path": "crates/storage/src/lib.rs",
+      "git_blob": "f89a0dc17b3e93a72c47d1d62a594a38ceb4ddc4",
+      "sha256": "d961d2fe48787a1fd856bbda18fe634b32aaa8f2f8067781653ee7c2b0ac88d2"
+    },
+    {
+      "path": "crates/storage/src/sessions.rs",
+      "git_blob": "e879d2bc226c8433b31f73cc29e1c8d34515333a",
+      "sha256": "ff6ea458a33cd663b04bb7169215317f2c4a58f2719d48bbc8b7ebc25e62619a"
+    },
+    {
+      "path": "crates/storage/tests/sessions.rs",
+      "git_blob": "0fde624c6183de6223c5871fab3eb884019f3606",
+      "sha256": "7b1f45981c3460491fabea1ef42bd5bf54990823407643c73329880d8bc38498"
+    },
+    {
+      "path": "crates/domain/src/observation.rs",
+      "git_blob": "ec5f6936fc410da9ff6ed9a2d3f07c5491fcc1eb",
+      "sha256": "86f25eacc4742cc9ff26a31bb076034ecb941b41b078c6a540e14211c2bf4b5b"
+    },
+    {
+      "path": "crates/app/src/lib.rs",
+      "git_blob": "05522e7276a8d7a91441c6e9887858672c69ae1a",
+      "sha256": "31c03accb788edf38910383c58b3d7f1f8d3454d6413b402dda2bc4034952721"
+    },
+    {
+      "path": "crates/app/src/charts.rs",
+      "git_blob": "0174af2c5e8d8cfed15e42f4d7691e3326230657",
+      "sha256": "aaf42df6a383fe11ebe6f1767c92a753f866129da88d89ab62caf6ab58c4c462"
+    },
+    {
+      "path": "crates/app/src/incoming.rs",
+      "git_blob": "7bfd75bdc11a883d6d1a578148f9ee1ba5774ec7",
+      "sha256": "d6f13fcee3d4bf70fe305d4cda5d06e6b57010e5bc08da098bdebe93f85c151d"
+    },
+    {
+      "path": "crates/app/src/shell.rs",
+      "git_blob": "7de3d70d588a0b978d63a2c47f7c5120e94236dd",
+      "sha256": "43829465ef46007ac2e12de2f376daf71fc2a66324c19fa477c6d0113801d0dd"
+    },
+    {
+      "path": "crates/app/src/hid_worker.rs",
+      "git_blob": "3f550e6c7cefc5c620261b3248c745877059b445",
+      "sha256": "b8ef08c81c1c74b1f4c0b693720af8a6ce4f581f5be49a51d2c910180446d197"
+    },
+    {
+      "path": "crates/app/src/sessions.rs",
+      "git_blob": "7eaedef19bc8783ea871f6b6744e7e12be206f77",
+      "sha256": "fda65214aa756dc4473a8e2f62a65831c20bf2ce6b8303e21fa4fa69fd62c40c"
+    },
+    {
+      "path": "crates/app/tests/sessions.rs",
+      "git_blob": "50c5932a8eb78a51e0e9b0c5253e9df204c16653",
+      "sha256": "8c80718d4a858888ae9a4e2c38bbbcd9fd3e12c156fcea2cdcc000be9581fe14"
+    },
+    {
+      "path": "crates/app/tests/incoming.rs",
+      "git_blob": "9fafb3dc248ab8052f5f07d9d2d92780113852b6",
+      "sha256": "34bea3f435f0fd69317b7932edb6f4fc94d3edcc0b89a9e401b8d417ed201d7d"
+    },
+    {
+      "path": "crates/app/tests/hid_worker.rs",
+      "git_blob": "4ddfe7790b23fa7d29fb1c3d444672fd155f2e35",
+      "sha256": "ec02c451228adb62db891a8a043c531f4d2ac5855c090eeb33aed9c8224938c9"
+    },
+    {
+      "path": "crates/gui/src/lib.rs",
+      "git_blob": "9952c26b9490f9e04dd65c4f46cd9aab0388da79",
+      "sha256": "fedc2a874d2aa0f73ba0b7c3d4f61fff488a802d5f56817268319306b5838c9d"
+    },
+    {
+      "path": "crates/gui/src/shell.rs",
+      "git_blob": "626b7bb090ddee3289bb89b4d211e8cb0953278a",
+      "sha256": "246b4a1bad498918ac60813c2582c828dbd492346f7ae776e3fd62f5d5778221"
+    },
+    {
+      "path": "crates/gui/src/sessions.rs",
+      "git_blob": "52692934fc5d45f9d8f49044361cf34289ef932e",
+      "sha256": "614453636487ed52ca149355c9c4bd7fa793cf4f1168f01762ef1ed8e00eeb09"
+    },
+    {
+      "path": "crates/gui/src/hid.rs",
+      "git_blob": "ce823513b8d6acb82d977f6d8d08b9a01301f19f",
+      "sha256": "e3b33d6b6a36a10acb7629045a1e5de7f7f54eedafbc6262c8d8850ad8ad8c34"
+    },
+    {
+      "path": "crates/gui/tests/sessions.rs",
+      "git_blob": "a34cc54ca7bbc5f9b6cf4d2b5a60ac0607512c0a",
+      "sha256": "a733757c98ff736e1d95641af3861493c0c0f71867b0abb534bf40088eca2fbc"
+    },
+    {
+      "path": "crates/gui/tests/hid.rs",
+      "git_blob": "dcf570e52b0273aedfbe953ca6a4024dcf88b3bd",
+      "sha256": "493f311f4ab7a519e599772c5f7434d54a39e7ff5ca601ffe76bf50234e723b9"
+    },
+    {
+      "path": "crates/gui/tests/settings.rs",
+      "git_blob": "41777ab5932d30b5d3cb80be5159e12043bafcd5",
+      "sha256": "f05c42c4fc0421ed07400fdb13521df01f3ac5e760fe44d4b7bc0506b59076f2"
+    },
+    {
+      "path": "crates/gui/examples/native_sessions_smoke.rs",
+      "git_blob": "1e2da6c29b0aa1c345845f91d66f07d8ed196ef6",
+      "sha256": "afb79e53f66522742a651e5f5e1f4bcb301397b4c7bfd9cc6485c6dbaeb49496"
+    },
+    {
+      "path": "docs/sessions.md",
+      "git_blob": "739f1723d21ec18ac481151896029e6ab3fe8dba",
+      "sha256": "f80e187d27c6ad49bc0b29d0d288d7bd060a96006a158475c458a27d909f4fc0"
+    },
+    {
+      "path": "docs/desktop-shell.md",
+      "git_blob": "068a221eb127e8e9f76682cfa2329423d4cf971e",
+      "sha256": "5080b9bcd37a826f919a9e12977819acf1190b6d72d20a03bd68790c853809b2"
+    },
+    {
+      "path": "docs/incoming-traffic.md",
+      "git_blob": "a3d5f5bedfc5ffad2ee18af000929514aa91f614",
+      "sha256": "edafcfb7852fb3a9210601a4011efff68628c2569c68d4ec866add16cffbdce5"
+    }
+  ],
+  "cleanup": "Passing fixtures remove their uniquely owned temporary directories/files; short bounded Windows cleanup waits only for confirmed asynchronous reader handle release. Bounded local logs/PNGs and reviewed synthetic native/HID SQLite evidence remain ignored under target; no generated outputs committed. Unrelated ignored .idea files preserved.",
+  "limitations": [
+    "Process interruption simulated; power loss/electrical/timing/physical protocol fidelity are not passed",
+    "Derived samples cover processed messages; earlier capture/processing loss is separate from recorder input attempts and GUI decimation. Recording is not a promise of lossless traffic beyond configured budgets.",
+    "Saved chart sample values/specifications retained; rendered plot decimation/averages are derived presentation, not a second unbounded plot history",
+    "Current SQLite format version1 rejects foreign/future/corrupt schemas; semantic record validation is page-wise, not a claim of eager validation of every record on open",
+    "Physical stand035/036, macOS, packaged identity/ACL/install/signing037 and Epic canonical gate/independent review remain unqualified"
+  ],
+  "checkpoint": {
+    "goal": "ACTIVE",
+    "turn": "PROGRESS",
+    "current_item": "EXM-031",
+    "state": "Complete on successful immediate publication; one first version request only",
+    "next": "Fresh Goal turn: reread rules, fetch published state and functional dependencies, inspect next unblocked Windows/virtual item (032 CSV/JSON export). No032 claim or implementation in this turn.",
+    "authority": "Owner Windows installation/cross-Epic exception retained; no physical open/TX, release, purchase, signing or secret authority inferred."
+  }
+}

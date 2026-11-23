@@ -1,5 +1,6 @@
 //! Validated immutable observations; transport handles never enter this layer.
 use crate::{Direction, validate_lengths};
+use serde::{Deserialize, Serialize};
 use std::{fmt, net::SocketAddr};
 
 pub const MAX_PAYLOAD: usize = 65_536;
@@ -13,7 +14,8 @@ pub enum TransportKind {
     Can,
 }
 /// Fixed-size host-controller trace metadata, distinct from active USB I/O.
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct UsbMonMetadata {
     pub tag: u64,
     pub event: u8,
@@ -32,7 +34,8 @@ pub struct UsbMonMetadata {
     pub reported_length: u32,
     pub data_tag: u8,
 }
-#[derive(Clone, PartialEq, Eq)]
+#[derive(Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub enum Metadata {
     Ethernet {
         link_type: u32,

@@ -115,6 +115,7 @@ pub struct Status {
     pub groups: Vec<Group>,
 }
 struct Shared {
+    recorder: Mutex<Option<crate::sessions::Client>>,
     quit: AtomicBool,
     generation: AtomicU64,
     input_dropped: AtomicU64,
@@ -167,6 +168,7 @@ impl Worker {
         factory: impl FnOnce() -> Result<Processor, Error> + Send + 'static,
     ) -> Result<Self, Error> {
         let shared = Arc::new(Shared {
+            recorder: Mutex::new(None),
             quit: AtomicBool::new(false),
             generation: AtomicU64::new(0),
             input_dropped: AtomicU64::new(0),
@@ -195,6 +197,7 @@ impl Worker {
                     *c = Some(Arc::new(processor.config.clone()));
                 }
                 let mut generation = 0;
+                let mut recorded_revision = None;
                 let mut status = Status {
                     ready: true,
                     ..Default::default()
@@ -221,6 +224,21 @@ impl Worker {
                                     g.name = rename.name.clone();
                                 }
                             }
+                        }
+                    }
+                    if let Ok(recorder) = state.recorder.try_lock()
+                        && let Some(recorder) = &*recorder
+                    {
+                        let revision = (recorder.token(), generation, processor.revision);
+                        if revision.0 != 0
+                            && recorded_revision != Some(revision)
+                            && recorder.definitions(
+                                generation,
+                                processor.revision,
+                                &processor.config,
+                            )
+                        {
+                            recorded_revision = Some(revision);
                         }
                     }
                     if let Ok(batch) = rx.try_recv() {
@@ -251,6 +269,11 @@ impl Worker {
                             }
                         }
                         processor.rates(&mut status);
+                        if let Ok(recorder) = state.recorder.try_lock()
+                            && let Some(recorder) = &*recorder
+                        {
+                            recorder.rows(generation, &rows);
+                        }
                         let count = rows.len() as u64;
                         if tx.try_send(PreparedBatch { generation, rows }).is_err() {
                             status.output_decimation =
@@ -341,6 +364,11 @@ impl Worker {
     }
     pub fn configuration(&self) -> Option<Arc<ProjectConfig>> {
         self.shared.config.try_lock().ok()?.clone()
+    }
+    pub fn record_to(&self, client: crate::sessions::Client) {
+        if let Ok(mut recorder) = self.shared.recorder.lock() {
+            *recorder = Some(client);
+        }
     }
     pub fn worker_thread(&self) -> Option<ThreadId> {
         self.shared.owner.get().copied()

@@ -5,6 +5,7 @@ pub mod incoming;
 pub mod inspection;
 mod network_filters;
 pub mod outgoing;
+pub mod sessions;
 pub mod settings;
 pub mod shell;
 pub use eframe::egui;

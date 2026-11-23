@@ -14,14 +14,14 @@ pub const CHARTS: usize = 4;
 pub const SERIES: usize = 8;
 pub const SAMPLES: usize = 4096;
 pub const POINTS: usize = 512;
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
 pub struct Selection {
     pub protocol: String,
     pub field: String,
     pub label: String,
     pub unit: String,
 }
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, serde::Serialize)]
 pub struct Spec {
     pub id: u64,
     pub name: String,
@@ -30,7 +30,7 @@ pub struct Spec {
     pub series: Vec<Selection>,
 }
 impl Spec {
-    fn valid(&self) -> bool {
+    pub(crate) fn valid(&self) -> bool {
         self.id > 0
             && !self.name.is_empty()
             && self.name.len() <= 64
