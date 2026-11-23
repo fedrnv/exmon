@@ -1079,6 +1079,7 @@ name = "exmon-protocol"
 version = "0.1.0"
 dependencies = [
  "exmon-domain",
+ "serde_json",
 ]
 
 [[package]]

@@ -1,0 +1,255 @@
+Command: cargo test --workspace --locked
+Exit code: 0
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on build directory
+   Compiling exmon-protocol v0.1.0 (C:\GitHub\exmon\crates\protocol)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.27s
+     Running unittests src\lib.rs (target\debug\deps\exmon_app-0952347cd839d04e.exe)
+
+running 1 test
+test tests::invalid_logging_filter_is_rejected ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\diagnostics.rs (target\debug\deps\diagnostics-6bbc43dd66b054d1.exe)
+
+running 2 tests
+test structured_output_redacts_payload_and_identifiers ... ok
+test blocked_log_sink_cannot_block_metric_producers ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\hid_worker.rs (target\debug\deps\hid_worker-6913b23609364a71.exe)
+
+running 2 tests
+test refresh_failure_invalidates_old_selection_and_permission_denial_is_recoverable ... ok
+test exact_selected_worker_reports_and_stale_generations_never_fall_back ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests\shell.rs (target\debug\deps\shell-9fc0659dc5e31fd0.exe)
+
+running 2 tests
+test preferences_are_loaded_and_saved_on_distinct_worker_without_capture_state ... ok
+test sustained_capture_is_off_thread_bounded_and_stop_survives_full_results ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+
+     Running unittests src\lib.rs (target\debug\deps\exmon_capture-7a3be8bc545dce68.exe)
+
+running 1 test
+test usb_transfers::tests::expired_deadline_is_timeout_not_zero_byte_success ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\adapter.rs (target\debug\deps\adapter-41bc0b095e1158d6.exe)
+
+running 4 tests
+test deterministic_lifecycle_cancel_and_reconnect ... ok
+test errors_permission_and_backend_contract_failure_are_explicit ... ok
+test slow_consumer_is_bounded_by_bytes_and_counts_with_visible_losses ... ok
+test snapshot_limit_and_failed_close_cannot_be_bypassed ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\can.rs (target\debug\deps\can-d72e88d48e84e235.exe)
+
+running 5 tests
+test virtual_exchange_filters_standard_extended_remote_and_preserves_metadata ... ok
+test invalid_can_frames_modes_filters_and_raw_byte_tx_are_rejected ... ok
+test unavailable_backends_and_activation_failure_do_not_send ... ok
+test bounded_bus_loss_session_limits_cancel_and_reconnect_are_explicit ... ok
+test error_metadata_is_receive_only_and_send_disconnect_revokes_running_source ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\ethernet.rs (target\debug\deps\ethernet-0167b4c438f1a736.exe)
+
+running 3 tests
+test unsupported_links_and_permission_denial_remain_explicit ... ok
+test exact_bytes_capture_time_truncation_and_options ... ok
+test stop_under_synthetic_load_is_finite_and_does_not_read_after_cancel ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\hid.rs (target\debug\deps\hid-ccc043ef1bd0ecda.exe)
+
+running 4 tests
+test removal_permission_cancellation_and_size_errors_do_not_open_other_devices ... ok
+test selection_and_numbered_report_fidelity_are_explicit ... ok
+test report_mode_must_be_fixed_before_selecting_a_collection ... ok
+test unnumbered_input_is_not_stripped_and_output_zero_id_is_not_duplicated ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\serial.rs (target\debug\deps\serial-430e471e9b25c5b4.exe)
+
+running 3 tests
+test cancellation_bounds_partial_writes_and_unsupported_direction_are_honest ... ok
+test disconnect_and_reconnect_preserve_unrelated_session ... ok
+test virtual_pair_verifies_fragmented_framing_input_and_explicit_tx_output ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\synthetic.rs (target\debug\deps\synthetic-65ea8cf48f892fa3.exe)
+
+running 1 test
+test synthetic_transports_are_bounded_rx_only_and_poll_on_the_owning_thread ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\usb_transfers.rs (target\debug\deps\usb_transfers-e4de3a3dc1475a24.exe)
+
+running 4 tests
+test asynchronous_in_and_explicit_out_have_separate_bounded_completions ... ok
+test descriptor_fixtures_validate_bulk_interrupt_and_bad_selection ... ok
+test interrupt_completion_preserves_bytes_and_endpoint_kind ... ok
+test stall_disconnect_and_cancel_keep_partial_or_unknown_results_honest ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\usbmon.rs (target\debug\deps\usbmon-5c2b33369f9ac1bb.exe)
+
+running 6 tests
+test incremental_nonblocking_reader_preserves_lines_and_reports_truncated_eof ... ok
+test bulk_interrupt_control_and_iso_preserve_metadata_and_bytes ... ok
+test common_session_preserves_passive_direction_limits_and_cancellation ... ok
+test incomplete_data_and_invalid_records_are_explicit ... ok
+test unsupported_hosts_cannot_fall_back_to_active_usb ... ok
+test oversized_line_is_rejected_and_following_record_recovers ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\lib.rs (target\debug\deps\exmon_domain-43d07b5bf0c211d0.exe)
+
+running 6 tests
+test metrics::tests::rates_use_same_epoch_positive_time_and_unsaturated_totals ... ok
+test metrics::tests::stages_health_and_saturation_remain_distinct ... ok
+test tests::direction_roundtrip_and_unknown_input ... ok
+test tests::length_validation_preserves_unknown_and_truncated_semantics ... ok
+test observation::tests::bounds_metadata_and_privacy ... ok
+test metrics::tests::concurrent_producers_do_not_lose_counts ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\lib.rs (target\debug\deps\exmon_gui-fcf76d05f5c225fc.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\main.rs (target\debug\deps\exmon_gui-b8dc089335b340ee.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\hid.rs (target\debug\deps\hid-c31855d38193d911.exe)
+
+running 2 tests
+test default_native_hid_ui_is_explicitly_unsupported_without_discovering_hardware ... ok
+test actual_shell_opens_and_sends_only_the_explicitly_selected_hid_collection ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 2.76s
+
+     Running tests\shell.rs (target\debug\deps\shell-6e38223eef03e4e2.exe)
+
+running 2 tests
+test saved_split_and_theme_restore_into_the_actual_panel_without_starting_capture ... ok
+test production_ui_interacts_under_sustained_capture_and_renders_sizes_themes_dpi ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 5.72s
+
+     Running unittests src\lib.rs (target\debug\deps\exmon_protocol-6304fb195e7ff5da.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\network.rs (target\debug\deps\network-cf727320968496cb.exe)
+
+running 9 tests
+test fragments_unknown_encrypted_jumbo_and_non_ethernet_keep_original_bytes ... ok
+test exact_known_ethernet_ipv4_ipv6_tcp_udp_and_odd_checksums ... ok
+test checksum_corruption_zero_udp_truncation_and_source_routing_are_explicit ... ok
+test ipv6_extensions_and_atomic_fragment_preserve_upper_layer_checksum ... ok
+test hard_and_configured_limits_stop_before_allocating_or_scanning_excess_headers ... ok
+test existing_application_payload_corpus_is_retained_without_claiming_wire_decoding ... ok
+test invalid_lengths_options_and_reserved_fields_are_rejected ... ok
+test stacked_vlans_ipv4_tcp_options_and_padding ... ok
+test all_fixture_prefixes_mutations_and_deterministic_hostile_noise_stay_bounded ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src\lib.rs (target\debug\deps\exmon_storage-e3a42e1b8bd544a9.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\configuration.rs (target\debug\deps\configuration-ea405b02db103d50.exe)
+
+running 8 tests
+test machine_bindings_are_separate_and_reference_checked ... ok
+test all_transports_and_defaults_roundtrip_deterministically ... ok
+test documented_examples_are_loadable ... ok
+test remaining_schema_variants_and_nested_unknown_fields ... ok
+test framing_and_numeric_variants_roundtrip ... ok
+test version_and_syntax_errors_are_explicit_bounded_and_redacted ... ok
+test unsafe_and_invalid_values_are_rejected ... ok
+test collection_payload_and_output_caps_are_enforced ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running tests\layout.rs (target\debug\deps\layout-35faa6fe2c38312b.exe)
+
+running 1 test
+test layout_is_bounded_versioned_and_cannot_restore_capture_or_transmission ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\traffic_fixtures.rs (target\debug\deps\traffic_fixtures-ccff93576aedcbd8.exe)
+
+running 2 tests
+test independent_reference_matches_all_expected_messages_and_fields ... ok
+test corpus_is_synthetic_complete_bounded_and_ordered ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+   Doc-tests exmon_app
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests exmon_capture
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests exmon_domain
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests exmon_gui
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests exmon_protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests exmon_storage
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

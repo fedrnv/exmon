@@ -1,0 +1,23 @@
+Command: $env:LIBPCAP_LIBDIR=(Resolve-Path target/npcap-sdk-1.17/Lib/x64).Path; $env:PATH='C:\Windows\System32\Npcap;'+$env:PATH; cargo test -p exmon-capture --features native-pcap --lib --test ethernet --locked
+Exit code: 0
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.40s
+     Running unittests src\lib.rs (target\debug\deps\exmon_capture-fb97afc81ff56c0a.exe)
+
+running 2 tests
+test usb_transfers::tests::expired_deadline_is_timeout_not_zero_byte_success ... ok
+test native_pcap::tests::native_permission_messages_are_fixed_errors_without_losing_other_failures ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\ethernet.rs (target\debug\deps\ethernet-694a1e6d0e90fe8c.exe)
+
+running 5 tests
+test native_windows::native_km_test_fidelity_filter_snapshot_and_stop_under_load ... ignored, requires installed Npcap and explicitly provisioned Microsoft KM-TEST adapter; no physical interface
+test native_windows::native_npcap_loopback_remains_unsupported_by_ethernet_contract ... ignored, requires installed Npcap and explicit Windows virtual fixture opt-in
+test unsupported_links_and_permission_denial_remain_explicit ... ok
+test stop_under_synthetic_load_is_finite_and_does_not_read_after_cancel ... ok
+test exact_bytes_capture_time_truncation_and_options ... ok
+
+test result: ok. 3 passed; 0 failed; 2 ignored; 0 measured; 0 filtered out; finished in 0.00s

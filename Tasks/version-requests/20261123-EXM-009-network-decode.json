@@ -1,0 +1,11 @@
+{
+  "schema": "fdtasks-version-request/v1",
+  "request_id": "EXM-009-20261123T094601Z-bounded-network-decode-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-009",
+  "summary": "Decode Ethernet/VLAN/IPv4/IPv6/TCP/UDP with bounded parsing, retained wire bytes and explicit integrity diagnostics",
+  "verification": [
+    "Tasks/items/server/EXM-009-decode-ethernet-ipv4-ipv6-tcp-and-udp/evidence/20261123T094601Z-network-verification.json"
+  ]
+}

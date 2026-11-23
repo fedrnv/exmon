@@ -1,0 +1,10 @@
+Command: cargo fmt --all -- --check; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; cargo clippy --workspace --all-targets --locked -- -D warnings; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; node scripts/check-architecture.mjs; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; node scripts/generate-traffic-fixtures.mjs --check; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; git diff --check
+Exit code: 0
+    Blocking waiting for file lock on build directory
+    Checking exmon-protocol v0.1.0 (C:\GitHub\exmon\crates\protocol)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.16s
+PASS: six workspace layers, resolved dependency graph and three negative graph fixtures
+PASS: 132 synthetic cases (--check)
+warning: in the working copy of 'Cargo.lock', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/protocol/Cargo.toml', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'crates/protocol/src/lib.rs', LF will be replaced by CRLF the next time Git touches it

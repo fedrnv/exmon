@@ -1,0 +1,96 @@
+{
+    "task_id":  "EXM-009",
+    "owner":  "Codex exmon network decode development",
+    "verified_at":  "2026-11-23T09:46:01Z",
+    "source_base":  "533abc3741006e74a94e837dd4f998ebd64dbfc2",
+    "candidate_tree":  "92ae8eca5c71e0894e57a61b157b0a83c33f95cb",
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "owner_exception":  "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+    "hash_basis":  "SHA-256 of verified checkout bytes; candidate_tree identifies staged Git-normalized product source before closure records",
+    "files":  {
+                  "Cargo.lock":  "15d41e5f04f8901cfc2a67f89a22586131d7abf873414fffc1a3fcbb1e50d5fd",
+                  "crates/protocol/Cargo.toml":  "7a5687c63f342bb67a652c21ff15c499ae83e73abfd8cba435f1cc97b36a5202",
+                  "crates/protocol/src/lib.rs":  "4fffc1d0786fea1cd3a730c44f5777952369f88efc68ca6c8df0bdd18710e7f1",
+                  "crates/protocol/src/network.rs":  "2a237e672e4d5aa732ac582204ea0ebc94f42c1be8d3bcb00cfb7f5ab8639fef",
+                  "crates/protocol/tests/network.rs":  "01e9df0365168efc512722335665144bffe595fa57731e38137fd732ff020ec1",
+                  "docs/network-decoding.md":  "66701b2e7edd31160973f279143d3f63b488bbb36c07000f1b49bfe8807bff6d",
+                  "fixtures/traffic/corpus.json":  "e45111cc5c12aeb44e4843f6530f45ad716350e73ad05f197c9257b82d179295"
+              },
+    "environment":  "Windows Server 2025 Datacenter x64 build26100; rustc1.98.0 88d9e12ae, cargo1.98.0, Node24.22.1, x86_64-pc-windows-msvc. Existing Npcap SDK1.17 for feature regression only. No new installer/device/network capture required for pure decoder.",
+    "acceptance":  {
+                       "AC-01":  "PASS exact synthetic wire fixtures: Ethernet source/destination/type, stacked VLAN TPID/TCI/ID/priority/DEI, IPv4/IPv6 endpoints/fields/spans, TCP/UDP fields/payload/checksums, odd/even/empty payload, padding, variable IPv4/TCP options, five IPv6 extension kinds with atomic fragment. Independent byte-significance reference checksum and RFC1071 example. Corruption, zero UDP, incomplete data, endpoint ambiguity, unknown EtherTypes/IP protocols, IEEE802.3, ESP, jumbo, fragment metadata and unsupported Observation link/transport explicit. EXM005 application corpus is only raw-retention coverage, not a wire corpus.",
+                       "AC-02":  "PASS all prefixes and five-value single-byte mutation at each byte of six fixtures; 4000 deterministic hostile frames through default and reduced limits; invalid IP/UDP/TCP/option/extension/fragment fields; all allowed VLAN/extension limits exercised with one excess item; oversized input, hard header budget and exact maximum frame. Every emitted span checked in captured/header bounds; raw pointer+bytes unchanged; bounded vector lengths. No panic or boundary escape. This is targeted parser testing, not a full independent fuzz qualification."
+                   },
+    "verification":  [
+                         {
+                             "command":  "cargo test -p exmon-protocol --test network --locked",
+                             "result":  "PASS9"
+                         },
+                         {
+                             "command":  "cargo test --workspace --locked",
+                             "result":  "PASS68, ignored0, all six doctest groups pass; existing app/capture/domain/GUI/storage regressions",
+                             "output":  "Tasks/items/server/EXM-009-decode-ethernet-ipv4-ipv6-tcp-and-udp/evidence/20261123T094601Z-workspace-output.txt"
+                         },
+                         {
+                             "command":  "cargo fmt --all -- --check; cargo clippy --workspace --all-targets --locked -- -D warnings; node scripts/check-architecture.mjs; node scripts/generate-traffic-fixtures.mjs --check; git diff --check",
+                             "result":  "PASS; six layers, three negative dependency fixtures,132 unchanged synthetic cases",
+                             "output":  "Tasks/items/server/EXM-009-decode-ethernet-ipv4-ipv6-tcp-and-udp/evidence/20261123T094601Z-quality-output.txt"
+                         },
+                         {
+                             "command":  "$env:LIBPCAP_LIBDIR=(Resolve-Path target/npcap-sdk-1.17/Lib/x64).Path; $env:PATH=\u0027C:\\Windows\\System32\\Npcap;\u0027+$env:PATH; cargo test -p exmon-capture --features native-pcap --lib --test ethernet --locked",
+                             "result":  "PASS2 feature unit +3 Ethernet fixture tests;2 opt-in actual Windows native tests ignored in this invocation, not counted as passes. Capture source unchanged; previously published actual008 virtual Windows evidence retained.",
+                             "output":  "Tasks/items/server/EXM-009-decode-ethernet-ipv4-ipv6-tcp-and-udp/evidence/20261123T094601Z-native-regression-output.txt"
+                         },
+                         {
+                             "command":  "git diff --cached --check; git diff --cached --stat; git diff --cached -- \u003cproduct source\u003e; git fetch origin main; git rev-parse HEAD origin/main",
+                             "result":  "PASS; published claim533abc3 remains authoritative, same owner, no competing events; six product paths only; lockfile changes only existing serde_json dev dependency edge; final staged records check required before commit"
+                         }
+                     ],
+    "artifacts":  [
+                      {
+                          "path":  "Tasks/items/server/EXM-009-decode-ethernet-ipv4-ipv6-tcp-and-udp/evidence/20261123T094601Z-workspace-output.txt",
+                          "sha256":  "938eb7ede53b33045eead7b1129b2bfb3ff50782598a4d08819010a4f94fc9a4"
+                      },
+                      {
+                          "path":  "Tasks/items/server/EXM-009-decode-ethernet-ipv4-ipv6-tcp-and-udp/evidence/20261123T094601Z-quality-output.txt",
+                          "sha256":  "89cb28b134e3554f5ce4b419a0d93f30b442b870583e6e6c1d7916abc5a1fc9f"
+                      },
+                      {
+                          "path":  "Tasks/items/server/EXM-009-decode-ethernet-ipv4-ipv6-tcp-and-udp/evidence/20261123T094601Z-native-regression-output.txt",
+                          "sha256":  "3da7b9e544cc9053dcc195cb3c604420611f6dda1fc2a32f0f3ae9d478caac38"
+                      }
+                  ],
+    "failures_corrected":  [
+                               "Initial compilation used domain root imports; corrected to existing observation module without changing domain API.",
+                               "First negative fixture set included two assignments equal to existing zero bytes; removed those no-op cases while retaining explicit invalid total/UDP length assertions. Final malformed suite passes.",
+                               "Clippy1.98 required as_chunks rather than chunks_exact; adapted bounded checksum implementation and reran tests/lint.",
+                               "Source review against RFC4302 found IPv6 AH fixture needed64-bit alignment; enforce length/alignment, use16-byte valid AH and test malformed8/12-byte variants. Final exact chain checksum passes.",
+                               "PowerShell wildcard reads with nonexistent guessed event suffix and rg wildcard literal returned no file; read actual event filenames instead. No missing record treated as evidence.",
+                               "Prepublication staged whitespace check caught trailing blank lines in new unaccepted output/event drafts; trimmed draft EOFs and recomputed artifact hashes before accepting/publishing any record. No accepted record changed."
+                           ],
+    "reviewer":  "Codex exmon network decode development (author review; separate independent review remains Epic gate work)",
+    "review":  "Reviewed all staged product source, safe read preconditions and fixed-size unwraps, bounded arithmetic (input65536/options \u003c=2048/header4096), monotonically advancing walks, fixed metadata bounds, checksum sum overflow margin, IP pseudoheader lengths and padding, non-atomic fragment stop, source-routing ambiguity, explicit truncation/unsupported behavior, no borrowed range mutation via public metadata, Debug redaction and API layering. No GUI/capture/domain source changes. No production dependency added.",
+    "limits":  {
+                   "frame_bytes":  65536,
+                   "vlan_tags":  8,
+                   "ipv6_extensions":  16,
+                   "header_bytes":  4096,
+                   "recursion":  false,
+                   "payload_copy":  false
+               },
+    "limitations":  [
+                        "No IP/TCP reassembly, IEEE802.3 LLC, jumbograms, nested IP, ESP decryption, FCS or AH cryptographic verification; original bytes retained with explicit diagnostics as documented.",
+                        "Invalid checksum describes captured data; checksum offload may explain it. Never infer physical wire validity or malformed-frame exclusion from decoder success alone.",
+                        "No new GUI behavior; GUI regression executed, no new visual inspection applicable.",
+                        "Windows pure parser verification; no macOS/physical stand pass claimed. General EXM035/036 qualification remains later, as explicitly requested by owner. No Linux runtime check claimed this task.",
+                        "Independent fuzz/security034 and Epic gate/review are separate accepted obligations; this evidence does not close them."
+                    ],
+    "cleanup":  "Only intended six product paths and new009 records/request staged. Existing fixture corpus and accepted records unchanged. target/.idea ignored and preserved; build artifacts not committed. No devices touched, no physical TX, no temporary source fixtures left.",
+    "checkpoint":  {
+                       "goal":  "ACTIVE; close all safe Windows VPS work across Epics, continue after this one-task turn",
+                       "next":  "Refresh GitHub main/allocator and all rules/task records, then select EXM010 network filters (008/009 Done) or EXM011 sockets if valid. Publish next claim before implementation; no second task identity claimed this turn.",
+                       "authorization":  "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+                       "remaining":  "EXM014 physical/macOS obligations need revalidation under owner phase in a later dedicated turn. Actual device and macOS stands later. Epic development switches permitted without preceding Epic closure; functional dependencies still required. Never stop merely because009 Done.",
+                       "publication":  "Commit and immediately push verified009 closure to main; reconcile uncertain push before switching; first immutable version request exactly once, allocator remains sole version writer under actual qualified adoption boundary."
+                   }
+}
