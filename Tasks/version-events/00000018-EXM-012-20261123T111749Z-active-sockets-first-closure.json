@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 18,
+  "version": "0.1.0.18",
+  "request_id": "EXM-012-20261123T111749Z-active-sockets-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-012",
+  "summary": "Worker-owned active TCP/UDP IPv4/IPv6 sockets with explicit lifecycle, targeted TX and bounded resources",
+  "verification": [
+    "Tasks/items/server/EXM-012-implement-active-tcp-and-udp-socket-modes/evidence/20261123T111749Z-sockets-verification.json"
+  ],
+  "request_file": "Tasks/version-requests/20261123-EXM-012-active-sockets.json",
+  "request_sha256": "8b5941f5747d11ebca6f2c97d4ee8b40e727eacc218e89fb9112fe492badb2f7"
+}
