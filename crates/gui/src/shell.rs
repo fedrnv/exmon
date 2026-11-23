@@ -13,6 +13,7 @@ pub const TRANSPORTS: [(TransportKind, &str); 6] = [
     (TransportKind::Can, "CAN"),
 ];
 pub struct Shell {
+    network_filter: crate::network_filters::FilterPanel,
     hid: crate::hid::HidPanel,
     hid_view: bool,
     capture: CaptureWorker,
@@ -36,6 +37,7 @@ impl Shell {
     }
     pub fn with_hid(path: Option<PathBuf>, hid: crate::hid::HidPanel) -> Result<Self, ShellError> {
         Ok(Self {
+            network_filter: Default::default(),
             hid,
             hid_view: false,
             capture: CaptureWorker::spawn()?,
@@ -64,7 +66,15 @@ impl Shell {
         if self.hid_view || self.hid.busy() {
             return Err(ShellError::Busy);
         }
-        self.capture.start(self.transport(), self.interface)?;
+        let settings = if crate::network_filters::network(self.transport()) {
+            self.network_filter
+                .settings(self.interface)
+                .map_err(|_| ShellError::Invalid)?
+        } else {
+            Default::default()
+        };
+        self.capture
+            .start_filtered(self.transport(), self.interface, settings)?;
         self.history.clear();
         self.evicted = 0;
         self.notice = None;
@@ -121,30 +131,110 @@ impl Shell {
         }
         let selection_before = (self.selected, self.interface);
         let live = status.requested || self.hid.open();
-        egui::Panel::top("app-header").resizable(false).show(ui,|ui|{
-            ui.add_space(8.);
-            ui.horizontal(|ui|{
-                ui.heading("Exchange Monitor");ui.label(RichText::new("VIRTUAL PROTOTYPE").small().color(Color32::from_rgb(97,162,187)));
-                ui.with_layout(egui::Layout::right_to_left(egui::Align::Center),|ui|{
-                    if ui.add_enabled(!status.requested && !status.running && !self.hid.busy(),egui::Button::new(if self.hid_view{"Mock capture"}else{"HID reports"})).clicked(){self.hid_view = !self.hid_view;}
-                    let title=if self.layout.theme==Theme::Dark{"Light theme"}else{"Dark theme"};
-                    if ui.button(title).clicked(){self.layout.theme=if self.layout.theme==Theme::Dark{Theme::Light}else{Theme::Dark};}
-                    ui.label(RichText::new(if live{"CAPTURING"}else{"IDLE"}).color(if live{Color32::from_rgb(65,185,140)}else{Color32::GRAY}));
+        let filter_valid = !crate::network_filters::network(self.transport())
+            || self.network_filter.settings(self.interface).is_ok();
+        egui::Panel::top("app-header")
+            .resizable(false)
+            .show(ui, |ui| {
+                ui.add_space(8.);
+                ui.horizontal(|ui| {
+                    ui.heading("Exchange Monitor");
+                    ui.label(
+                        RichText::new("VIRTUAL PROTOTYPE")
+                            .small()
+                            .color(Color32::from_rgb(97, 162, 187)),
+                    );
+                    ui.with_layout(egui::Layout::right_to_left(egui::Align::Center), |ui| {
+                        if ui
+                            .add_enabled(
+                                !status.requested && !status.running && !self.hid.busy(),
+                                egui::Button::new(if self.hid_view {
+                                    "Mock capture"
+                                } else {
+                                    "HID reports"
+                                }),
+                            )
+                            .clicked()
+                        {
+                            self.hid_view = !self.hid_view;
+                        }
+                        let title = if self.layout.theme == Theme::Dark {
+                            "Light theme"
+                        } else {
+                            "Dark theme"
+                        };
+                        if ui.button(title).clicked() {
+                            self.layout.theme = if self.layout.theme == Theme::Dark {
+                                Theme::Light
+                            } else {
+                                Theme::Dark
+                            };
+                        }
+                        ui.label(
+                            RichText::new(if live { "CAPTURING" } else { "IDLE" }).color(if live {
+                                Color32::from_rgb(65, 185, 140)
+                            } else {
+                                Color32::GRAY
+                            }),
+                        );
+                    });
                 });
-            });ui.add_space(8.);ui.separator();
-            if !self.hid_view {ui.horizontal_wrapped(|ui|{
-                ui.add_enabled_ui(!status.requested && !status.running,|ui|{
-                    egui::ComboBox::from_label("Transport").selected_text(TRANSPORTS[self.selected].1).width(100.).show_ui(ui,|ui|{for (i,(_,name)) in TRANSPORTS.iter().enumerate(){ui.selectable_value(&mut self.selected,i,*name);}});
-                    egui::ComboBox::from_label("Interface").selected_text(format!("Mock {:02}",self.interface)).width(110.).show_ui(ui,|ui|{ui.selectable_value(&mut self.interface,1,"Mock 01");ui.selectable_value(&mut self.interface,2,"Mock 02");});
-                });
-                if ui.add_enabled(!status.requested && !status.running,egui::Button::new("Start capture")).clicked() && self.start_capture().is_err(){self.notice=Some("Capture worker is busy or unavailable.");}
-                if ui.add_enabled(status.requested || status.running,egui::Button::new("Stop capture")).clicked(){self.stop_capture();}
-                if ui.button("Clear view").clicked(){self.history.clear();self.evicted=0;}
+                ui.add_space(8.);
+                ui.separator();
+                if !self.hid_view {
+                    ui.horizontal_wrapped(|ui| {
+                        ui.add_enabled_ui(!status.requested && !status.running, |ui| {
+                            egui::ComboBox::from_label("Transport")
+                                .selected_text(TRANSPORTS[self.selected].1)
+                                .width(100.)
+                                .show_ui(ui, |ui| {
+                                    for (i, (_, name)) in TRANSPORTS.iter().enumerate() {
+                                        ui.selectable_value(&mut self.selected, i, *name);
+                                    }
+                                });
+                            egui::ComboBox::from_label("Interface")
+                                .selected_text(format!("Mock {:02}", self.interface))
+                                .width(110.)
+                                .show_ui(ui, |ui| {
+                                    ui.selectable_value(&mut self.interface, 1, "Mock 01");
+                                    ui.selectable_value(&mut self.interface, 2, "Mock 02");
+                                });
+                        });
+                        if ui
+                            .add_enabled(
+                                !status.requested && !status.running && filter_valid,
+                                egui::Button::new("Start capture"),
+                            )
+                            .clicked()
+                            && self.start_capture().is_err()
+                        {
+                            self.notice = Some("Capture worker is busy or unavailable.");
+                        }
+                        if ui
+                            .add_enabled(
+                                status.requested || status.running,
+                                egui::Button::new("Stop capture"),
+                            )
+                            .clicked()
+                        {
+                            self.stop_capture();
+                        }
+                        if ui.button("Clear view").clicked() {
+                            self.history.clear();
+                            self.evicted = 0;
+                        }
+                    });
+                    let kind = self.transport();
+                    self.network_filter.show(
+                        ui,
+                        self.interface,
+                        kind,
+                        status,
+                        self.capture.effective_filter(),
+                    );
+                }
+                ui.add_space(6.);
             });
-            ui.label(RichText::new("Effective filter: all synthetic observations | Physical capture and TX unavailable in this shell").small().weak());
-            }
-            ui.add_space(6.);
-        });
         if selection_before != (self.selected, self.interface) {
             self.history.clear();
             self.evicted = 0;
@@ -168,6 +258,7 @@ impl Shell {
                         ));
                         ui.separator();
                         ui.label(format!("History evictions: {}", self.evicted));
+                        ui.label(format!("Filtered out: {}", status.filtered_out));
                     });
                     if status.failed {
                         ui.colored_label(

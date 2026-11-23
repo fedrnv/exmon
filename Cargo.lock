@@ -1036,6 +1036,7 @@ dependencies = [
  "exmon-domain",
  "exmon-protocol",
  "exmon-storage",
+ "pcap",
  "tracing",
  "tracing-subscriber",
 ]

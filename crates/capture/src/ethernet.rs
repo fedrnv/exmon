@@ -41,6 +41,15 @@ pub struct RawFrame {
 }
 /// Trusted backend. Native next() must be nonblocking and bound copies by snaplen.
 pub trait Source: Send {
+    /// Compile without discovering/opening a live interface. Unsupported permits
+    /// an explicitly displayed post-capture-only fallback, never a silent error.
+    fn validate_filter(&mut self, filter: &str) -> Result<(), Error> {
+        if filter.is_empty() {
+            Ok(())
+        } else {
+            Err(Error::Unsupported)
+        }
+    }
     fn list(&mut self, maximum: usize) -> Result<Vec<String>, Error>;
     fn activate(&mut self, name: &str, snapshot: usize, options: &Options) -> Result<u32, Error>;
     fn next(&mut self) -> Result<Option<RawFrame>, Error>;

@@ -29,6 +29,15 @@ fn map_error(error: pcap::Error) -> Error {
 }
 
 impl Source for NativePcap {
+    fn validate_filter(&mut self, filter: &str) -> Result<(), Error> {
+        if filter.len() > 4096 || filter.contains('\0') {
+            return Err(Error::InvalidConfig);
+        }
+        let dead = pcap::Capture::dead(pcap::Linktype::ETHERNET).map_err(map_error)?;
+        dead.compile(filter, true)
+            .map(|_| ())
+            .map_err(|_| Error::InvalidConfig)
+    }
     fn list(&mut self, maximum: usize) -> Result<Vec<String>, Error> {
         Ok(pcap::Device::list()
             .map_err(map_error)?
@@ -39,6 +48,7 @@ impl Source for NativePcap {
     }
     fn activate(&mut self, name: &str, snapshot: usize, options: &Options) -> Result<u32, Error> {
         self.close();
+        self.validate_filter(&options.filter)?;
         let mut handle = pcap::Capture::from_device(name)
             .map_err(map_error)?
             .snaplen(i32::try_from(snapshot).map_err(|_| Error::InvalidConfig)?)

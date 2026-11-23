@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 pub mod config;
 pub mod metrics;
+pub mod network_filter;
 pub mod observation;
 
 /// Direction relative to the selected capture interface.

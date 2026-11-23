@@ -1,0 +1,204 @@
+{
+  "task_id": "EXM-010",
+  "owner": "Codex exmon network filters",
+  "verified_at": "2026-11-23T10:16:50Z",
+  "source_base": "d8d4de59e36614c8022884adcf8ab8f27d26c44f",
+  "candidate_tree": "e363ea4dedb2a082011b56ae77cb30fada7ac9aa",
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "task_sha256": "d90e27b4bd2b150597a220870e993dc0eb9ce2c89c1e09f3846c65c2212dac0d",
+  "owner_exception": "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+  "hash_basis": "SHA-256 of verified checkout bytes; candidate_tree is staged Git-normalized product source before closure records. Detailed streams/images remain in ignored local bounded evidence store per5.7, not Git.",
+  "environment": "Windows Server2025 Datacenter x64 build26100/admin; rustc/cargo1.98.0, Node24.22.1, MSVC/SDK. Previously installed trusted Npcap1.90/wpcap1.10.7 and SDK1.17. No new installations needed this task.",
+  "files": {
+    "Cargo.lock": "03dc9c4e50920b7c60e95272525257d26945859dff72be326f8b15118edb8402",
+    "crates/app/Cargo.toml": "e5c8cc7760f0a0495d6625902e61c632adcf82da1a3c4483127caf10034326e0",
+    "crates/app/src/lib.rs": "03cfa3428602899df160b8aa0b3e5981d207c701f50f66594124432c9116cc90",
+    "crates/app/src/network_filters.rs": "dfa774092d39bd4b7d320bc71294c34d3374b9b9c42de68dc445d0a392b72928",
+    "crates/app/src/shell.rs": "edf466f9ed6801fa7d43dab8d89d5f652e4e8e88f1cc31c151033d805bda9f4d",
+    "crates/app/tests/network_filters.rs": "c2c94dc959b0d5b2f5bdfbd1594d332b713d298752a65fcbccda38c851165a28",
+    "crates/capture/src/ethernet.rs": "d4e39fa08f422e4c7b84d75ee4f7bfd546110eb06ffcb8c71c9fbd4774477515",
+    "crates/capture/src/native_pcap.rs": "38c3f558abcfa009e4965e0f4e0416b6fac301f0118e3792839d1e2eb59a564b",
+    "crates/domain/src/lib.rs": "130cb46c43d31eec8c103a6bf15a8f73d9581320c28aeafc9c06369b1d84fee8",
+    "crates/domain/src/network_filter.rs": "c3d03742b6fa61948f98eda54247be6d1c6f909ea6ceb3b505e5be3b6a776558",
+    "crates/gui/src/lib.rs": "05bfe3e8ffa4f22cf9d1e43f7ed8f32a07a5c576c4f521ca1c8fc065cd7a1264",
+    "crates/gui/src/network_filters.rs": "c2d3d1e5ab9c5c8f1e95a7f7ebc0e718674d72b213b3655ee1047cdea3da0a07",
+    "crates/gui/src/shell.rs": "c6eef7a0d76642583a5c58356d12126e1944092b301252cb1aa5d65216282f41",
+    "crates/gui/tests/network_filters.rs": "a2c11253a44a57263aa75a0f0a6ce68999be4907c53cccfbf1b3a58516e73a82",
+    "crates/protocol/src/lib.rs": "f91a4de6c87247fce0f087f7db4593a1cec62727c83a5534b3d76327618b41b8",
+    "crates/protocol/src/network_filter.rs": "8c97b7964d3f994b3049729405794c982b118aaba9295ddec8168914ea4222e6",
+    "crates/protocol/tests/network_filters.rs": "6cf2801fd06165ad4604f6ffd89c475aae5a7665e8db3a706b162c096a64dea1",
+    "crates/protocol/tests/support/filter_wire.rs": "d32f231e81c02d7d9c63279b0fbaf247d7f9aab0c223314219d86ab8705429a8",
+    "docs/network-filters.md": "4f8b7e39b9a127fae4b899b5926da5214f9c5558ed136afef16c9855d0cf7b6b"
+  },
+  "acceptance": {
+    "AC-01": "PASS: exact IPv4/IPv6 TCP/UDP source/destination/either-port matching, IP address/protocol/interface/direction predicates, stacked VLAN<=8, IPv4 options and IPv6 extensions. Unknown directions do not invent socket source/destination; fragments/truncated or unresolved headers never fabricate ports/upper protocol. Numeric bounded settings validate before activation. Native Npcap dead compiler+interpreter proves combined BPF/post decisions equal post-only on all prefixes of known wire cases, including IPv4 options and IPv6/VLAN broad branches. Actual Windows FilteredEthernet/NativePcap receives at least16 each exact IPv4 TCP443 and IPv6 UDP443+extensions/VLAN frames, excludes444 variants, observes postfilter rejection of broad VLAN branch, preserves original/source timestamps and stops<500ms. Only explicitly provisioned isolated KM-TEST fixture used.",
+    "AC-02": "PASS: one canonical immutable FilterPlan supplies capture options, postfilter and displayed state. GUI rejects invalid IP/ports before Start and direct start cannot bypass validation; active settings disabled and shown from accepted plan; explicit stop/restart binds selected interface/generation. A24-round immediate Stop/Start test proves a prior backend generation cannot be labelled Running for a new filter. Mock worker filters off GUI thread with separate rejection counter; actual mode is explicitly post-only. Filtered native adapter exposes actual BPF/post mode and active state; invalid compilation/installation/start or terminal poll failure does not become/stay active. Author inspected all four supported geometry/theme/DPI renders and actual hidden native Windows viewport."
+  },
+  "verification": [
+    {
+      "command": "cargo test -p exmon-domain -p exmon-protocol -p exmon-capture --locked",
+      "result": "PASS49 plus doctests at stable baseline; retain46 unchanged domain/decoder/capture regressions. Three filter tests were strengthened afterward and superseded by final focused run below.",
+      "log": "target/exm010-evidence/core.txt"
+    },
+    {
+      "command": "cargo test -p exmon-protocol --test network_filters --locked",
+      "result": "PASS3 final: all exact metadata predicates and port boundaries, direction, bounds/prefix/mutation/fragments, newly explicit unresolved IPv6 protocol and known-address behavior, IPv4 option variants.",
+      "log": "target/exm010-evidence/protocol-final.txt"
+    },
+    {
+      "command": "cargo test -p exmon-app --test network_filters --test shell --locked",
+      "result": "PASS7:5 filter/lifecycle/worker/generation tests+2 affected shell tests. Final native-feature run below re-executes all5 filter tests against final protocol/helper.",
+      "log": "target/exm010-evidence/app.txt"
+    },
+    {
+      "command": "cargo test -p exmon-gui --test network_filters --test shell --locked",
+      "result": "PASS5:3 actual new UI tests plus2 affected shell regressions. GUI/controller source unchanged afterward; final raw-wire-only protocol resolution/IPv4 fixture changes do not affect mock socket UI semantics, validated again by native-app worker tests and final native GUI smoke.",
+      "log": "target/exm010-evidence/gui.txt"
+    },
+    {
+      "command": "LIBPCAP_LIBDIR=<Npcap SDK1.17>/Lib/x64; PATH=C:/Windows/System32/Npcap;<existing>; EXMON_TEST_WINDOWS_ETHERNET=km-test; cargo test -p exmon-app --features native-pcap --test network_filters --locked -- --include-ignored",
+      "result": "PASS7 final exact candidate,0 ignored:5 lifecycle/worker tests, actual dead BPF compiler/interpreter and1 actual isolated Windows live filter test. Capture/IP forwarding fixture guard passed before raw injection; no physical interface chosen.",
+      "log": "target/exm010-evidence/native-app-final.txt"
+    },
+    {
+      "command": "cargo test -p exmon-capture --features native-pcap --lib --test ethernet --locked (same trusted DLL/SDK env)",
+      "result": "PASS2 feature unit+3 Ethernet fixture tests;2 opt-in Windows tests ignored here but actually run separately below, not inferred passes.",
+      "log": "target/exm010-evidence/native-capture.txt"
+    },
+    {
+      "command": "EXMON_TEST_WINDOWS_ETHERNET=km-test; cargo test -p exmon-capture --features native-pcap --test ethernet --locked native_windows:: -- --ignored --nocapture (same trusted DLL/SDK env)",
+      "result": "PASS2,0 ignored,0.53s: actual existing KM-TEST capture/BPF/snapshot/cancel and explicit NPF_Loopback Unsupported. Executed after native prevalidation change; capture/native source and these test bodies unchanged afterward. Existing008 published qualification also retained."
+    },
+    {
+      "command": "cargo fmt --all -- --check; cargo clippy --workspace --all-targets --locked -- -D warnings; cargo clippy -p exmon-app --features native-pcap --all-targets --locked -- -D warnings",
+      "result": "PASS final",
+      "logs": [
+        "target/exm010-evidence/lint.txt",
+        "target/exm010-evidence/native-lint.txt"
+      ]
+    },
+    {
+      "command": "cargo run -p exmon-gui --example native_shell_smoke --locked",
+      "result": "PASS final: actual hidden eframe Windows viewport processes>=1024 mock observations, draws accepted running plan and closes by its8s deadline. Screenshot callback writes on background thread; native window/source never opens physical device.",
+      "log": "target/exm010-evidence/native-gui.txt"
+    },
+    {
+      "command": "node scripts/check-architecture.mjs; git diff --cached --check; git write-tree",
+      "result": "PASS six-layer resolved graph/3 negative fixtures; staged19 product paths reviewed and tree frozen. Final closure records must also pass staged whitespace check before commit."
+    }
+  ],
+  "local_artifacts": [
+    {
+      "path": "target/exm010-evidence/core.txt",
+      "sha256": "2580425dd4b1c5e0e834b6a11485df4a95461ed4dabbc48de21078e94cbc440e",
+      "bytes": 15282
+    },
+    {
+      "path": "target/exm010-evidence/protocol-final.txt",
+      "sha256": "793030ac948f1d56156e82d13759341d62f4a4f0db43de9b0af79589676af881",
+      "bytes": 1890
+    },
+    {
+      "path": "target/exm010-evidence/app.txt",
+      "sha256": "7778dcba2e3f0b883cad516caf587bd3b6b2e5dad1fd20b158877db698de1caf",
+      "bytes": 2968
+    },
+    {
+      "path": "target/exm010-evidence/gui.txt",
+      "sha256": "9e14b507c87ad3e8be5d41a345bf5c68a9e07b3112659dc06f25aa96c3244d08",
+      "bytes": 3152
+    },
+    {
+      "path": "target/exm010-evidence/native-app-final.txt",
+      "sha256": "dc3c3b53c728f77bea8c8ad6be202a525cbd012b79ed44ec02c7f4ad1ab0362c",
+      "bytes": 3124
+    },
+    {
+      "path": "target/exm010-evidence/native-capture.txt",
+      "sha256": "b9c50e4c6c6656398bf8e14f6e9896f1c70ce194474a476f17adb378c1f2ac08",
+      "bytes": 3438
+    },
+    {
+      "path": "target/exm010-evidence/lint.txt",
+      "sha256": "3486ef3600b3978003cce2d0492ef0faf1b62aca038922a85aec55b707b22b4b",
+      "bytes": 1520
+    },
+    {
+      "path": "target/exm010-evidence/native-lint.txt",
+      "sha256": "991e6d3ac79fc52fee6bfd59be447ef9d283b652fba58b4b14e346bc1b5ebf2d",
+      "bytes": 1214
+    },
+    {
+      "path": "target/exm010-evidence/native-gui.txt",
+      "sha256": "e1dbdc398059f0bfa9bb6a1da956cf5e864cd69ee05b2e3c7931e10a1e60bf39",
+      "bytes": 1946
+    },
+    {
+      "path": "target/debug/examples/native_shell_smoke.exe",
+      "sha256": "5e902fb6a0bde1d327ce0c5ebe825189afc27cfe991624a99f4580319fe2fd97",
+      "bytes": 48183296
+    },
+    {
+      "path": "target/debug/deps/network_filters-a577dcecd5963f46.exe",
+      "sha256": "0ed1bfbc0362e9749263be03dbae57bb289077fdb874e6bd88f4f231e37a8551",
+      "bytes": 1518592
+    }
+  ],
+  "visual_evidence": {
+    "artifacts": [
+      {
+        "path": "target/exm010-visual/filter-1360x900-1-dark.png",
+        "sha256": "d4ed0f718907ef3b9bed64557dd21f6de2c5786cd899b4d19452836ca39d61db",
+        "bytes": 284011
+      },
+      {
+        "path": "target/exm010-visual/filter-1360x900-1.5-light.png",
+        "sha256": "714abd793c99bcc3eb09756d41493e959a45b9aac16f0e22bfc84c90e58fc98e",
+        "bytes": 567204
+      },
+      {
+        "path": "target/exm010-visual/filter-900x600-1-dark.png",
+        "sha256": "1110f626ab15c533f3fb2e8a4614a596bdef49a0ee7f05251c30f7ad6f666c02",
+        "bytes": 184273
+      },
+      {
+        "path": "target/exm010-visual/filter-900x600-1.5-light.png",
+        "sha256": "0bb5d07072beb4ddc0cbea1326f9b90f211e922b406e3908a6e870d603b41ffe",
+        "bytes": 348537
+      },
+      {
+        "path": "target/exm010-visual/native-windows.png",
+        "sha256": "d9521bca5c93013fbab6c2146d513f1b8d73b620d45ed269ef43dd1b65c85431",
+        "bytes": 285523
+      }
+    ],
+    "inspection": "Inspected actual current5 PNGs using view_image:900x600/1360x900 dark1x and light1.5x, plus1200x760 native Windows. Controls, canonical running summary, disabled active fields, usable split panes and separate counters visible with no overlap/clipping. Kittest None-preferences setup intentionally shows existing layout-saving-unavailable notice; actual native smoke uses a real ignored layout path and no such notice. No physical capture/private payload shown. Generated PNGs not committed."
+  },
+  "safety": "Real port-filter traffic restricted by exact ROOT/DEVGEN/EXMON_ETHERNET_TEST identity, Microsoft KM-TEST product and kmloop service; GUID shape checked locally without recording it. Both IPv4/IPv6 forwarding disabled required by native guard, observed0 for both. Fixed documentation IP/local synthetic MAC fixtures; finite1000-iteration scoped injector,3s capture deadline, joined thread and closed handles. Existing physical management adapter untouched. No new credentials, downloads, physical TX, signing or release.",
+  "failures_corrected": [
+    "Initial GUI accessibility helper used old text_edit arity; use actual labelled_by response API so values/names/disabled state remain correct.",
+    "Initial new GUI test missed NodeT import; corrected trait import before execution. No failing behavior test weakened.",
+    "Review found terminal filtered poll error could leave active true; now stops/closes capture and clears active, with explicit disconnected/cancel tests.",
+    "Review found quick Stop/Start could expose old running flag with newly accepted plan; bind running to active_generation, with24-round rapid restart test.",
+    "Review found incomplete IPv6 extension chain could expose an extension number as resolved upper protocol; keep upper protocol unavailable while preserving known IP addresses, verified focused case.",
+    "Tcpdump documentation fetch denied by robots; used primary Npcap guide and pcap2.5 API docs. Literal PowerShell wildcard/rg paths in exploratory reads failed; resolved actual files, no missing-file result treated as evidence.",
+    "One apply_patch expected pre-format lines no longer present; tool rejected atomically, inspected source then applied exact patch. No partial product change accepted.",
+    "PowerShell native stderr redirection formats Cargo progress as NativeCommandError text in local logs; real process exit and test summaries observed0/PASS. No runtime failure or flaky PASS accepted."
+  ],
+  "review": "Author reviewed staged contract end-to-end: validated domain limits, immutable plan, numeric BPF construction/no hostnames or injected syntax, conservative IPv4/IPv6/VLAN pushdown and exact postfilter, safe borrowed decoder boundaries, no guessed missing metadata, bounded polling/no refill, actual lifecycle state after failure, generation-safe UI transitions, separate filter exclusions, GUI-thread separation, redacted Debug, unchanged persistent schema and physical TX authority. Optional app native-pcap dependency enables direct interpreter/native integration only when requested; no crate versions changed and default GUI still needs no Npcap. Capture/protocol/storage remain independent.",
+  "limitations": [
+    "BPF is a conservative optimization, not the full predicate: supported untagged IPv4 protocol/address/ports and IPv6 base addresses pushed down, IPv6 upper headers and VLAN handled by exact postfilter. Source Unsupported means explicit post-only fallback; invalid native syntax/install never silently falls back.",
+    "Snapshot-truncated/malformed or non-atomic fragmented transport headers cannot match ports. No IP/TCP reassembly, CIDR/hostname parsing or persistent filter-schema migration in this accepted item. Unknown native Ethernet direction remains Unknown.",
+    "Mock Ethernet contains application payload, not wire IP headers; network predicates match nothing there. Mock TCP/UDP ports12000/12001 exercise UI. GUI remains explicit mock/selected HID; typed native filtered adapter is available in application API without adding physical capture controls.",
+    "No macOS/Linux native runtime, physical/electrical/device or packaged-release qualification claimed for this item. Owner deferred general platform/physical qualification to035/036 and packaging037; independent security/fuzz034 and Epic gate/review remain separate obligations."
+  ],
+  "cleanup": "Only19 intended product paths and new010 records/request staged; accepted history and existing fixture corpus unchanged. Local verbose evidence+5 images bounded below1MiB logs/3MiB images, retained ignored; no generated binary/image/cache/log committed. Native fixture injector and hidden viewport exited, capture handles/worker threads closed. Existing target caches and unrelated .idea preserved.",
+  "checkpoint": {
+    "task": "EXM-010 Done only after verified closure is successfully pushed",
+    "goal": "ACTIVE, previous and this turn make product progress; do not stop at item success",
+    "next": "Fresh turn: fetch/reconcile published010 closure and allocator update, reread applicable rules/011 immutable task+records, verify functional prerequisites, then publish EXM-011 socket-adapter claim before implementing Windows TCP/UDP loopback/native behavior.",
+    "authority": "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+    "resources": "Windows admin/toolchain/Npcap and isolated KM-TEST remain available. No new persistent process needed. Physical-device and macOS stands deferred, not a blocker for other Windows-ready tasks. Owner permits switching Epics before preceding closure; functional task dependencies, per-task ownership and Epic acceptance gates still apply.",
+    "publication": "Immediately push this coherent implementation/verified closure/request to main; reconcile uncertain/rejected push before another commit or task. Create first010 version request exactly once, never assign a version manually; actual qualified allocator/adoption boundary preserved."
+  }
+}

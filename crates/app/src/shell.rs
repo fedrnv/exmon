@@ -1,4 +1,5 @@
 //! Nonblocking desktop controllers. Capture and filesystem work stay in workers.
+use crate::network_filters::{FilterPlan, NetworkFilter};
 pub use exmon_capture::adapter::Captured;
 use exmon_capture::{
     adapter::{Limits, Session},
@@ -9,7 +10,7 @@ pub use exmon_storage::layout::{Layout, LayoutError, Theme};
 use std::{
     path::PathBuf,
     sync::{
-        Arc, OnceLock,
+        Arc, Mutex, OnceLock,
         atomic::{AtomicBool, AtomicU8, AtomicU64, Ordering},
         mpsc::{self, Receiver, SyncSender},
     },
@@ -36,6 +37,7 @@ struct Control {
     quit: AtomicBool,
     desired: AtomicBool,
     generation: AtomicU64,
+    active_generation: AtomicU64,
     running: AtomicBool,
     packets: AtomicU64,
     bytes: AtomicU64,
@@ -43,6 +45,8 @@ struct Control {
     backend_loss: AtomicU64,
     application_drops: AtomicU64,
     failed: AtomicBool,
+    filtered_out: AtomicU64,
+    effective_filter: Mutex<Option<FilterPlan>>,
     owner: OnceLock<ThreadId>,
 }
 impl Default for Control {
@@ -51,6 +55,7 @@ impl Default for Control {
             quit: AtomicBool::new(false),
             desired: AtomicBool::new(false),
             generation: AtomicU64::new(0),
+            active_generation: AtomicU64::new(0),
             running: AtomicBool::new(false),
             packets: AtomicU64::new(0),
             bytes: AtomicU64::new(0),
@@ -58,6 +63,8 @@ impl Default for Control {
             backend_loss: AtomicU64::new(0),
             application_drops: AtomicU64::new(0),
             failed: AtomicBool::new(false),
+            filtered_out: AtomicU64::new(0),
+            effective_filter: Mutex::new(None),
             owner: OnceLock::new(),
         }
     }
@@ -66,6 +73,7 @@ struct Start {
     kind: TransportKind,
     interface: u64,
     generation: u64,
+    filter: FilterPlan,
 }
 pub struct Batch {
     pub generation: u64,
@@ -74,13 +82,16 @@ pub struct Batch {
 #[derive(Clone, Copy, Debug)]
 pub struct CaptureStatus {
     pub requested: bool,
+    /// True only when the accepted request's generation is actually running.
     pub running: bool,
+    pub active_generation: Option<u64>,
     pub packets: u64,
     pub bytes: u64,
     pub display_decimation: u64,
     pub backend_loss: u64,
     pub application_drops: u64,
     pub failed: bool,
+    pub filtered_out: u64,
 }
 pub struct CaptureWorker {
     control: Arc<Control>,
@@ -99,13 +110,16 @@ impl CaptureWorker {
             .spawn(move || {
                 let _ = worker.owner.set(thread::current().id());
                 let mut session: Option<Session<Synthetic>> = None;
+                let mut filter: Option<(u64, FilterPlan)> = None;
                 let mut active = 0;
                 while !worker.quit.load(Ordering::Acquire) {
                     if !worker.desired.load(Ordering::Acquire)
                         || worker.generation.load(Ordering::Acquire) != active
                     {
                         session.take();
+                        filter.take();
                         worker.running.store(false, Ordering::Release);
+                        worker.active_generation.store(0, Ordering::Release);
                     }
                     if let Ok(start) = rx.try_recv()
                         && worker.desired.load(Ordering::Acquire)
@@ -136,10 +150,13 @@ impl CaptureWorker {
                             Ok(capture) => {
                                 active = start.generation;
                                 session = Some(capture);
+                                filter = Some((start.interface, start.filter));
+                                worker.filtered_out.store(0, Ordering::Relaxed);
                                 worker.packets.store(0, Ordering::Relaxed);
                                 worker.bytes.store(0, Ordering::Relaxed);
                                 worker.decimated.store(0, Ordering::Relaxed);
                                 worker.failed.store(false, Ordering::Relaxed);
+                                worker.active_generation.store(active, Ordering::Release);
                                 worker.running.store(true, Ordering::Release);
                             }
                             Err(_) => {
@@ -166,7 +183,20 @@ impl CaptureWorker {
                             worker
                                 .application_drops
                                 .store(metrics.count(Counter::ApplicationDrops), Ordering::Relaxed);
-                            let records = capture.drain(32);
+                            let mut records = capture.drain(32);
+                            if let Some((interface, plan)) = &filter {
+                                records.retain(|record| {
+                                    let accepted = plan.matches(*interface, &record.observation);
+                                    if !accepted {
+                                        let _ = worker.filtered_out.fetch_update(
+                                            Ordering::Relaxed,
+                                            Ordering::Relaxed,
+                                            |n| Some(n.saturating_add(1)),
+                                        );
+                                    }
+                                    accepted
+                                });
+                            }
                             let count = records.len() as u64;
                             if tx
                                 .try_send(Batch {
@@ -191,6 +221,7 @@ impl CaptureWorker {
                 }
                 session.take();
                 worker.running.store(false, Ordering::Release);
+                worker.active_generation.store(0, Ordering::Release);
             })
             .map_err(|_| ShellError::Unavailable)?;
         Ok(Self {
@@ -201,9 +232,28 @@ impl CaptureWorker {
         })
     }
     pub fn start(&self, kind: TransportKind, interface: u64) -> Result<(), ShellError> {
+        self.start_filtered(kind, interface, NetworkFilter::default())
+    }
+    pub fn start_filtered(
+        &self,
+        kind: TransportKind,
+        interface: u64,
+        mut settings: NetworkFilter,
+    ) -> Result<(), ShellError> {
         if !(1..=2).contains(&interface) {
             return Err(ShellError::Invalid);
         }
+        if settings.interface.is_some_and(|id| id != interface)
+            || (settings.has_network_predicates()
+                && !matches!(
+                    kind,
+                    TransportKind::Ethernet | TransportKind::Tcp | TransportKind::Udp
+                ))
+        {
+            return Err(ShellError::Invalid);
+        }
+        settings.interface = Some(interface);
+        let filter = FilterPlan::new(settings).map_err(|_| ShellError::Invalid)?;
         if self.control.desired.swap(true, Ordering::AcqRel) {
             return Err(ShellError::Busy);
         }
@@ -223,11 +273,15 @@ impl CaptureWorker {
                 kind,
                 interface,
                 generation,
+                filter: filter.clone(),
             })
             .is_err()
         {
             self.control.desired.store(false, Ordering::Release);
             return Err(ShellError::Busy);
+        }
+        if let Ok(mut effective) = self.control.effective_filter.lock() {
+            *effective = Some(filter);
         }
         if let Some(thread) = &self.thread {
             thread.thread().unpark();
@@ -241,16 +295,23 @@ impl CaptureWorker {
         }
     }
     pub fn status(&self) -> CaptureStatus {
+        let active = self.control.active_generation.load(Ordering::Acquire);
         CaptureStatus {
             requested: self.control.desired.load(Ordering::Acquire),
-            running: self.control.running.load(Ordering::Acquire),
+            running: self.control.running.load(Ordering::Acquire) && active == self.generation(),
+            active_generation: (active != 0).then_some(active),
             packets: self.control.packets.load(Ordering::Relaxed),
             bytes: self.control.bytes.load(Ordering::Relaxed),
             display_decimation: self.control.decimated.load(Ordering::Relaxed),
             backend_loss: self.control.backend_loss.load(Ordering::Relaxed),
             application_drops: self.control.application_drops.load(Ordering::Relaxed),
             failed: self.control.failed.load(Ordering::Relaxed),
+            filtered_out: self.control.filtered_out.load(Ordering::Relaxed),
         }
+    }
+    /// Accepted immutable settings; mock capture always uses exact postfilter only.
+    pub fn effective_filter(&self) -> Option<FilterPlan> {
+        self.control.effective_filter.lock().ok()?.clone()
     }
     pub fn generation(&self) -> u64 {
         self.control.generation.load(Ordering::Acquire)
