@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 21,
+  "version": "0.1.0.21",
+  "request_id": "EXM-020-20261123T122600Z-classification-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-020",
+  "summary": "Deterministic explainable metadata/header/mask classification with stable fallback groups and persistent names",
+  "verification": [
+    "Tasks/items/server/EXM-020-implement-automatic-message-classification/evidence/20261123T122600Z-classification-verification.json"
+  ],
+  "request_file": "Tasks/version-requests/20261123-EXM-020-classification.json",
+  "request_sha256": "d81635bb9a1292a53ac96cae7d7d4428c29ec93153f27d4ece8f57a09c32f57a"
+}
