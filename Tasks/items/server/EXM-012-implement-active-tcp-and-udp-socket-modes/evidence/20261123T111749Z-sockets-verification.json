@@ -1,0 +1,139 @@
+{
+  "task_id": "EXM-012",
+  "owner": "Codex exmon active sockets",
+  "verified_at": "2026-11-23T11:17:49Z",
+  "source_base": "ac4cf38b817ceef0ea9dfb61c6d00c649c3e12fb",
+  "candidate_tree": "3bfaf7241b605985816960478971f8a2c22d0127",
+  "task_sha256": "7c39b10d17d71cfbb2d1820f592fe88a8be46ce438d8358d2d8a70b0a04b6539",
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "owner_exception": "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+  "hash_basis": "SHA256 of verified checkout bytes; candidate_tree is Git-normalized staged product before closure records. Verbose logs and test binary remain in ignored bounded local store.",
+  "environment": {
+    "host": "Windows Server2025 Datacenter x64 build26100, x86_64-pc-windows-msvc",
+    "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)",
+    "cargo": "cargo 1.98.0 (797e8a9bc 2026-08-05)",
+    "node": "v24.22.1",
+    "network": "Actual OS TCP/UDP sockets on127.0.0.1/::1 and ephemeral ports only; no physical interface/capture, remote server, firewall change or driver/administrator privilege required."
+  },
+  "files": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "177947ec9fc79d0a1bd808158151fbae05a444534ced1a934ea310a519289cf1",
+      "bytes": 108514
+    },
+    {
+      "path": "crates/capture/Cargo.toml",
+      "sha256": "dca34cbdf89768d81c7da0fed3a8e4642b5b76bd726cc89a75cc581e9f951eb4",
+      "bytes": 943
+    },
+    {
+      "path": "crates/capture/src/lib.rs",
+      "sha256": "3eb1fc535aba66407f07bb79897af6ff12a0d9d8f60a0cf6875559f1974d0e46",
+      "bytes": 481
+    },
+    {
+      "path": "crates/capture/src/sockets.rs",
+      "sha256": "75dcd56561c5a53f4aff3c441c9d01f4c0373f55fe8f715fc903a879735d5d78",
+      "bytes": 31635
+    },
+    {
+      "path": "crates/capture/tests/sockets.rs",
+      "sha256": "37615acdba7359e785be440777fb9a5c878d8aee32bc2c8ccb0990aae7f7168e",
+      "bytes": 27917
+    },
+    {
+      "path": "docs/active-sockets.md",
+      "sha256": "f692bf8ab9e1e28036672a5e5b7a177d35d775ae474e63c595a674dd70dc3046",
+      "bytes": 5433
+    }
+  ],
+  "local_artifacts": [
+    {
+      "path": "target/exm012-evidence/sockets.log",
+      "sha256": "bae25cce14a0158b72f9998bfd5cba2a9f6fa7d822c30abe32f98f289ce5fe37",
+      "bytes": 3434
+    },
+    {
+      "path": "target/exm012-evidence/regressions.log",
+      "sha256": "7c5be86aa80b5c0f6378ecc179db40a2ff6f53aa751556ed9a33677ca7b4cf2e",
+      "bytes": 13486
+    },
+    {
+      "path": "target/exm012-evidence/quality.log",
+      "sha256": "ddab956eb97fc014b19e4069b8e4ab7a423da274cafb71e8c6b32b63bbcdbbb8",
+      "bytes": 1680
+    },
+    {
+      "path": "target/debug/deps/sockets-c0e5ab1f5431a457.exe",
+      "sha256": "a8cd3da266361526fab0a05ece196dd191c7ad17f63f316b965788ac7245cd46",
+      "bytes": 1252352
+    }
+  ],
+  "acceptance": {
+    "AC-01": "PASS13 focused tests cover all four modes on actual IPv4/IPv6 loopback: binary bidirectional fidelity and metadata, snapshot-fragmented TCP, explicit client local bind, multiple clients/target-only responses, UDP datagram boundaries/empty messages/selected peer filtering, exact original lengths after truncation. Additional IPv4 maximum65507-byte UDP datagram fidelity and send/truncation event endpoints checked. Generic targetless TX Unsupported; invalid destination, stale epoch and cancellation reject before payload submission.",
+    "AC-02": "PASS shutdown/Drop/reopen with24 UDP cycles per IP family, exact UDP/listener port reuse after handle release, TCP client reconnect with distinct IDs/epoch and stale TX rejection, half-close reverse data and full closure, explicit peer close, reset isolated to one server peer, refused connect and busy bind failure cleanup/recovery. Nonblocking TCP backpressure asserts accepted prefix count equals actual peer-received bytes; Stop<250ms. Bounded peer/event caps, lost-event metric, poll limits and actual common Session receive/reconnect/close tested. Source creates no thread/task/runtime and owns all handles by RAII."
+  },
+  "verification": [
+    {
+      "command": "cargo test -p exmon-capture --test sockets --locked",
+      "result": "PASS13,0 failed/ignored; final0.51s.",
+      "log": "target/exm012-evidence/sockets.log"
+    },
+    {
+      "command": "cargo test -p exmon-capture -p exmon-domain --locked",
+      "result": "PASS50 (13 new sockets+31 existing capture transport contracts+6 domain),0 failed/ignored; doctests pass. Default-feature regression scope; no native-feature/physical qualification inferred.",
+      "log": "target/exm012-evidence/regressions.log"
+    },
+    {
+      "command": "cargo fmt --all -- --check; cargo clippy --workspace --all-targets --locked -- -D warnings",
+      "result": "PASS workspace format and lint, no warnings.",
+      "log": "target/exm012-evidence/quality.log"
+    },
+    {
+      "command": "node scripts/check-architecture.mjs; git diff --check; git diff --cached --check",
+      "result": "PASS six layers/resolved dependency graph+3 negative fixtures, worktree/staged whitespace."
+    },
+    {
+      "command": "Review staged source/tests/docs/Cargo diff; git diff --cached --stat/--numstat; git write-tree; git fetch origin main; git rev-parse HEAD origin/main",
+      "result": "PASS6 intended product paths; HEAD/origin main bothac4cf38. Current published012 claim remains owned by Codex exmon active sockets. Exact dependencies007/009/readiness unchanged. socket2 already existed transitively; only one capture dependency edge added to lock, no package/version upgrades."
+    }
+  ],
+  "resource_contract": {
+    "peers": 32,
+    "event_slots": 256,
+    "poll_os_attempts": 64,
+    "poll_accepts": 8,
+    "batch_items": 64,
+    "snapshot_batch_send_bytes": 65536,
+    "requested_kernel_buffer_bytes": 1048576,
+    "connect_timeout_ms": 1000,
+    "defaults": "16 peers,64 events,65536-byte socket buffers/max send,250ms connect",
+    "ownership": "No background task/thread/reactor; worker polls nonblocking sockets. No payload TX queue/schedule or automatic send/reconnect. Stop revokes phase then drops listener/UDP/all peers; Drop stops. TCP half-closed peers explicitly retained for reverse direction until close; TIME_WAIT is OS state, not owned descriptor leakage."
+  },
+  "failures_corrected": [
+    "Initial cap test FAILED1/11 with Windows10061 on second connect: max_peers1 also gives a one-slot OS listen backlog, and the test had not accepted the first connection. Changed test to accept first, then connect second and poll until explicit active-peer rejection. Exact rejection/cap assertions preserved, no unchanged functional retry/flaky pass.",
+    "Removed unused test imports; fixed new test reference to std::thread and original_length usize expectation after compiler errors. No production contract/test weakening or lint allows.",
+    "Review made UDP Sent/DatagramTruncated events carry the actual explicit destination/sender; shutdown_write failure now removes the failed peer and records lifecycle failure. Added maximum UDP payload/event-endpoint and reset-isolation/explicit-close behavior tests; final13 focused and selected regressions pass.",
+    "PowerShell native stderr progress is formatted as NativeCommandError in local logs, despite successful Cargo exit0; actual test/lint results inspected.",
+    "One routine timestamp read used unsupported Get-Date -AsUTC on Windows PowerShell; replaced with DateTime.UtcNow. Product/gates unaffected.",
+    "Current readiness prose erroneously called018 framing. Read immutable018 TASK now:018 is PCAP/PCAPNG import/export, dependencies008/009. Exact TASK is scope authority; accepted readiness history left unchanged."
+  ],
+  "reviewer": "Codex exmon active sockets (author review; independent Epic review not claimed)",
+  "review": "Reviewed6 staged product paths: no pre-Start I/O, bounded connect cancellation, same-family endpoint/length validation, nonblocking accept/read/write and fair finite loops, single targeted/partial TCP TX and atomic UDP TX, half-close/reset/disconnect/error cleanup, checked epochs/IDs, saturating metrics, bounded events/payload/peer retention, exact UDP truncation and metadata, Debug privacy, shared Session/layer compatibility. Unwraps guarded by validated private invariants. socket2 safe wrapper only, workspace unsafe prohibition retained. No shared Adapter/schema/GUI/protocol/storage/CI changes.",
+  "limitations": [
+    "Windows VPS qualification only. Platform matrix035/physical036, packaging/releases037 and separate Epic gate/review remain unpassed by this task; no macOS/Linux-native or physical-device success inferred.",
+    "Numeric IP endpoints only; IPv6-only sockets, no DNS/resolver or dual-stack listener. OS can reject unavailable addresses/path limits; fixed failure category and snapshot/event expose errors.",
+    "Connect occupies worker for at most configured bounded OS timeout plus scheduling overhead; cancellation checked around it cannot retract kernel traffic. Poll cancellation requires worker Stop/Close; common Session handles failures.",
+    "TCP stream chunks do not preserve application messages. EOF preserves the reverse direction and consumes peer capacity until explicit closure. Accepted writes do not prove remote delivery, UDP has no delivery guarantee or exact kernel-loss counter.",
+    "Requested kernel buffers may be rounded; per-adapter bounds are not process RSS ceilings. Callers must bound retained observations and consume bounded event ring/snapshots after event loss.",
+    "No GUI changed: visual N/A; endpoint settings/worker command routing remain029. Real installations/physical stand credentials were not needed or touched."
+  ],
+  "cleanup": "Only6 intended source/docs/dependency paths plus new012 evidence/Done/request. No accepted TASK/event/evidence, generated version state/history or unrelated .idea change. Logs total<32KiB ignored and test executable retained in normal bounded build cache. All test processes exited, no owned background helper or live socket remains.",
+  "checkpoint": {
+    "task": "EXM-012 verified Done upon successful publication",
+    "goal": "ACTIVE;012 is product progress, no global blocker or overall completion",
+    "next": "Fresh turn fetch/reconcile012 closure and allocator. Inspect all EXM018 PCAP/PCAPNG import/export records, effective state/rules/008+009 dependencies and publish claim if Planned/unowned. Alternatively revalidate014 under Windows owner exception if required by dependency order; do not select/claim another identity in this turn. Read immutable task scopes before naming work.",
+    "authority": "Owner explicitly authorizes completing all possible Windows VPS work across Epics; physical devices/macOS deferred to other stands. Required toolchain is available, no installation/permission blocker for next pure file-processing task.",
+    "publication": "Commit coherent product+verification+Done+single first012 version request and immediately pushmain. Reconcile rejected/unknown push before other commit/task; allocator remains sole version writer under actual qualified adoption boundary."
+  }
+}

@@ -1052,6 +1052,7 @@ dependencies = [
  "rustix 1.1.6",
  "serde_json",
  "serial2",
+ "socket2",
  "socketcan",
 ]
 

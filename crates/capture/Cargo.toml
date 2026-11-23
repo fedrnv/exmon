@@ -10,6 +10,7 @@ workspace = true
 [dependencies]
 exmon-domain.workspace = true
 serial2 = { version = "0.2.39", features = ["rs4xx"] }
+socket2 = "0.6.5"
 pcap = { version = "2.5", optional = true }
 hidapi = { version = "2.6.7", optional = true, default-features = false, features = ["windows-native", "linux-native-basic-udev"] }
 nusb = { version = "0.2.9", optional = true }
