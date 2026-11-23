@@ -1,0 +1,223 @@
+{
+    "task_id":  "EXM-022",
+    "owner":  "Codex exmon message codec",
+    "verified_at":  "2026-11-23T13:17:38Z",
+    "source_base":  "15bb3b2f42bd2b88e0380982d634adb2948de59e",
+    "candidate_tree":  "6acb2df154b5b43e2adae0acf90c63b30d8c1d20",
+    "task_sha256":  "906e3cd928e2b57dca6267a18f1d5c184796932f997b6f63b7c1a6c0d45d7116",
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "hash_basis":  "SHA256 of verified checkout bytes; candidate_tree is Git-normalized staged product before closure records. Detailed logs and focused executable remain bounded/ignored locally.",
+    "owner_exception":  "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+    "environment":  {
+                        "host":  "Windows Server2025 Datacenter x64 build26100 x86_64-pc-windows-msvc",
+                        "rustc":  "1.98.0 (88d9e12ae 2026-08-18)",
+                        "cargo":  "1.98.0 (797e8a9bc 2026-08-05)",
+                        "node":  "24.22.1",
+                        "devices":  "Pure codec/schema work, no new device/native/physical traffic, install or privileges. Default-feature synthetic/loopback transport regressions retained. No macOS or stand qualification."
+                    },
+    "files":  [
+                  {
+                      "path":  "crates/domain/src/checksum.rs",
+                      "sha256":  "e902b416d587d02b8bfc2d02bdce64e999fd91d9f7a0c2ad2ae882014b3be483",
+                      "bytes":  5151
+                  },
+                  {
+                      "path":  "crates/domain/src/config.rs",
+                      "sha256":  "3168e1ee9c6ef7b084007349ba88437ea1dd4bc1f5868991f96d523f02969457",
+                      "bytes":  19671
+                  },
+                  {
+                      "path":  "crates/domain/src/lib.rs",
+                      "sha256":  "7dd02c4901510a2ee30e1a874322ebf5fa62e8897f60d7593d1ccc5ba4dd8b2a",
+                      "bytes":  2103
+                  },
+                  {
+                      "path":  "crates/protocol/src/checksum.rs",
+                      "sha256":  "732564505a1d29c603bcb7f2e0a0a38fb6ac94e86982de8674a9b846b7fbfce5",
+                      "bytes":  9184
+                  },
+                  {
+                      "path":  "crates/protocol/src/codec.rs",
+                      "sha256":  "f3096fa5847ef32e4f850e2d54cd1a44dffd78b71728a807e247bb185e313928",
+                      "bytes":  11518
+                  },
+                  {
+                      "path":  "crates/protocol/src/lib.rs",
+                      "sha256":  "2fe1c99f3f0a47ec6953837361e24faaf257c226ef3cb608a2b5c70d2684821c",
+                      "bytes":  243
+                  },
+                  {
+                      "path":  "crates/protocol/tests/codec.rs",
+                      "sha256":  "d448490e853aec375aaec58e5a0cbfb86c198cccaf64b3fead45f1ee08e16570",
+                      "bytes":  31016
+                  },
+                  {
+                      "path":  "crates/storage/tests/configuration.rs",
+                      "sha256":  "2ed625cad0a15ee58413d1b992a29dce5c4a8b53ebd20ca759d21c9626c0b499",
+                      "bytes":  19903
+                  },
+                  {
+                      "path":  "docs/binary-fields.md",
+                      "sha256":  "15e764ae58684c60edad47a5c438ef7ad5b39ca6eac9626bd5ee6c986007fe7d",
+                      "bytes":  6282
+                  },
+                  {
+                      "path":  "docs/configuration.md",
+                      "sha256":  "2a7c8083c4f5d7cf284b2fbf1f2f9c9a67f8b50b6058b9c3926a4d8f58ce5ce5",
+                      "bytes":  7599
+                  },
+                  {
+                      "path":  "docs/message-codec.md",
+                      "sha256":  "76301d3ff1ffd37b46cafc15678138e604af00b756a49792fb26bc1dc3666006",
+                      "bytes":  6937
+                  }
+              ],
+    "unchanged_inputs":  [
+                             {
+                                 "path":  "Cargo.lock",
+                                 "sha256":  "177947ec9fc79d0a1bd808158151fbae05a444534ced1a934ea310a519289cf1",
+                                 "bytes":  108514
+                             },
+                             {
+                                 "path":  "fixtures/traffic/corpus.json",
+                                 "sha256":  "e45111cc5c12aeb44e4843f6530f45ad716350e73ad05f197c9257b82d179295",
+                                 "bytes":  73047
+                             },
+                             {
+                                 "path":  "crates/domain/src/fields.rs",
+                                 "sha256":  "9a852f8ea49e897753db06658f2187ea037621e62b9d8636b54bf3978ffea79e",
+                                 "bytes":  18223
+                             },
+                             {
+                                 "path":  "crates/protocol/src/fields.rs",
+                                 "sha256":  "d1a1eba26a3c84916b363d77413661c8914472587d39074b1698549831f3eb91",
+                                 "bytes":  20610
+                             }
+                         ],
+    "local_artifacts":  [
+                            {
+                                "path":  "target/exm022-evidence/domain.log",
+                                "sha256":  "866b41fcdc03589888237b1e6205fbd7b7d26e928e645388f11fb1ed6bae3e4d",
+                                "bytes":  2864
+                            },
+                            {
+                                "path":  "target/exm022-evidence/codec-step.log",
+                                "sha256":  "f80e720b8d6fcb30155bc859958658e008c4a3c8c62bcaa6b7a9ea7429f4b59c",
+                                "bytes":  1870
+                            },
+                            {
+                                "path":  "target/exm022-evidence/focused.log",
+                                "sha256":  "41fb743665bc6e4c7372b838c58646081aa26b9ddab0ab3c76a467461637b05e",
+                                "bytes":  3830
+                            },
+                            {
+                                "path":  "target/exm022-evidence/configuration.log",
+                                "sha256":  "50fc3b927741385ec580334987a5ebf05eacc993e5faf760d08ce9bda991e094",
+                                "bytes":  3076
+                            },
+                            {
+                                "path":  "target/exm022-evidence/regression.log",
+                                "sha256":  "696deb4d5a6df6feb3c825bf9db44c34f312640506896570e7bedd5f5fb4adfe",
+                                "bytes":  31656
+                            },
+                            {
+                                "path":  "target/exm022-evidence/fmt.log",
+                                "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                "bytes":  0
+                            },
+                            {
+                                "path":  "target/exm022-evidence/clippy.log",
+                                "sha256":  "b08060c14eff6a0cdd6921cbc9fc0975a08ae78fc3bfc2c633f836bb1acea665",
+                                "bytes":  1926
+                            },
+                            {
+                                "path":  "target/exm022-evidence/architecture.log",
+                                "sha256":  "4f389e2d9cdf167261ce323cd3ff4bfc6fb9335b6d69cac66fc14320ab8eaece",
+                                "bytes":  180
+                            },
+                            {
+                                "path":  "target/debug/deps/codec-30534177601909c6.exe",
+                                "sha256":  "037fab50b7cb6a387b5ba4890afd42b2ad71e25b2d77dcd118c00fd9b8d9df20",
+                                "bytes":  3244032
+                            }
+                        ],
+    "acceptance":  {
+                       "AC-01":  "PASS exact unchanged draft decode/encode across integers/bits/IEEE NaN and negative zero/bytes/ASCII/UTF8/undeclared data; all truncated prefixes, invalid text/constraints/checksum preserved unchanged. All132 accepted corpus cases go through actual framing/classification into codec, match expected raw fields, roundtrip byte-identically and preserve source after edits.4096 deterministic complete messages agree with independent widened checksum/reference edit bytes. Original/captured bytes and prior validated snapshots remain unchanged; no-op batches keep revision; configuration/registry snapshots immutable.",
+                       "AC-02":  "PASS14 codec integration tests plus private revision-exhaustion unit: raw/engineering/label/HEX ordered edits preserve all undeclared bytes/bits and update only changed-input checksum dependencies in topological order. Independent sum/xor/CRC known vectors, split coverage, both endian, all1/2/4/8 host widths, read-only checksum fields/bytes, explicit repair-all and unchanged mismatches preserved. All field-level constant/enum/finite/text/derived errors block preparation with raw values intact. Extension unknown/width/error/unwind/result-width and late dependency failure roll back bytes/revision. Geometry/cycles/overlap/self-input/truncation/HEX/edits/coverage/registry/message limits and2048 deterministic definition mutations reject safely.12 configuration tests cover actual load/save/shared admission/default omission/determinism and disabled schedules/TX."
+                   },
+    "verification":  [
+                         {
+                             "command":  "cargo check -p exmon-domain --locked",
+                             "result":  "Initial FAIL E0277 deriving Eq for Checksum containing existing PartialEq-only Endian. Removed unnecessary new Eq derive; domain compilation then PASS via following focused configuration/protocol checks. No existing type/test weakened.",
+                             "log":  "target/exm022-evidence/domain.log"
+                         },
+                         {
+                             "command":  "cargo test -p exmon-protocol --lib --locked",
+                             "result":  "PASS2,0 failed/ignored including new revision exhaustion unit; final combined regression repeats exact final code.",
+                             "log":  "target/exm022-evidence/codec-step.log"
+                         },
+                         {
+                             "command":  "cargo test -p exmon-protocol --test codec --locked",
+                             "result":  "PASS13,0 failed/ignored,0.11s intermediate candidate. Added all-field validation/coverage boundary test afterward; final combined regression below PASS14 codec tests on final source.",
+                             "log":  "target/exm022-evidence/focused.log"
+                         },
+                         {
+                             "command":  "cargo test -p exmon-storage --test configuration --locked",
+                             "result":  "PASS12,0 failed/ignored,0.21s; later source changes only codec test/docs, configuration behavior unchanged.",
+                             "log":  "target/exm022-evidence/configuration.log"
+                         },
+                         {
+                             "command":  "cargo test -p exmon-protocol -p exmon-capture -p exmon-domain --locked",
+                             "result":  "PASS135 (85 protocol including14 codec+revision unit,44 capture,6 domain),0 failed/ignored plus doctests,exit0. With12 configuration tests147 selected tests total. Default-feature synthetic/loopback regression, no physical/native support inferred.",
+                             "log":  "target/exm022-evidence/regression.log"
+                         },
+                         {
+                             "command":  "cargo fmt --all -- --check",
+                             "result":  "PASS exit0",
+                             "log":  "target/exm022-evidence/fmt.log"
+                         },
+                         {
+                             "command":  "cargo clippy --workspace --all-targets --locked -- -D warnings",
+                             "result":  "PASS exit0 all six crates/targets; no lint allowance",
+                             "log":  "target/exm022-evidence/clippy.log"
+                         },
+                         {
+                             "command":  "node scripts/check-architecture.mjs",
+                             "result":  "PASS six-layer resolved dependency graph+three negative fixtures,exit0",
+                             "log":  "target/exm022-evidence/architecture.log"
+                         },
+                         {
+                             "command":  "git diff --check; git diff --cached --check; review11 staged product paths; git write-tree; git fetch origin main; git rev-parse HEAD origin/main; first request search",
+                             "result":  "PASS exact candidate bound above, HEAD/origin15bb3b2 current published022 owner unchanged. Policy/task/accepted records unchanged. First request absent (rg no-match exit1 expected). Only allowed paths; no dependencies, capture/fields/framing/classifier/app/GUI/CI/allocator or unrelated files changed."
+                         }
+                     ],
+    "contract":  {
+                     "preservation":  "Codec binds immutable fields/checksum definitions/registry entries; Draft borrows codec and owns original/current\u003c=65536-byte buffers. Exact encode even for invalid capture; separate inspect/prepare reports every field/checksum validity result. Validated snapshot immutable and versioned, never transport authority. HEX may create invalid inspectable drafts; typed edits enforce021 contracts. Revision increments only actual byte change; exhaustion or structural/edit/algorithm errors preserve entire bytes/revision.",
+                     "checksums":  "Shared domain validation limits geometry/ordered disjoint ranges/own-output exclusion/nonoverlapping outputs/contained inspection fields and dependency cycles. Host alone writes checksum-owned bytes. Dirty input comparison propagates actual changed bytes in topological order; unaffected preexisting mismatches stay untouched until explicit repair-all. Output/range truncation explicit, no out-of-bounds slice. Builtins sum8/xor8/CRC16-CCITT-FALSE.",
+                     "extension":  "Max64 trusted application-linked Rust algorithms; fixed host width and narrow repeatable covered-byte iterator, bounded u64/error result; ordinary unwind caught and out-of-width result rejected. No configuration-loaded code, scripts, libraries or external resolution. Trusted implementation must be pure/deterministic/nonblocking/bounded; native CPU/allocation/I/O/state sandbox is not claimed. Panic hook remains runtime behavior; no payload logs in builtins/host.",
+                     "resources":  "Max32 checksums,32 ranges each,1MiB total coverage/protocol; identifiers\u003c=128ASCII. Max256 edits,65536 aggregate replacements and196608 aggregate HEX text/batch. Codec admission before copying, bounded original/current/candidate/field/checksum reports, no undo/history retained. Builtins update+final inspect traverse\u003c=2MiB total covered input; CRC8 fixed bitsteps/byte. Callers bound instance/queue/result retention and run on worker, not GUI."
+                 },
+    "corrections":  [
+                        "Removed invalid new Eq derive after initial compiler failure; no acceptance tests failed on functional candidate. All final declared checks passed without ignored acceptance or flaky retry.",
+                        "Review bounded aggregate HEX text before scanning/parsing, not only per-edit text/replacement bytes; added final-report algorithm failure rollback as well as update failure rollback. Dirty comparison includes available prefix of truncated coverage, so edits cannot silently skip required missing checksum bytes.",
+                        "Public ByteRange overlap treats zero/overflow ranges safely; shared geometry validates lengths before graph/slice operations. Revision overflow private unit verifies no changed-byte commit.",
+                        "PowerShell represents normal Cargo stderr/cache waits as NativeCommandError text. Actual command exit0 and per-suite summaries inspected; live tool handles polled to terminal status without restart. Test panic fixture uses fixed synthetic text and ordinary unwind is caught; no real sensitive data."
+                    ],
+    "reviewer":  "Codex exmon message codec (author review; independent Epic review not claimed)",
+    "review":  "Reviewed11 product paths: schema1 compatibility/default omission and all direct struct consumers; common field/checksum admission; checked offsets/endian masks/coverage/topological dependency graph; immutable registry and narrow input; checksum fail/width/unwind/rollback; unknown bytes and strict HEX; field-level validity/derived recomputation; raw vs numeric semantics; snapshots/revision/TX boundary; count/byte/work caps and redacted diagnostics. No field/framing/classifier behavior edited, no sibling layer dependency or unsafe code. Independent reference edits, full132 corpus, hostile prefixes/mutations and boundary negatives exercise production APIs.",
+    "limitations":  [
+                        "Pure Windows VPS codec/configuration evidence. Mac/native cross-platform035 and physical stand036 deferred; broader034 fuzz/security and independent Epic gate/review unpassed.",
+                        "Normalized message bytes only: codec does not serialize transport framing/escaping or prove unspecified protocol validity. Validated bytes are not actual send permission;023 must validate intended template/config revisions, binding/epoch/capability/state/permission and explicit action before submission.",
+                        "Trusted native extensions are not sandboxed; arbitrary runtime/allocation/I/O/state/abort/OOM cannot be prevented by this trait. Ordinary unwind returns a fixed issue but configured Rust panic hook still runs. Only application-authorized pure bounded implementations are suitable; builtins have no I/O.",
+                        "Fixed-length draft edits do not insert/delete; create a new bounded draft for a different message length. Checksum fields can be wholly contained in outputs but cannot straddle their boundary. Host-owned checksum bytes require explicit repair rather than direct HEX overwrite.",
+                        "Wire IEEE nonfinite raw bits and nonnumeric bytes/text may be valid while unavailable to numeric charts. Derived failures and explicit validity constraints block preparation. Schema1 extensions preserve old docs in this reader, not older applications accepting new keys."
+                    ],
+    "cleanup":  "Only11 declared product paths plus new022 evidence/completed/first request. Accepted TASK/events/evidence/ADRs, corpus/Cargo.lock/allocator and unrelated .idea preserved. Detailed logs\u003c64KiB and ordinary executable cache ignored locally; no generated outputs or helper process staged. All owned test/check handles terminal; no new live device/socket/helper resources.",
+    "checkpoint":  {
+                       "task":  "EXM-022 verified Done upon successful publication",
+                       "goal":  "ACTIVE; this turn PROGRESS, no global blocker/completion",
+                       "next":  "Fresh turn fetch/reconcile022 publication/allocator; refresh rules and exact023 safe transmission TASK/all events/evidence and007/012/013/014/015/017/022 prerequisites. If Planned/unowned and functionally ready, publish023 claim then implement complete one-shot/cloning/binding/state/permission/history contract using Windows/virtual scope. No023 claim/implementation in022 turn.",
+                       "authority":  "Owner authorizes Windows tools/install and safe virtual work across all Epics before prior Epic closure; physical devices/macOS later stands. Functional dependencies, one identity/turn, published ownership and explicit physical TX boundary remain.",
+                       "publication":  "Commit coherent product+evidence+Done+single first request and immediately pushmain; reconcile uncertain/rejected publication before next commit/task. Allocator remains sole version writer at actual supported boundary."
+                   }
+}

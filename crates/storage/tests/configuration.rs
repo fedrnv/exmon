@@ -67,6 +67,48 @@ fn framing_and_numeric_variants_roundtrip() {
     }
 }
 #[test]
+fn checksum_schema_roundtrip_ownership_and_coverage_validation_preserve_launch_safety() {
+    let old = String::from_utf8(save_project(&load(&fixture()).unwrap()).unwrap()).unwrap();
+    assert!(!old.contains("\"checksums\""));
+    let mut value = fixture();
+    value["protocols"][0]["fields"] = json!([
+        {"id":"value","offset":0,"length":1,"representation":"unsigned","endian":"big"},
+        {"id":"checksum","offset":3,"length":1,"representation":"unsigned","endian":"big"}
+    ]);
+    value["protocols"][0]["checksums"] = json!([
+        {"id":"sum","algorithm":"sum8","offset":3,"length":1,"endian":"big","ranges":[{"offset":0,"length":3}]}
+    ]);
+    let config = load(&value).unwrap();
+    let bytes = save_project(&config).unwrap();
+    let loaded = load_project(&bytes).unwrap();
+    assert_eq!(loaded, config);
+    assert_eq!(save_project(&loaded).unwrap(), bytes);
+    assert!(!loaded.schedules[0].enabled);
+    assert!(!loaded.interfaces[1].tx_allowed);
+    for (path, bad) in [
+        ("/protocols/0/checksums/0/offset", json!(u32::MAX)),
+        ("/protocols/0/checksums/0/length", json!(3)),
+        ("/protocols/0/checksums/0/algorithm", json!("../plugin")),
+        ("/protocols/0/checksums/0/ranges/0/length", json!(4)),
+        ("/protocols/0/checksums/0/ranges", json!([])),
+        ("/protocols/0/fields/1/offset", json!(2)),
+    ] {
+        let mut invalid = value.clone();
+        *invalid.pointer_mut(path).unwrap() = bad;
+        if path.ends_with("fields/1/offset") {
+            invalid["protocols"][0]["fields"][1]["length"] = json!(2);
+        }
+        assert!(load(&invalid).is_err(), "{path}");
+    }
+    let mut invalid = value.clone();
+    invalid["protocols"][0]["checksums"][0]["script"] = json!("execute");
+    assert!(load(&invalid).is_err());
+    // Portable definitions may name trusted application extensions; only codec
+    // registry resolution can establish actual algorithm availability.
+    value["protocols"][0]["checksums"][0]["algorithm"] = json!("trusted_custom");
+    assert!(load(&value).is_ok());
+}
+#[test]
 fn binary_field_schema_extensions_roundtrip_and_reject_unsafe_definitions() {
     let old = String::from_utf8(save_project(&load(&fixture()).unwrap()).unwrap()).unwrap();
     for new in ["\"bits\"", "\"constant\"", "\"constraints\"", "\"derived\""] {

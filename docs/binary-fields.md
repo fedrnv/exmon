@@ -5,7 +5,7 @@
 framing/classification selection, then call `decode` on normalized message bytes
 on a worker. Offsets refer to those bytes. This module performs no I/O,
 transmission, scheduling, capture mutation or GUI work. Whole-message editing,
-HEX transactions and checksum dependencies belong to EXM-022.
+HEX transactions and checksum dependencies use the [message codec](message-codec.md).
 
 ## Wire layout and values
 

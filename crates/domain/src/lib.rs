@@ -2,6 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
+pub mod checksum;
 pub mod classification;
 pub mod config;
 pub mod fields;

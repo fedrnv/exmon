@@ -91,6 +91,8 @@ pub struct Protocol {
     pub classification: Classification,
     #[serde(default)]
     pub fields: Vec<Field>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub checksums: Vec<crate::checksum::Checksum>,
 }
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
@@ -395,6 +397,11 @@ impl Protocol {
             crate::fields::validate(&self.fields, limit).is_ok(),
             "fields",
             "invalid field definition, overlap, constraint or dependency",
+        )?;
+        check(
+            crate::checksum::validate(&self.checksums, &self.fields, limit).is_ok(),
+            "checksums",
+            "invalid checksum geometry, coverage or dependency",
         )?;
         Ok(())
     }
