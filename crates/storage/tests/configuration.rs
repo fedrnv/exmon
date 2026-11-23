@@ -66,6 +66,58 @@ fn framing_and_numeric_variants_roundtrip() {
         }
     }
 }
+#[test]
+fn classification_rules_and_explicit_names_roundtrip_without_changing_tx_defaults() {
+    let old = load(&fixture()).unwrap();
+    let encoded = String::from_utf8(save_project(&old).unwrap()).unwrap();
+    assert!(!encoded.contains("\"grouping\""));
+    assert!(!encoded.contains("\"priority\""));
+    let mut value = fixture();
+    value["protocols"][0]["classification"] = json!({"priority":-7,"length":4,"offset":1,"prefix":[160,1],"mask":[240,255],"direction":"Rx","transport":{"kind":"tcp","remote_port":80}});
+    value["grouping"] = json!({"header_bytes":0,"names":[]});
+    let mut config = load(&value).unwrap();
+    let key = "auto-v1-0000030000000300";
+    config.rename_type("sample", "Temperature").unwrap();
+    config.rename_auto_group(key, "Unknown packet").unwrap();
+    let bytes = save_project(&config).unwrap();
+    let restored = load_project(&bytes).unwrap();
+    assert_eq!(restored, config);
+    assert_eq!(restored.protocols[0].name, "Temperature");
+    assert_eq!(restored.grouping.names[0].name, "Unknown packet");
+    assert!(!restored.schedules[0].enabled);
+    assert!(!restored.interfaces[1].tx_allowed);
+    let mut duplicate = config.clone();
+    duplicate
+        .grouping
+        .names
+        .push(duplicate.grouping.names[0].clone());
+    assert!(save_project(&duplicate).is_err());
+    let before = config.clone();
+    assert!(config.rename_auto_group(key, "bad\nname").is_err());
+    assert!(config.rename_type("absent", "Name").is_err());
+    assert_eq!(config, before);
+    for bad in [
+        json!({"header_bytes":17}),
+        json!({"names":[{"id":"auto-v1-00","name":"N"}]}),
+        json!({"names":[{"id":key,"name":""}]}),
+        json!({"names":[{"id":key,"name":"N","unknown":1}]}),
+    ] {
+        let mut value = fixture();
+        value["grouping"] = bad;
+        assert!(load(&value).is_err());
+    }
+    for bad in [
+        json!({"prefix":[1],"mask":[255,255]}),
+        json!({"prefix":[1],"offset":u32::MAX}),
+        json!({"transport":{"kind":"usb","endpoint":112}}),
+        json!({"transport":{"kind":"ethernet","unknown":1}}),
+        json!({"priority":2147483648u64}),
+    ] {
+        let mut value = fixture();
+        value["protocols"][0]["classification"] = bad;
+        assert!(load(&value).is_err());
+    }
+}
 
 #[test]
 fn framing_escape_defaults_extensions_and_negative_inputs_preserve_launch_safety() {

@@ -2,6 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
+pub mod classification;
 pub mod config;
 pub mod metrics;
 pub mod network_filter;

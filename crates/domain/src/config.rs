@@ -1,4 +1,8 @@
 //! Portable configuration contract. Loading never authorizes physical I/O.
+use crate::{
+    Direction,
+    classification::{GroupName, Grouping, MetadataMatch, valid_auto_id, valid_name},
+};
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 
@@ -58,6 +62,8 @@ pub struct ProjectConfig {
     pub templates: Vec<Template>,
     #[serde(default)]
     pub schedules: Vec<Schedule>,
+    #[serde(default, skip_serializing_if = "Grouping::is_default")]
+    pub grouping: Grouping,
 }
 impl Default for ProjectConfig {
     fn default() -> Self {
@@ -68,6 +74,7 @@ impl Default for ProjectConfig {
             charts: vec![],
             templates: vec![],
             schedules: vec![],
+            grouping: Grouping::default(),
         }
     }
 }
@@ -190,6 +197,38 @@ pub struct Classification {
     pub length: Option<u32>,
     #[serde(default)]
     pub prefix: Vec<u8>,
+    #[serde(default, skip_serializing_if = "zero_i32")]
+    pub priority: i32,
+    #[serde(default, skip_serializing_if = "zero_u32")]
+    pub offset: u32,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub mask: Vec<u8>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub transport: Option<MetadataMatch>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub direction: Option<Direction>,
+}
+fn zero_i32(n: &i32) -> bool {
+    *n == 0
+}
+fn zero_u32(n: &u32) -> bool {
+    *n == 0
+}
+impl Classification {
+    pub fn validate(&self, limit: u32) -> bool {
+        (1..=MAX_BYTES).contains(&limit)
+            && self.prefix.len() <= limit as usize
+            && self
+                .offset
+                .checked_add(self.prefix.len() as u32)
+                .is_some_and(|n| n <= limit)
+            && (self.offset == 0 || !self.prefix.is_empty())
+            && (self.mask.is_empty() || self.mask.len() == self.prefix.len())
+            && self.length.is_none_or(|n| {
+                n > 0 && n <= limit && n as usize >= self.offset as usize + self.prefix.len()
+            })
+            && self.transport.as_ref().is_none_or(MetadataMatch::validate)
+    }
 }
 #[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -332,10 +371,7 @@ impl Protocol {
         )?;
         let limit = self.framing.limit(self.escape)?;
         check(
-            self.classification.prefix.len() <= limit as usize
-                && self.classification.length.is_none_or(|n| {
-                    n > 0 && n <= limit && n as usize >= self.classification.prefix.len()
-                }),
+            self.classification.validate(limit),
             "classification",
             "prefix and optional positive length must fit frame limit",
         )?;
@@ -374,7 +410,53 @@ impl Protocol {
 }
 
 impl ProjectConfig {
+    /// Explicit name edit only; validation fails before changing the current configuration.
+    pub fn rename_type(&mut self, id: &str, name: &str) -> Result<(), ConfigError> {
+        self.validate()?;
+        check(
+            valid_name(name),
+            "classification.name",
+            "use 1..128 bytes without controls",
+        )?;
+        let p = self
+            .protocols
+            .iter_mut()
+            .find(|p| p.id == id)
+            .ok_or(ConfigError {
+                section: "classification.name",
+                reason: "unknown configured type",
+            })?;
+        p.name = name.to_owned();
+        Ok(())
+    }
+    pub fn rename_auto_group(&mut self, id: &str, name: &str) -> Result<(), ConfigError> {
+        self.validate()?;
+        check(
+            valid_auto_id(id) && valid_name(name),
+            "classification.name",
+            "invalid automatic key or name",
+        )?;
+        if let Some(group) = self.grouping.names.iter_mut().find(|g| g.id == id) {
+            group.name = name.to_owned();
+        } else {
+            check(
+                self.grouping.names.len() < MAX_ITEMS,
+                "classification.name",
+                "at most 256 named groups",
+            )?;
+            self.grouping.names.push(GroupName {
+                id: id.to_owned(),
+                name: name.to_owned(),
+            });
+        }
+        Ok(())
+    }
     pub fn validate(&self) -> Result<(), ConfigError> {
+        check(
+            self.grouping.validate(),
+            "classification.grouping",
+            "invalid grouping settings, duplicate key or name",
+        )?;
         check(
             self.schema_version == SCHEMA_VERSION,
             "schema_version",

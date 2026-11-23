@@ -1,0 +1,182 @@
+{
+  "task_id": "EXM-020",
+  "owner": "Codex exmon classification",
+  "verified_at": "2026-11-23T12:26:00Z",
+  "source_base": "04cbb0dc3f664a2b35f8529f1d0c868649cd96d4",
+  "candidate_tree": "021b51001f99ca0e94c754fc9aadd0619d711853",
+  "task_sha256": "d0cbee5a1542f9fdecb94032e6dc617e9300e02f333bc5b8469b178348a1fddb",
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "hash_basis": "SHA256 of verified checkout bytes. candidate_tree is Git-normalized staged product before closure records. Detailed logs/reproduced failure and test executable retained only in bounded ignored local store.",
+  "owner_exception": "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+  "environment": {
+    "host": "Windows Server2025 Datacenter x64 build26100 x86_64-pc-windows-msvc",
+    "rustc": "1.98.0 (88d9e12ae 2026-08-18)",
+    "cargo": "1.98.0 (797e8a9bc 2026-08-05)",
+    "node": "24.22.1",
+    "devices": "Pure classification/configuration work, no new native/live device/network/installer/privilege operation. Existing default-feature capture synthetic/loopback regressions retained; no physical/stand or macOS qualification."
+  },
+  "files": [
+    {
+      "path": "crates/domain/src/classification.rs",
+      "sha256": "e2f11c50790a0bd4382d1fa05b929a61d08989adad96578c4d3745ffd4d9332a",
+      "bytes": 6029
+    },
+    {
+      "path": "crates/domain/src/config.rs",
+      "sha256": "67a5d8559a05cd73d4dabeef6efa1f012b820d86093ca31b8cf180157fc70f2a",
+      "bytes": 19571
+    },
+    {
+      "path": "crates/domain/src/lib.rs",
+      "sha256": "eb37eee90d6e90f46b251be5ec9f67b2bc61c1c753edda9bb3cd2d6c635bb4e0",
+      "bytes": 2069
+    },
+    {
+      "path": "crates/protocol/src/classification.rs",
+      "sha256": "d85ae968902ecf516cce6bc536dce48e70513872e6072b6b6b83fe83e5677e40",
+      "bytes": 16905
+    },
+    {
+      "path": "crates/protocol/src/lib.rs",
+      "sha256": "a98a0cb6658a5a9df8e0ace2034e0091c40a148b96e42b713bf6a28aabe3ee0f",
+      "bytes": 194
+    },
+    {
+      "path": "crates/protocol/tests/classification.rs",
+      "sha256": "47bba03231c6a5f3eae7c498c75a58e0d5519ebfc3cb33882ddef786661a3ca2",
+      "bytes": 26794
+    },
+    {
+      "path": "crates/storage/tests/configuration.rs",
+      "sha256": "c716e73533482b3e27aec9a52d0fe5ae1d3480f3620660d2d6aa6688fec4e031",
+      "bytes": 15357
+    },
+    {
+      "path": "docs/classification.md",
+      "sha256": "4dc1edf0be02c6f5c7818d21734ee0ae7ac5b9412452ac82a876170bcc9ac20f",
+      "bytes": 8703
+    },
+    {
+      "path": "docs/configuration.md",
+      "sha256": "3d129491f3cd35b9e417ff032b3559f80fb26743578e67905a8b2da4639ecfbf",
+      "bytes": 6877
+    }
+  ],
+  "unchanged_inputs": [
+    {
+      "path": "fixtures/traffic/corpus.json",
+      "sha256": "e45111cc5c12aeb44e4843f6530f45ad716350e73ad05f197c9257b82d179295",
+      "bytes": 73047
+    },
+    {
+      "path": "Cargo.lock",
+      "sha256": "177947ec9fc79d0a1bd808158151fbae05a444534ced1a934ea310a519289cf1",
+      "bytes": 108514
+    }
+  ],
+  "local_artifacts": [
+    {
+      "path": "target/exm020-evidence/focused.log",
+      "sha256": "69bf8eadc321d366aa88b920a721e61fb906ba2f78c01ffb7da7783628959fcf",
+      "bytes": 3428
+    },
+    {
+      "path": "target/exm020-evidence/configuration.log",
+      "sha256": "7c372641d290b9bac297c5618a0c8caf40b56a7f53d68b60df028cad04b9e577",
+      "bytes": 2736
+    },
+    {
+      "path": "target/exm020-evidence/regressions.log",
+      "sha256": "a8e4528afa930c64f86372aafff82f2482db97841b44cd3968db35e140d93196",
+      "bytes": 27928
+    },
+    {
+      "path": "target/exm020-evidence/quality.log",
+      "sha256": "62660bfabc553488581655ce402afc7c9efa78155b7c7878254e05089be41edb",
+      "bytes": 1914
+    },
+    {
+      "path": "target/exm020-evidence/can-wildcard-before.log",
+      "sha256": "dbab40fed885a164c4b2f26344cc68d7015e3d0bf2758c09bc135fa2315af6c0",
+      "bytes": 2672
+    },
+    {
+      "path": "target/debug/deps/classification-25f879f3ea98282f.exe",
+      "sha256": "797203c97d3caf6c1a37331238d626f332dc782e82dd91897d22c9202e250812",
+      "bytes": 3058688
+    }
+  ],
+  "acceptance": {
+    "AC-01": "PASS11 focused tests: independent masked-prefix/offset/length/direction/metadata vectors, ignored-bit variations, signed priority extremes, repeated input/config permutation/reload/rename, stable canonical literal key, source revision/name snapshots and all typed metadata variants. All132 accepted005 corpus cases go through actual019 framing then production classifier to expected recognized types, with unmatched output still explained. Independent slow matcher over4096 varied headers/lengths agrees on top candidates/outcome; another4096 distinct fallback shapes produce distinct full keys without retained classifier history. Exact immutable rule inspection exposes configured expected values for explanation.",
+    "AC-02": "PASS explicit equal-top ambiguity with sorted IDs, lower-priority shadowing, every failed predicate, unknown/incomplete/native-vs-stream input, short/empty records, opaque automatic grouping, declared volatile metadata exclusions and source immutability. Max256 rules/candidates/checks,1MiB aggregate patterns,256 explicit names and65536 input bounds reached/excess rejected; malformed selector/mask/offset/key/name and invalid typed metadata fail safely. All canonical key prefixes/mutations fail without panic. Debug excludes payload/IDs/names/endpoints.10 storage configuration tests preserve old defaults and new rule/name load/save, transactional rename/duplicate rejection and disabled schedules/TX."
+  },
+  "verification": [
+    {
+      "command": "cargo check -p exmon-protocol --locked; cargo test -p exmon-protocol --test classification --locked",
+      "result": "PASS11 focused tests,0 failed/ignored,0.07s after CAN wildcard correction. Final8-byte CAN error-frame fixture and automatic key check rerun in final combined suite below.",
+      "log": "target/exm020-evidence/focused.log"
+    },
+    {
+      "command": "cargo test -p exmon-storage --test configuration --locked",
+      "result": "PASS10,0 failed/ignored,0.20s after selector correction; final exact suite also runs in combined verification.",
+      "log": "target/exm020-evidence/configuration.log"
+    },
+    {
+      "command": "cargo test -p exmon-protocol -p exmon-capture -p exmon-domain --locked; cargo test -p exmon-storage --test configuration --locked",
+      "result": "PASS115 (55 protocol including11 classification+13 framing+31 prior network/filter/reassembly,44 capture,6 domain,10 configuration),0 failed/ignored and doctests; all commands exit0 on exact final candidate. Default-feature transport regression scope, no physical/native support inferred.",
+      "log": "target/exm020-evidence/regressions.log"
+    },
+    {
+      "command": "cargo fmt --all -- --check; cargo clippy --workspace --all-targets --locked -- -D warnings; node scripts/check-architecture.mjs; git diff --check; git diff --cached --check",
+      "result": "PASS final workspace format/lint, six-layer resolved graph+3 negative graph fixtures, source/staged whitespace.",
+      "log": "target/exm020-evidence/quality.log"
+    },
+    {
+      "command": "Review staged9 product paths; git diff --cached --stat; git write-tree; git fetch origin main; git rev-parse HEAD origin/main; check020 immutable task/claim/dependencies/policy and first version request absence",
+      "result": "PASS exact product tree bound above, HEAD/origin both04cbb0d, published020 claim still owned by Codex exmon classification,019 Done. Only declared paths; no dependency/Cargo.lock/corpus/framing/capture/GUI/CI/allocator or unrelated changes. Search confirms no broken direct ProjectConfig/Classification struct construction in optional consumers."
+    }
+  ],
+  "contract": {
+    "rules": "ANDed typed transport, direction, positive exact length, checked header offset and prefix/mask. Higher signed priority wins; top ties explicit Ambiguous, stable ID ordering independent of config order, lower matches shadowed. Every check has fixed reason/criteria; explicit condition(id) reads exact immutable compiled values.",
+    "identity": "Known groups use Protocol.id/name. Auto-v1 is full canonical hex of outcome state,direction,typed stable signature,captured length and0..16 header octets; no truncated hash or observation-order allocation. Complete/Unknown quality remain visible; Incomplete cannot claim a rule. Auto groups do not retain current candidate IDs across revisions, only raw shape identity.",
+    "metadata": "Ethernet link; TCP/UDP endpoint/port constraints; serial revision; USB endpoint; HID VID/PID/usage/report; usbmon event/transfer/endpoint/bus/device; CAN channel/ID/extended/FD/remote/error/DLC. Fallback excludes host addresses, connection IDs, serial revision, trace tag/status/bus/device; includes stable ports/report/trace kind/CAN flags+DLC.",
+    "naming": "Explicit transactional rename_type/rename_auto_group validated before mutation. Schema1 default-skipped fields preserve old data/default serialization; existing JSON load/save persists user names, no new file I/O or automatic upload. Old decisions/classifiers preserve name/revision; caller must keep historical config revisions.",
+    "source": "Normalized EXM019 message entry point requires caller's coherent metadata/direction/quality. Native observation helper rejects TCP/serial read chunks and marks truncation/USB failure Incomplete, unknown original length Unknown. No source mutation or payload copy into classifier history. Returned automatic IDs/labels may encode<=16 header bytes and require capture/config privacy; Debug redacted.",
+    "bounds": {
+      "rules": 256,
+      "aggregate_prefix_mask_bytes": 1048576,
+      "named_auto_groups": 256,
+      "input_bytes": 65536,
+      "header_bytes": 16,
+      "name_id_bytes": 128,
+      "canonical_auto_id_text_bytes": 76,
+      "explanations_candidates": 256,
+      "notes": "Borrowed config/budgets checked before compiled copies. No learned group map, regex/executable rules, recursion, message/observation history, device/file handle or TX schedule. Per-call work bounded by pattern bytes/rule count. JSON1MiB limit separate; callers bound instance/result retention and source history, not an RSS guarantee."
+    }
+  },
+  "failures_corrected": [
+    "Source review found optional CAN error wildcard was treated as false when validating nonextended IDs: a valid CAN error frame with29-bit error-class ID and extended=false was rejected. Added wildcard_error_flag_accepts_valid_nonextended_can_error_identifiers and reproduced FAIL Configuration in can-wildcard-before.log. Corrected11-bit restriction to require both extended=false and error=false; error wildcard may match valid error=true. Negative test now explicitly constrains error=false (genuinely impossible case), and new positive verifies full8-byte error-frame observation plus canonical fallback key.11 focused/10 config and final115 selected regressions PASS. No unchanged functional retry/flaky acceptance.",
+    "Clippy1.98 required as_chunks::<2> rather than constant chunks_exact; changed key decoding to fixed array chunks with enumerate and derived byte count, preserving strict bounded parsing. No lint allow or weakened key limit.",
+    "Review strengthened test coverage before closure: endpoint-vs-port mismatch cases remove the other correlated predicate so they test valid negative matching rather than contradiction rejection; independent4096-case reference now varies the actual masked byte and length, rather than only irrelevant bytes. Added ignored-bit equivalence and exact immutable condition inspection.",
+    "Documentation clarified that returned automatic IDs/names can retain bounded header fragments, while the classifier retains no observation history; no claim that encoded header fragments are sanitized.",
+    "PowerShell formats normal Cargo stderr/cache/build waits as NativeCommandError records. Actual selected commands exit0 and summaries inspected; live tool handles polled to terminal completion without restart."
+  ],
+  "reviewer": "Codex exmon classification (author source review, independent Epic review not claimed)",
+  "review": "Reviewed all9 staged product paths: default/serde compatibility and shared limits, typed wildcard logic including CAN error/extended combinations, checked offsets/widths/hex key signatures, key parser bounds and typed namespace separation, full canonical stable identity with no collision-prone hash, priority ordering/ties/failed checks/shadowing, exact condition revision inspection, source quality/immutability/native boundary, transactional name edits/capacity, compiled pattern/output bounds, redacted Debug/no I/O/TX and unchanged layer graph. All root/path policy sources and published claim/dependency state current. No accepted history or unrelated source edit.",
+  "limitations": [
+    "Pure Windows VPS processing qualification only;035 cross-platform/native,036 real stand,034 broader fuzz/security, GUI naming/tabs, release and independent Epic gate/review remain separate unpassed work.",
+    "Auto grouping is declared shape grouping, not inference of unknown field layout/protocol validity. Header count can split value-changing unknown packets; explicit masked rules define intended type equivalence. Direction/outcome/signature distinctions and volatile exclusions are documented, not hidden heuristics.",
+    "A header match cannot prove complete capture or checksum/device validity. Unknown quality remains explicit, Incomplete blocks matching; invalid input returns a fixed error while caller retains unchanged source for an inspection row.",
+    "The caller must supply coherent metadata/quality for normalized framed data and retain framing diagnostics/config revisions and bounded raw source. Native TCP/serial chunks must be framed first; no application flow/context manager introduced.",
+    "Automatic IDs contain bounded header fragments, display names may contain private user text, and explicit condition inspection reveals configured endpoints/patterns. Default Debug redacts them; user-authorized configuration export still needs privacy/destination handling in the application.",
+    "New schema1 optional fields/variants preserve old data in this reader, not forward compatibility with older applications. Typed1MiB pattern budget does not override existing1MiB JSON document limit or downstream memory budget."
+  ],
+  "cleanup": "Only9 declared product paths plus new020 evidence/Done/request. No accepted TASK/event/evidence/ADR, fixture corpus, Cargo.lock/generated version state or unrelated .idea changes. Bounded ignored logs<64KiB including reproduced failure and normal executable cache retained; no capture/log/binary staged. No new background process, thread, live socket/device or external effect; all gate handles finished.",
+  "checkpoint": {
+    "task": "EXM-020 verified Done upon successful publication",
+    "goal": "ACTIVE; this turn is product PROGRESS, no global blocker/completion",
+    "next": "Fresh turn fetch/reconcile020 closure and allocator; read exact EXM021 binary field definitions TASK/all events/evidence/current rules and003/020 dependencies. Publish claim if Planned/unowned/ready, implement accepted integers/floats/bits/arrays/text/scaling/units/enums/constants/constraints/derived fields and exact encode/decode with safe range/overlap validation. No021 claim/implementation in020 turn.",
+    "authority": "Owner authorizes all Windows/virtual tasks across Epics before prior Epic closure. Toolchain present; physical/macOS deferred to other stands. One identity/turn, functional dependencies, published ownership and product safety remain.",
+    "publication": "Commit product+verification+Done+one first020 version request and immediately pushmain. Reconcile unknown/rejected publication before other commit/task; allocator remains sole version writer under actual qualified adoption boundary."
+  }
+}
