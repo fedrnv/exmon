@@ -70,9 +70,12 @@ bounded mock reports to test exact selection, no automatic opens/writes,
 numbered/unnumbered fidelity, partial writes, invalid sizes, cancellation,
 permission denial and removal. Native Windows and Linux compile checks are
 separate from runtime qualification. No physical HID was opened for these tests.
-The production UI selection boundary is now covered by audited mock interaction
-tests. EXM-014 remains In Progress because approved physical-device fidelity is
-unavailable; a passing virtual UI/source test does not close that criterion.
+The production UI selection boundary is covered by audited mock interaction
+tests. Under the owner's Windows VPS development phase, EXM-014 development
+qualification uses those tests, Windows native-feature compilation and retained
+native Linux emulated-device evidence. Approved physical-device fidelity remains
+unqualified and belongs to EXM-036 on the later stand; native platform runtime
+qualification belongs to EXM-035. Development completion is not a physical pass.
 
 ## Desktop HID controls
 
@@ -191,6 +194,8 @@ An actual unprivileged guest attempt returns PermissionDenied without opening a
 report session or sending output. Existing numbered/unnumbered, removal and
 two-device UI/mock tests remain separate evidence. Native numbered-report,
 physical removal, Windows/macOS driver behavior, and physical Stop timing are not
-proved by this keyboard. EXM-014 stays In Progress until approved physical
-fidelity is recorded. Exact native output and source/tool/binary hashes are in
-the immutable EXM-014 verification checkpoint.
+proved by this keyboard. The owner's later Windows VPS phase instruction allows
+development closure while explicitly deferring those obligations to EXM-035/036.
+The original physical requirement and all historical partial results remain
+recorded; emulation is never reported as physical qualification. Exact native
+output and source/tool/binary hashes are in the immutable EXM-014 checkpoints.

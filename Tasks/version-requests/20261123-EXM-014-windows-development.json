@@ -1,0 +1,11 @@
+{
+    "schema":  "fdtasks-version-request/v1",
+    "request_id":  "EXM-014-20261123T132500Z-windows-development-first-closure",
+    "type":  "task_closed",
+    "epic_id":  "EXM-EPIC-001",
+    "work_item_id":  "EXM-014",
+    "summary":  "Selected HID adapter and UI verified for owner Windows virtual development phase; physical and platform qualification deferred035/036",
+    "verification":  [
+                         "Tasks/items/server/EXM-014-implement-usb-hid-support/evidence/20261123T132500Z-windows-development-verification.json"
+                     ]
+}

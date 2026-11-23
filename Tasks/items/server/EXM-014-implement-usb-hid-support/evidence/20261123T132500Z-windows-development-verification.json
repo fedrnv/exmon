@@ -1,0 +1,270 @@
+{
+    "task_id":  "EXM-014",
+    "owner":  "Codex exmon HID development",
+    "verified_at":  "2026-11-23T13:25:00Z",
+    "source_base":  "1d5d1d1a50a835a87cd861b3fb9989ba37a557ad",
+    "candidate_tree":  "1b18e41e150bedec59de6ca44a311cb842ca4cf5",
+    "task_sha256":  "fc613978c88b994f74ec396b34a3ed90cbd4be7ad87af6cf0e5fef1b9c3a6419",
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "hash_basis":  "SHA256 of verified checkout bytes; candidate_tree is Git-normalized staged documentation before closure records. No production/test/manifest/lock changes in this turn. Current bounded logs/PNG artifacts remain ignored locally; historical accepted images/output/harness remain immutable.",
+    "current_phase_authority":  "Tasks/items/server/EXM-014-implement-usb-hid-support/events/20261123T132059Z-codex-owner-amended-ed01bd73071a4a588f4cf52c06cf8984.md",
+    "phase":  "Owner-directed Windows VPS development Done, not physical/platform qualification. User on2026-11-23 explicitly deferred real devices and macOS to later stands while requesting all possible development closure. Earlier cannot-close-until-physical statements are superseded by this later owner phase boundary, not rewritten or reported as passed.",
+    "environment":  {
+                        "host":  "Windows Server2025 Datacenter x64 build26100 x86_64-pc-windows-msvc",
+                        "rustc":  "1.98.0 (88d9e12ae 2026-08-18)",
+                        "cargo":  "1.98.0 (797e8a9bc 2026-08-05)",
+                        "gui":  "egui/eframe/egui_kittest0.37.0 WGPU offscreen",
+                        "hidapi":  "2.6.7 Windows native feature compiled/linked, mock runtime only",
+                        "devices":  "No real discovery/open/report I/O, no driver installation or physical TX; synthetic two-collection fixtures only. No VM started this turn."
+                    },
+    "files":  [
+                  {
+                      "path":  "docs/hid-capture.md",
+                      "sha256":  "9d871e8356b75c6ec8b7f07d40fd1ce5f04ba691b7ddded1e5221600791671b7",
+                      "bytes":  12367
+                  },
+                  {
+                      "path":  "crates/capture/src/hid.rs",
+                      "sha256":  "7dc0611d1568c71e95706e433594094a846a70692f5e62e256af1217abe274dd",
+                      "bytes":  6519
+                  },
+                  {
+                      "path":  "crates/capture/src/native_hid.rs",
+                      "sha256":  "efff369df6a99e9220acbfd11ffd1ec66e9594b3c45dc7457dad5becffb941df",
+                      "bytes":  3421
+                  },
+                  {
+                      "path":  "crates/capture/tests/hid.rs",
+                      "sha256":  "593e9e0d27f5fb79c5477dd8264659b50cf086c1e72dd55cd979afa88c1a9342",
+                      "bytes":  12662
+                  },
+                  {
+                      "path":  "crates/app/src/hid_worker.rs",
+                      "sha256":  "0458eb48d012a077140c54fa97679007960914b292551388c932c618b4c47c81",
+                      "bytes":  19374
+                  },
+                  {
+                      "path":  "crates/app/tests/hid_worker.rs",
+                      "sha256":  "f424b0fff3efa56eb3d9850764b06cee4344d4ddf6b0135e3802000b962aa06a",
+                      "bytes":  6276
+                  },
+                  {
+                      "path":  "crates/gui/src/hid.rs",
+                      "sha256":  "c8d908ce8b04fec8daa362a07bea9a422a6329733356bb77a8220f39a6d8d7c8",
+                      "bytes":  10671
+                  },
+                  {
+                      "path":  "crates/gui/src/shell.rs",
+                      "sha256":  "c6eef7a0d76642583a5c58356d12126e1944092b301252cb1aa5d65216282f41",
+                      "bytes":  15370
+                  },
+                  {
+                      "path":  "crates/gui/tests/hid.rs",
+                      "sha256":  "a651584214ba7a98851fd4e52dc9ffd3329485cacf6755dce71cc3f6773e1322",
+                      "bytes":  7194
+                  },
+                  {
+                      "path":  "crates/gui/examples/native_hid_smoke.rs",
+                      "sha256":  "24a1ad1453636a515ffbdf557974efa17fec85a62975271141a5058bb8d8f8a8",
+                      "bytes":  5322
+                  },
+                  {
+                      "path":  "crates/app/Cargo.toml",
+                      "sha256":  "e5c8cc7760f0a0495d6625902e61c632adcf82da1a3c4483127caf10034326e0",
+                      "bytes":  485
+                  },
+                  {
+                      "path":  "crates/gui/Cargo.toml",
+                      "sha256":  "70a161f153ed71a670c09b3a9231fad072637fbc07df98758bf104b4c5741490",
+                      "bytes":  537
+                  },
+                  {
+                      "path":  "crates/capture/Cargo.toml",
+                      "sha256":  "dca34cbdf89768d81c7da0fed3a8e4642b5b76bd726cc89a75cc581e9f951eb4",
+                      "bytes":  943
+                  },
+                  {
+                      "path":  "crates/domain/src/observation.rs",
+                      "sha256":  "3cb6e31a37c6583f7b40ff8d8975e44a0b44065376cff8159d02928e2f831631",
+                      "bytes":  6315
+                  },
+                  {
+                      "path":  "Cargo.lock",
+                      "sha256":  "177947ec9fc79d0a1bd808158151fbae05a444534ced1a934ea310a519289cf1",
+                      "bytes":  108514
+                  }
+              ],
+    "historical_evidence":  [
+                                {
+                                    "path":  "Tasks/items/server/EXM-014-implement-usb-hid-support/evidence/20261122T182035Z-hid-progress.json",
+                                    "sha256":  "eb4bdefd2c77f44c4328977139fb0f1677f754be3eecacb1ec0903736ff53bfa",
+                                    "bytes":  6011
+                                },
+                                {
+                                    "path":  "Tasks/items/server/EXM-014-implement-usb-hid-support/evidence/20261122T195445Z-hid-ui-progress.json",
+                                    "sha256":  "f02e6c604f967a4e02b64b59438c607957341bfd8cf2190023481909037cf756",
+                                    "bytes":  10710
+                                },
+                                {
+                                    "path":  "Tasks/items/server/EXM-014-implement-usb-hid-support/evidence/20261122T203745Z-hid-linux-progress.json",
+                                    "sha256":  "b73ac46c2056d9e849086c328223de5884712ca51af9eb73fbd797a25dde7bf8",
+                                    "bytes":  11541
+                                },
+                                {
+                                    "path":  "Tasks/items/server/EXM-014-implement-usb-hid-support/evidence/20261122T203745Z-guest-output.txt",
+                                    "sha256":  "05e70f8904425bc7ce41949e6bd6c8746a3a444f8548a49f55396e50807a8c09",
+                                    "bytes":  1790
+                                },
+                                {
+                                    "path":  "Tasks/items/server/EXM-014-implement-usb-hid-support/evidence/20261122T203745Z-manual-harness.txt",
+                                    "sha256":  "09a8b1e7177a8dc6204a21db875135f909a1b3ab7b3639466d285cd79c0a0d45",
+                                    "bytes":  3296
+                                },
+                                {
+                                    "path":  "Tasks/items/server/EXM-022-implement-message-decoding-and-encoding/evidence/20261123T131738Z-codec-verification.json",
+                                    "sha256":  "f7fdc37b4581a3436d66fb836b574c347a9267ef9a5872628e0ec16077f9711b",
+                                    "bytes":  20751
+                                }
+                            ],
+    "local_logs":  [
+                       {
+                           "path":  "target/exm014-windows-closure/capture.log",
+                           "sha256":  "92f2a70b2ac276179bfa2377962076279c596663ad61e70cd81dd80f6a405224",
+                           "bytes":  2726
+                       },
+                       {
+                           "path":  "target/exm014-windows-closure/worker.log",
+                           "sha256":  "b373ad7f80ea1aaf0cae0ac756d61c65258477ab8015c7f0382cd555fae080b1",
+                           "bytes":  2304
+                       },
+                       {
+                           "path":  "target/exm014-windows-closure/ui.log",
+                           "sha256":  "cd297bda47e1ea0dc337517a6aa6cf463fd9edfab3e533805244f0be166e0448",
+                           "bytes":  3232
+                       },
+                       {
+                           "path":  "target/exm014-windows-closure/ui-native.log",
+                           "sha256":  "5ae5c0993684abeeb0a435c253d5cf8edc559855869afde0df3bc7306ae1cb47",
+                           "bytes":  2400
+                       },
+                       {
+                           "path":  "target/exm014-windows-closure/native-clippy.log",
+                           "sha256":  "fe56e04120dbd6c547b7008af9bac3e0899aec16d876308ef2a776941572bf0e",
+                           "bytes":  2034
+                       },
+                       {
+                           "path":  "target/exm014-windows-closure/fmt.log",
+                           "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                           "bytes":  0
+                       },
+                       {
+                           "path":  "target/exm014-windows-closure/architecture.log",
+                           "sha256":  "4f389e2d9cdf167261ce323cd3ff4bfc6fb9335b6d69cac66fc14320ab8eaece",
+                           "bytes":  180
+                       }
+                   ],
+    "current_visuals":  [
+                            {
+                                "path":  "target/exm014-visual/hid-1200x760-dark.png",
+                                "sha256":  "8368af76cac1e17cc6bf5e325222b7f1ffbef16d1b0d7ff6112b03ac178c3f0b",
+                                "bytes":  147524
+                            },
+                            {
+                                "path":  "target/exm014-visual/hid-900x600-1.5-dark.png",
+                                "sha256":  "83539dd63e5878e043861b1542db160a5487d8934427aaba22aa7b86714ac4da",
+                                "bytes":  224250
+                            },
+                            {
+                                "path":  "target/exm014-visual/hid-900x600-1.5-light-closed.png",
+                                "sha256":  "98d12d34ad822cea03f05171c1ab84569500daf61458d8067b6d8b41c9546353",
+                                "bytes":  230340
+                            }
+                        ],
+    "acceptance":  {
+                       "AC-01-current-development-phase":  "PASS4 current HID adapter fixtures and2 worker fixtures: exact numbered/unnumbered RX/TX and VID/PID/usage/report id/direction; no duplicate ID prefix or stripped unnumbered input; exact selected index; partial/zero result honesty; bad size, permission, removal, cancellation, stale/revoked selection and failed refresh behavior. Windows native-hid compilation/lint PASS. Historical actual Linux emulated input/output and independent selected-bus usbmon callback/status, actual unprivileged denial and removal PASS retained after source/output/harness hash verification. Approved physical tests remain DEFERRED036, never PASS.",
+                       "AC-02":  "PASS2 default and1 feature-enabled production UI interaction tests: constructor/discovery/selection do not open report sessions or send; only explicitly selected collection1 receives Open/Send; saturated HEX input disabled, Close/reselection/relaunch prevent stale sends. Same real HidPanel/HidWorker with audited mock Source. Current1200x760 and900x600@1.5 dark/light-closed PNGs inspected; historical native Windows renderer screenshot/source retained. No physical-native runtime inference."
+                   },
+    "verification":  [
+                         {
+                             "command":  "cargo test -p exmon-capture --features native-hid --test hid --locked",
+                             "result":  "PASS4,0 failed/ignored,0.00s,exit0. Native feature linked but only synthetic sources invoked.",
+                             "log":  "target/exm014-windows-closure/capture.log"
+                         },
+                         {
+                             "command":  "cargo test -p exmon-app --test hid_worker --locked",
+                             "result":  "PASS2,0 failed/ignored,0.03s,exit0",
+                             "log":  "target/exm014-windows-closure/worker.log"
+                         },
+                         {
+                             "command":  "cargo test -p exmon-gui --test hid --locked",
+                             "result":  "PASS2,0 failed/ignored,3.47s,exit0. Includes explicit Unsupported default build without native discovery.",
+                             "log":  "target/exm014-windows-closure/ui.log"
+                         },
+                         {
+                             "command":  "cargo test -p exmon-gui --features native-hid --test hid --locked",
+                             "result":  "PASS1,0 failed/ignored,2.85s,exit0. Same audited mock UI source; default Unsupported case cfg-excluded, not skipped acceptance.",
+                             "log":  "target/exm014-windows-closure/ui-native.log"
+                         },
+                         {
+                             "command":  "cargo clippy -p exmon-gui --features native-hid --all-targets --locked -- -D warnings",
+                             "result":  "PASS exit0 native Windows feature/all direct consumers, no lint allowance",
+                             "log":  "target/exm014-windows-closure/native-clippy.log"
+                         },
+                         {
+                             "command":  "cargo fmt --all -- --check",
+                             "result":  "PASS exit0",
+                             "log":  "target/exm014-windows-closure/fmt.log"
+                         },
+                         {
+                             "command":  "node scripts/check-architecture.mjs; git diff --check; git diff --cached --check",
+                             "result":  "PASS six-layer resolved graph+3 negative fixtures and whitespace",
+                             "log":  "target/exm014-windows-closure/architecture.log"
+                         },
+                         {
+                             "command":  "git diff 5dd0736..HEAD -- crates Cargo.lock fixtures scripts/check-architecture.mjs Tasks/developer-policy.json; compare every EXM022 files/unchanged_inputs SHA256; rustc --version; cargo --version",
+                             "result":  "PASS no executable/test/build/input/policy changes since final022 verification, all022 manifest checkout hashes identical, same1.98 toolchain. Reuse exact default-feature135 protocol/capture/domain+12 configuration PASS and workspace Clippy from immutable022 evidence; no new broad rerun manufactured. Current native-feature and UI direct-boundary tests above supplement that PASS.",
+                             "evidence":  "Tasks/items/server/EXM-022-implement-message-decoding-and-encoding/evidence/20261123T131738Z-codec-verification.json"
+                         },
+                         {
+                             "command":  "Verify historical native Linux source/output/harness hashes against014 native manifest",
+                             "result":  "PASS capture HID/native HID/tests exactly match, accepted guest output+manual harness exact hashes match; no new Linux run or new native platform claim.",
+                             "evidence":  "Tasks/items/server/EXM-014-implement-usb-hid-support/evidence/20261122T203745Z-hid-linux-progress.json"
+                         },
+                         {
+                             "command":  "Inspect historical four PNGs and current three generated PNGs; compare historical HID worker/panel/native renderer example source hashes",
+                             "result":  "PASS all images inspected. Current1200x760 dark and1350x900 for900x600@1.5 dark/light-closed show readable/wrapped controls, selected RX bytes/report metadata, explicit output/accepted-byte completion, saturated/closed Send disabled. Worker, HID panel and native smoke example match prior accepted sources. Main shell changed earlier for network filter so current production UI rerun/visuals used, not assumed unchanged."
+                         },
+                         {
+                             "command":  "git fetch origin main; git rev-parse HEAD origin/main; inspect014 owner/task/current readiness/amendment and first request absence",
+                             "result":  "PASS same1d5d1d1 published own014 resume, no competing owner,006/007 Done and025 UI dependency Done.023 considered but never claimed or implemented. Only docs and new014 records/request changed."
+                         }
+                     ],
+    "retained_native":  "Historical Linux emulation only: selected single QEMU USB keyboard0627:0001 usage1:6, RX00 00 04 00 00 00 00 00, explicit HIDAPI[0,2] observed independently as SET_REPORT payload02 and successful matching usbmon callback, unprivileged PermissionDenied and emulated unplug Disconnected. Exact guest binary552b33d... and environment in immutable native manifest. This is not approved physical HID or native Windows/macOS report-fidelity evidence.",
+    "review":  "Author reviewed documentation-only candidate, complete014 immutable history and current selected fidelity/security boundaries. Same HID source/worker/panel/native smoke implementation retained. Current UI interaction audit revalidates changed shell consumer after network-filter integration. Exact-path collection identity, explicit report mode/id convention, generation/lease revocation, bounded commands/reports/history, off-thread I/O, fixed diagnostics and no automatic open/send remain. No production code fix needed; no acceptance checks weakened. Same owner resume, explicit later owner phase exception preserves physical obligation035/036, first request only now. No independent Epic review claimed.",
+    "deferred":  [
+                     {
+                         "task":  "EXM-036",
+                         "state":  "DEFERRED, NOT PASSED",
+                         "required":  "Approved physical HID collection/descriptor, numbering/capacity and exact synthetic RX/TX vectors, explicit selected-device read/output authorization, removal/reconnect/Stop latency/timing and sustained bidirectional evidence. Real device access will occur on later stand per owner."
+                     },
+                     {
+                         "task":  "EXM-035",
+                         "state":  "DEFERRED, NOT PASSED",
+                         "required":  "Actual Windows HID driver/runtime fidelity and macOS/Linux supported native platform/permission/shutdown matrix, including declared devices. Windows feature compilation does not prove physical runtime; Linux evidence is the isolated emulated unnumbered keyboard only."
+                     }
+                 ],
+    "limitations":  [
+                        "HID path covers output reports, not feature/control report APIs. Full-buffer RX has unknown original wire length; approved descriptor/capacity essential for physical fidelity.",
+                        "Native HIDAPI write may finish after lease/revocation; accepted-byte count is not delivery/recall. Windows upstream overlapped wait and synchronous zero semantics retain prior documented limitations; no physical timing or hard Stop latency claim.",
+                        "No general TX/session-history or periodic scheduler implementation in this task;023/024 remain accepted future work. Backend loss unknown; bounded display drops separate.",
+                        "Earlier native Linux/UI evidence remains historical at its recorded source/environment, not relabelled as current physical acceptance. Default regressions reused only after exact source/toolchain/input closure verification."
+                    ],
+    "cleanup":  "Only docs/hid-capture.md plus new014 amendment/readiness/evidence/completed/first request. Accepted TASK/events/evidence/ADRs/images and generated version state untouched. Current9 focused checks/native lint/format/architecture finished; no live VM/helper/device/socket resources introduced. Bounded ignored logs/current PNGs retained; no binary/private data or unrelated .idea staged.",
+    "checkpoint":  {
+                       "task":  "EXM-014 current Windows/virtual development Done upon publication",
+                       "goal":  "ACTIVE; this turn PROGRESS, no global blocker/completion",
+                       "next":  "Fresh turn fetch/reconcile014 closure/allocator; refresh rules and023 TASK/all events/evidence plus007/012/013/014/015/017/022 functional statuses. If ready/unowned publish023 claim before any implementation.023 complete safe one-shot send, clone incoming format, binding/payload/state/permission validation and distinguishable TX/errors. No023 claim/implementation this turn.",
+                       "authority":  "Owner Windows/virtual work across Epics permitted; physical and macOS later stands, not passed. Existing explicit physical action/selection/TX boundary, one identity/turn and immediate publication retained.",
+                       "publication":  "Commit documentation+immutable evidence+Done+one first014 request and immediately pushmain. Reconcile uncertain/rejected publication before any next commit/task. Allocator sole version writer at actual qualified boundary."
+                   }
+}
