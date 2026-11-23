@@ -163,7 +163,7 @@ pub struct TemplateSpec {
 }
 /// Structural count/byte admission only, no decoding or extension calls. Charge
 /// conservatively includes compiled index/node overhead and escaping copies.
-fn charge(spec: &TemplateSpec) -> Result<usize, Failure> {
+pub(crate) fn charge(spec: &TemplateSpec) -> Result<usize, Failure> {
     use exmon_domain::fields::{Literal, Operation};
     fn literal(v: &Literal) -> usize {
         match v {
@@ -714,6 +714,17 @@ impl TxWorker {
         let generation = self.shared.change()?;
         charge(&spec)?;
         self.enqueue(Command::Template { generation, spec })
+    }
+    /// Revoke prepared/queued work immediately. An idle selected port is retained;
+    /// a fresh explicit validation/registration is required to obtain another ticket.
+    pub fn invalidate(&self) -> Result<(), Failure> {
+        self.shared.revoke();
+        let _guard = self
+            .shared
+            .control
+            .lock()
+            .map_err(|_| Failure::Disconnected)?;
+        self.shared.change().map(|_| ())
     }
     fn enqueue(&self, command: Command) -> Result<(), Failure> {
         self.commands

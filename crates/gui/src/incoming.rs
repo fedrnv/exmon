@@ -1,6 +1,7 @@
 use eframe::egui::{self, RichText};
 use exmon_app::incoming::{self, Draft, Status, View, Worker};
 pub struct Incoming {
+    pub copy_revision: u64,
     pub worker: Worker,
     pub view: View,
     pub status: Status,
@@ -11,6 +12,7 @@ pub struct Incoming {
 impl Incoming {
     pub fn new() -> Result<Self, incoming::Error> {
         Ok(Self {
+            copy_revision: 0,
             worker: Worker::prototype()?,
             view: View::default(),
             status: Status::default(),
@@ -191,6 +193,7 @@ impl Incoming {
                             .clicked()
                         {
                             self.draft = row.copy_format();
+                            self.copy_revision = self.copy_revision.saturating_add(1);
                         }
                     });
                     if self.view.selected_evicted() {

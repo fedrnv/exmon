@@ -1,0 +1,229 @@
+{
+  "schema": "exmon-verification/v1",
+  "task_id": "EXM-027",
+  "owner": "Codex exmon outgoing editor",
+  "verified_at": "2026-11-23T16:05:52Z",
+  "base_revision": "ccb0ecca8a59e55893bff768ed340beb668eae49",
+  "candidate_tree": "8dd0c498c727991138947c4e380474e9e15bee8f",
+  "task_sha256": "9f9bc9847db210a88a027b4181a29f52f3fbf8e2da72728ad5d9ec644a5b3680",
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "native_activation": false,
+  "environment": {
+    "platform": "win32",
+    "arch": "x64",
+    "node": "v24.22.1",
+    "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)",
+    "cargo": "cargo 1.98.0 (797e8a9bc 2026-08-05)",
+    "qualification": "Windows VPS virtual prototype only"
+  },
+  "unique_selected_tests": 149,
+  "verification": [
+    {
+      "command": "cargo test -p exmon-app --lib --locked",
+      "result": "7 PASS: existing TX internals and editor queue/Stop/exhaustion/shutdown boundaries",
+      "exit": 0,
+      "log": "target/exm027-app-lib-final.log",
+      "sha256": "60ad610c8e9afa3a0b649f318931036e961810c3b99c0d5daee15e3b5941330b"
+    },
+    {
+      "command": "cargo test -p exmon-app --test outgoing --test transmission --test scheduling --test incoming --test shell --test network_filters --test hid_worker --locked",
+      "result": "65 PASS:12 outgoing,20 transmission,15 scheduling,9 incoming,2 shell,5 filters,2 HID",
+      "exit": 0,
+      "log": "target/exm027-app-final.log",
+      "sha256": "15175dfa26cd8f2b57bc325e5af1ce630dc0e57c49fc5078988209134ced4e6b"
+    },
+    {
+      "command": "cargo test -p exmon-gui --locked -- --nocapture",
+      "result": "12 PASS:2 outgoing,3 incoming,2 shell,3 filters,2 HID; accessibility checks enabled",
+      "exit": 0,
+      "log": "target/exm027-gui-final.log",
+      "sha256": "708b63de3f3a15871c22a89c08f91b422c6b3e381b5539f38997fe678d79f573"
+    },
+    {
+      "command": "cargo test -p exmon-capture --locked",
+      "result": "48 implemented transport regressions PASS",
+      "exit": 0,
+      "log": "target/exm027-transports-final.log",
+      "sha256": "aec0bc37e25798ab3a83629912b6d3bcc0aef63db9b799eff2e876975aeb8fcb"
+    },
+    {
+      "command": "cargo test -p exmon-protocol --test codec --test outbound --locked",
+      "result": "17 PASS:14 codec,3 outbound",
+      "exit": 0,
+      "log": "target/exm027-codec-final.log",
+      "sha256": "a00ec7bf89db6ce07549ae4974823a76290d0163c48ab6fecee2c22e0cb09be6"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets --locked -- -D warnings",
+      "result": "Complete workspace/all targets PASS",
+      "exit": 0,
+      "log": "target/exm027-clippy-final.log",
+      "sha256": "734d5d68bc0574d75a6b3ad0d62fc952018968f186809946d54493fe4592093e"
+    },
+    {
+      "command": "cargo run -p exmon-gui --example native_outgoing_smoke --locked",
+      "result": "Actual Windows eframe/wgpu clone-edit-validate-bind-send screenshot and clean exit PASS;8s app deadline, PNG write off thread",
+      "exit": 0,
+      "log": "target/exm027-native-final.log",
+      "sha256": "4ad6dc8765b676331d011caeb82d50f3f8b488214a30f6c602d31c890ad210c6"
+    },
+    {
+      "command": "node scripts/check-architecture.mjs",
+      "result": "Six layers/resolved graph/three negative fixtures PASS",
+      "exit": 0,
+      "log": "target/exm027-architecture.log",
+      "sha256": "4f389e2d9cdf167261ce323cd3ff4bfc6fb9335b6d69cac66fc14320ab8eaece"
+    },
+    {
+      "command": "cargo fmt --all --check",
+      "result": "Complete workspace PASS",
+      "exit": 0
+    },
+    {
+      "command": "git diff --check; git diff --cached --check",
+      "result": "PASS; reviewed16 product paths",
+      "exit": 0
+    }
+  ],
+  "acceptance": {
+    "AC-01": "Malformed HEX/type/readonly/engineering/quantization/checksum/framing/header/oversize and unavailable permission/identity cannot submit. Every text mutation immediately revokes actual tickets/grants before admission; full TX queue gated before final lease rejects stale requests with zero writes and preserves idle selected port. Per-template edit versions, serial registration acknowledgements and per-template schedule versions fence stale publication. Explicit checksum repair only. Exact partial/unknown/Busy history remains truthful. Counter exhaustion closes source and full8-command queue Stop fences queued Enables. No startup/clone/bind/validation transmission or implicit rearm.",
+    "AC-02": "Real incoming normalized Row -> immutable clone -> field/raw HEX edit -> validation -> explicit target/permission/connect -> one-shot exact accepted bytes; original received data unchanged. App vectors cover enum/engineering/readonly, preserved explicit length header and CRC-owned outputs with variable tails. Actual production GUI clicks perform clone/edit/connect/send/start/stop/invalid edit. Manual per-template tabs, multiple queued creations and independent schedules verified; finite restart/options validation and source loss covered. Native Windows screenshot shows edited sequence42,32/32 accepted,TX count1 and disabled schedule."
+  },
+  "contracts": {
+    "layers": "Editor worker owns strict parsing/codec/framing and immutable prepared snapshots; existing TX worker owns adapter/final authority and024 scheduling engine. GUI contains no codec/native I/O/scheduler/storage. Trusted public factory API preserves existing exact identity/kind/permission; GUI exposes synthetic byte-stream Mock TX01/02 only, independent of passive RX kind.",
+    "authority": "New/copy/edit/validate/repair/connect never send or schedule. Permission checkbox alone does not connect. Explicit Send once/Start schedule only; source change/Stop capture/view change/disconnect/permission revoke/shutdown revoke. Data edits revoke all grants; schedule-option edits and Stop revoke selected handle independently of normal command queue. An already leased operation may report real completion; no retry/reconnect/rearm. Cached confirmed snapshot avoids optional lock contention failures; source send API and final dispatch still revalidate.",
+    "bounds": "64 templates,1MiB conservative aggregate draft/definition/prepared-text charge,8 editor commands; body/header<=65536 bytes,HEX/value text<=196608 bytes. Shared immutable Arc snapshots. Existing TX history/adapter/native/renderer and external retained snapshots have separate budgets. TX counts represent observed known full API acceptance, with gap/eviction minima, not delivery. No raw payload logs or implicit payload/permission/schedule persistence."
+  },
+  "visual_inspection": {
+    "result": "All9 final PNGs inspected;900x600/1360x900,dark/light,1x/1.5x; small panels scroll, Stop remains visible at75% left split through wrapping. No accessibility suppression. Native screenshot actual received copy/edited field/successful send.",
+    "ui_metrics": "Final incoming79 frames,max61.674ms,19200 packets,26944 eviction,4672 paused skips; existing shell108 frames,max16.4678ms,15008 packets. Thresholds unchanged; no whole-project performance claim.",
+    "artifacts": [
+      {
+        "path": "target/exm027-visual/outgoing-1360x900-1-dark.png",
+        "sha256": "7e05e14c82d1b463427f6aefb4e1ae0bfea190a24b4cf8bf2a124f1e96216ba4"
+      },
+      {
+        "path": "target/exm027-visual/outgoing-1360x900-1.5-light.png",
+        "sha256": "ddf0de4b66e682da708aaf9d158257021423a592366bb514994ef1edfe5ca6dd"
+      },
+      {
+        "path": "target/exm027-visual/outgoing-900x600-1-dark.png",
+        "sha256": "3be567c4f5b658b9c45590ed2b7b66bd532341cd1777e55e2adf09caa45f2157"
+      },
+      {
+        "path": "target/exm027-visual/outgoing-900x600-1.5-light.png",
+        "sha256": "a7f397bff755ea3d9057f7896e068397c4679c99be3d37dfd67b64f1c971b85f"
+      },
+      {
+        "path": "target/exm027-visual/outgoing-narrow-900x600-1.5.png",
+        "sha256": "7476a1c6df90f5349532d87ab3062764234b4315bade617fa845d8584034b8c0"
+      },
+      {
+        "path": "target/exm027-visual/outgoing-narrow-900x600-1.png",
+        "sha256": "1dc6eab71ba203a0e655d5eca4502431fa6f2b76a8dfa961bd2932f4ed26bdb5"
+      },
+      {
+        "path": "target/exm027-visual/outgoing-schedule-900x600-1.5.png",
+        "sha256": "ed600fc1f8e718ae50b9f56d507f3e7e263667a02854d02cf80ecc53a77e1ac2"
+      },
+      {
+        "path": "target/exm027-visual/outgoing-schedule-900x600-1.png",
+        "sha256": "6299c87536d7434604343cdf29c2a359d3de80098268c2b096f77579b44b26b3"
+      },
+      {
+        "path": "target/exm027-native.png",
+        "sha256": "d508c908371c69d6045dea87e225c4ac2b621c635e1b89eacf6e9f9d8a60714f"
+      }
+    ]
+  },
+  "source_hashes": [
+    {
+      "path": "crates/app/src/lib.rs",
+      "sha256": "8ce0bda0a777dcbb39f554cbeeef92a6cc50a68d989c6f2d79e7bb3132f2692f"
+    },
+    {
+      "path": "crates/app/src/outgoing.rs",
+      "sha256": "535a92183dbcd107b8c14e4d014759899db283b4f16dfb0d2a17065c6aaf0ca2"
+    },
+    {
+      "path": "crates/app/src/transmission.rs",
+      "sha256": "3fa66011dbd662b1b1dcfe7436432e2b276092d549d75a61660456731d8964aa"
+    },
+    {
+      "path": "crates/app/tests/outgoing.rs",
+      "sha256": "49f2ef915c22167fd69346f66c340fb5a0aec1129f70f35a716ff429370a80be"
+    },
+    {
+      "path": "crates/app/tests/transmission.rs",
+      "sha256": "e37d42f42a7c93e74551418efde33f1ebb9843fc75c4e41db1b90adeeea18cf9"
+    },
+    {
+      "path": "crates/gui/examples/native_incoming_smoke.rs",
+      "sha256": "7e74236a1f9e431b78eb70a38b6bd8283f41fa5f66208b2548d82abe6cb44b68"
+    },
+    {
+      "path": "crates/gui/examples/native_outgoing_smoke.rs",
+      "sha256": "59620ef818cfe924a29d8fc23a3887311ce1edd1dcaa687c0d5b72d591996021"
+    },
+    {
+      "path": "crates/gui/src/incoming.rs",
+      "sha256": "db2aadef09e1f0e7c1b5d835694267cda6e2cde130cc278bef862099dec16a59"
+    },
+    {
+      "path": "crates/gui/src/lib.rs",
+      "sha256": "80f2dcc90574df3a5cd1f810d92e23f37880132df4c0606053449f46c78c4770"
+    },
+    {
+      "path": "crates/gui/src/outgoing.rs",
+      "sha256": "cee74fa0539d4c01a852f258203eb8f62a244701775cc74d7b0f31ea48f65930"
+    },
+    {
+      "path": "crates/gui/src/shell.rs",
+      "sha256": "429b02b37efb68e97d54d7847c3bb6bd89a18ffc716623883c437dfc9f4e7f64"
+    },
+    {
+      "path": "crates/gui/tests/outgoing.rs",
+      "sha256": "a04e25247624cd0074ed96120979de97ea29e39be46976a047fecf32e966e8e1"
+    },
+    {
+      "path": "docs/desktop-shell.md",
+      "sha256": "d760b9a12846c55a1b7d72dad22323b2765f74c16b5cc06fde375317c27a64cc"
+    },
+    {
+      "path": "docs/incoming-traffic.md",
+      "sha256": "dc049d4173d8ee1e4d63b8680f22408e46f3d042b8a495e589ba4a7d2e59911d"
+    },
+    {
+      "path": "docs/outgoing-editor.md",
+      "sha256": "53a6f79807e6bf928250f8a5826dad185b1e31a18b27c12f28e44f9c5e0b5ad3"
+    },
+    {
+      "path": "docs/transmission.md",
+      "sha256": "2313c1b6f396bf09f644b936b011ad1cc466b9a7920b632d92c14af2d772490a"
+    }
+  ],
+  "hash_basis": "SHA256 checkout bytes; candidate_tree uses Git-normalized staged16 product files before closure records. Logs/images stay in ignored bounded local target cache, no generated outputs committed.",
+  "review": "Author reviewed implementation, actual tests and screenshots: worker ownership, bounded admission, checksum ownership/resizing, missing header failure, authority/queue/generation/Stop fences, no stale schedule restart, independent templates, accurate terminal outcomes, GUI dirty text and narrow scrolling, unchanged incoming/filter/HID behavior. This is author review, not independent Epic Level0.",
+  "corrections": [
+    "Allocator-only claim push race preserved rejected local claim and refreshed base; published new unique027 claim before implementation. No winning claim replay.",
+    "Separate checked schedule-definition nonce allows legitimate restart with changed options; per-template versions preserve independent queued creates/enables.",
+    "Optional snapshot lock contention no longer causes functional Busy; confirmed cache plus real source authority checks, no automatic retries.",
+    "Negative codec tests wait for confirmed binding before editing, because edits correctly cancel pending open. Explicit reconnection remains required.",
+    "Checksum-owned outputs remain protected while whole structured HEX supports admissible length changes and unknown tails through existing codec.",
+    "Oversize edit revokes before rejection; generation overflow closes source; dirty input channels cannot apply stale neighboring text.",
+    "Accessibility-labelled protocol selector and whole-pane scrolling/wrapped schedule controls verified at minimum size and narrow split."
+  ],
+  "limitations": [
+    "No physical port open/TX, macOS/native stand/driver/electrical/on-wire qualification, packaged/install/release/signing or credentials inferred.035/036/037 retain those qualifications.",
+    "Synthetic byte-stream target defaults only; passive HID/CAN/USB copy never guesses physical output conventions or permission. Missing framing header requires explicit input. Public trusted factory integration is not GUI physical-target discovery.",
+    "Editing while a transfer or asynchronous open is pending may close/cancel it; explicit reconnect required. Validate current data discards unapplied text and validates stored bytes; never silently repairs checksums.",
+    "No canonical full-project gate, independent Epic review/Epic closure, dynamic plugin/sandbox or hard real-time guarantee. No dependencies/Cargo.lock/capture/protocol/schema/CI/allocator/rule changes. Manual5.7 adoption does not upgrade actual runtime qualification."
+  ],
+  "owner_exception": "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+  "checkpoint": {
+    "goal": "ACTIVE; turn PROGRESS, no global blocker/completion",
+    "task": "EXM-027 Done upon successful publication",
+    "next": "Fresh goal turn fetch/reconcile027 closure/allocator and rules. Read028 exact TASK/events/evidence; verify published021/025/026 Done and current owner. Claim028 if ready/unowned, implement bounded real-time multi-series charts/time-index/zoom-pan/autoscale/manual ranges/units/legends/windows/moving averages and deterministic long-fixture/GUI checks. No028 claim/implementation this turn.",
+    "publication": "Commit and immediately pushmain coherent product+evidence+Done+single first request. Verify remote identity before fresh task; allocator solely assigns versions. Preserve unrelated .idea changes; no subagents."
+  }
+}

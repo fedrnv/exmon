@@ -47,8 +47,9 @@ worker exposes an immutable configuration snapshot for later explicit saving;
 this view does not silently write a project or add names to layout preferences.
 Copy format to outgoing retains the received normalized bytes, protocol/field
 definitions and source provenance as one immutable draft. It supplies no target,
-TX ticket/permission or schedule and performs no send. The outgoing editor and
-explicit transmission controls remain EXM-027.
+TX ticket/permission or schedule and performs no send. An explicit copy request
+also creates a tab in the [outgoing editor](outgoing-editor.md), where validation,
+target binding and transmission remain separate user actions.
 
 Input is limited to eight queued batches of at most32 observations and65536 total
 payload bytes each. Processing caps each observation at64 framed output messages,

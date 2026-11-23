@@ -1,0 +1,11 @@
+{
+  "schema": "fdtasks-version-request/v1",
+  "type": "task_closed",
+  "request_id": "EXM-027-20261123T160552Z-outgoing-editor-first-closure",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-027",
+  "summary": "Validated outgoing template tabs and explicit one-shot/periodic mock transmission with immediate edit and Stop revocation",
+  "verification": [
+    "Tasks/items/web/EXM-027-build-outgoing-message-tabs-and-editor/evidence/20261123T160552Z-outgoing-verification.json"
+  ]
+}

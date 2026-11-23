@@ -19,7 +19,9 @@ vertical edge. [Incoming inspection](incoming-traffic.md) provides raw/type tabs
 worker-decoded fields, stable instance selection, naming and display pause. It
 retains at most1024 combined raw/message rows and renders visible rows only.
 Clear view affects display history. Copying a received format creates an inert
-outgoing draft; editing/transmission controls remain separate work.
+outgoing draft. [Outgoing editor controls](outgoing-editor.md) provide background
+validation, explicit mock TX binding, one-shot sending and disabled-by-default
+periodic transmission.
 Theme can be changed during capture. Source loss, application queue drops,
 display decimation and history evictions remain separate indicators.
 

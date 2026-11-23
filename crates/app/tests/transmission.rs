@@ -290,6 +290,42 @@ fn revocation_before_submission_lease_defeats_queued_requests_and_full_queue() {
     until(|| a.lock().unwrap().closes > 0);
 }
 #[test]
+fn invalidation_revokes_queued_sends_and_revalidates_without_reopening_idle_port() {
+    let gate = Gate::new();
+    let a = Arc::new(Mutex::new(Audit {
+        metadata_gate: Some(gate.clone()),
+        ..Default::default()
+    }));
+    let w = bound(a.clone());
+    let t = register(&w, spec(1, 1, &[1, 2, 3]));
+    let first = w.send_once(&t, 1, 1).unwrap();
+    until(|| gate.entered.load(Ordering::Acquire));
+    let mut ids = vec![first];
+    for _ in 0..4 {
+        ids.push(w.send_once(&t, 1, 1).unwrap());
+    }
+    let start = Instant::now();
+    w.invalidate().unwrap();
+    assert!(start.elapsed() < Duration::from_millis(100));
+    gate.free();
+    for id in ids {
+        assert_eq!(outcome(&w, id).outcome, Outcome::Rejected(Failure::Stale));
+    }
+    assert!(a.lock().unwrap().writes.is_empty());
+    assert!(snapshot(&w).identity.is_some());
+    assert_eq!(a.lock().unwrap().closes, 0);
+    let t = register(&w, spec(1, 2, &[4, 5, 6]));
+    let sent = w.send_once(&t, 1, 2).unwrap();
+    assert!(matches!(
+        outcome(&w, sent).outcome,
+        Outcome::Complete {
+            accepted: Some(3),
+            status: Completion::Accepted
+        }
+    ));
+    assert_eq!(a.lock().unwrap().writes, [vec![4, 5, 6]]);
+}
+#[test]
 fn already_leased_submission_reports_actual_acceptance_after_close_without_recall_or_retry() {
     let gate = Gate::new();
     let a = Arc::new(Mutex::new(Audit {

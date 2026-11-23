@@ -36,6 +36,7 @@ impl eframe::App for Smoke {
                 .selected
                 .as_ref()
                 .and_then(|row| row.copy_format());
+            self.shell.incoming.copy_revision = 1;
         }
         self.shell.show(ui);
         if !self.shot

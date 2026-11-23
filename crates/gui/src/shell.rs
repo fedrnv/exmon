@@ -22,6 +22,8 @@ pub struct Shell {
     selected: usize,
     interface: u64,
     pub incoming: crate::incoming::Incoming,
+    pub outgoing: crate::outgoing::Outgoing,
+    incoming_copy: u64,
     notice: Option<&'static str>,
     loaded: bool,
     dirty: bool,
@@ -45,6 +47,8 @@ impl Shell {
             selected: 0,
             interface: 1,
             incoming: crate::incoming::Incoming::new().map_err(|_| ShellError::Unavailable)?,
+            outgoing: crate::outgoing::Outgoing::new().map_err(|_| ShellError::Unavailable)?,
+            incoming_copy: 0,
             notice: None,
             loaded: false,
             dirty: false,
@@ -73,11 +77,13 @@ impl Shell {
         };
         self.capture
             .start_filtered(self.transport(), self.interface, settings)?;
+        self.outgoing.disconnect();
         self.incoming.begin(self.capture.generation());
         self.notice = None;
         Ok(())
     }
     pub fn stop_capture(&mut self) {
+        self.outgoing.disconnect();
         self.capture.stop();
     }
     pub fn show(&mut self, ui: &mut egui::Ui) {
@@ -149,6 +155,7 @@ impl Shell {
                             .clicked()
                         {
                             self.hid_view = !self.hid_view;
+                            self.outgoing.disconnect();
                         }
                         let title = if self.layout.theme == Theme::Dark {
                             "Light theme"
@@ -227,6 +234,7 @@ impl Shell {
                 ui.add_space(6.);
             });
         if selection_before != (self.selected, self.interface) {
+            self.outgoing.disconnect();
             self.incoming.view.clear();
         }
         if self.hid_view {
@@ -276,7 +284,13 @@ impl Shell {
                 self.layout.split = (left.response.rect.width() / width).clamp(0.25, 0.75);
             }
             egui::CentralPanel::default().show(ui, |ui| {
-                self.incoming.outgoing(ui);
+                if self.incoming_copy != self.incoming.copy_revision {
+                    self.incoming_copy = self.incoming.copy_revision;
+                    if let Some(draft) = &self.incoming.draft {
+                        self.outgoing.copy_received(&draft.row);
+                    }
+                }
+                self.outgoing.show(ui, self.incoming.worker.configuration());
             });
         }
         self.dirty |= before != self.layout;
@@ -284,7 +298,7 @@ impl Shell {
             self.dirty = false;
         }
         ctx.request_repaint_after(Duration::from_millis(
-            if status.requested || status.running || self.hid_view {
+            if status.requested || status.running || self.hid_view || self.outgoing.active() {
                 16
             } else {
                 100
