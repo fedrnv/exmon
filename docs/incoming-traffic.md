@@ -1,5 +1,8 @@
 # Incoming traffic inspection
 
+For a linked network protocol tree, raw byte search, copy, selection export and
+PCAP/PCAPNG import, see the separate [Packets view](packet-inspection.md).
+
 The desktop prototype sends bounded captured batches to a separate
 `exmon_app::incoming::Worker`. That worker validates project definitions, compiles
 the existing classifier/codec, frames streams and prepares fields and endpoint

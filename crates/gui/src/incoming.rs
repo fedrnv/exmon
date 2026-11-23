@@ -4,6 +4,7 @@ pub struct Incoming {
     pub copy_revision: u64,
     pub worker: Worker,
     pub charts: exmon_app::charts::Worker,
+    pub inspection: exmon_app::inspection::Worker,
     pub view: View,
     pub status: Status,
     pub draft: Option<Draft>,
@@ -16,6 +17,8 @@ impl Incoming {
             copy_revision: 0,
             worker: Worker::prototype()?,
             charts: exmon_app::charts::Worker::new().map_err(|_| incoming::Error::Unavailable)?,
+            inspection: exmon_app::inspection::Worker::new()
+                .map_err(|_| incoming::Error::Unavailable)?,
             view: View::default(),
             status: Status::default(),
             draft: None,
@@ -26,11 +29,13 @@ impl Incoming {
     pub fn begin(&mut self, generation: u64) {
         self.view.reset(generation);
         self.charts.begin(generation);
+        self.inspection.begin(generation);
         self.status = Status::default();
         let _ = self.worker.begin(generation);
     }
     pub fn poll(&mut self) {
         for batch in self.worker.drain() {
+            let _ = self.inspection.submit(&batch);
             let _ = self.charts.submit(incoming::PreparedBatch {
                 generation: batch.generation,
                 rows: batch.rows.clone(),

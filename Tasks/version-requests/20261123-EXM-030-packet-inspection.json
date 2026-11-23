@@ -1,0 +1,11 @@
+{
+  "schema": "fdtasks-version-request/v1",
+  "request_id": "EXM-030-20261123T175125Z-packet-inspection-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-030",
+  "summary": "Shared live/imported packet inspection with checked protocol-tree HEX/ASCII selection, bounded search/display filters and explicit copy/raw selection export",
+  "verification": [
+    "Tasks/items/web/EXM-030-build-protocol-tree-and-packet-inspection-tools/evidence/20261123T175125Z-inspection-verification.json"
+  ]
+}

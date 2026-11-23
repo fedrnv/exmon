@@ -51,7 +51,7 @@ pub fn create(path: &Path, bytes: &[u8]) -> Result<(), Error> {
         .map_err(|_| Error::WriteIncomplete)
 }
 
-fn local(path: &Path) -> Result<(), Error> {
+pub(crate) fn local(path: &Path) -> Result<(), Error> {
     let text = path.to_str().ok_or(Error::Read)?;
     if text.is_empty() || text.len() > 4096 || text.chars().any(char::is_control) {
         return Err(Error::Read);

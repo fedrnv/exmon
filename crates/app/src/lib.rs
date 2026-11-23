@@ -4,6 +4,7 @@ pub mod charts;
 pub mod diagnostics;
 pub mod hid_worker;
 pub mod incoming;
+pub mod inspection;
 pub mod network_filters;
 pub mod outgoing;
 pub mod scheduler;

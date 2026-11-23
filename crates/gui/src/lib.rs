@@ -2,6 +2,7 @@
 pub mod charts;
 pub mod hid;
 pub mod incoming;
+pub mod inspection;
 mod network_filters;
 pub mod outgoing;
 pub mod settings;

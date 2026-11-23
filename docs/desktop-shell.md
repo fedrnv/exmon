@@ -25,6 +25,10 @@ periodic transmission.
 Theme can be changed during capture. Source loss, application queue drops,
 display decimation and history evictions remain separate indicators.
 
+The **Packets** view provides a [protocol tree and packet inspection tools](packet-inspection.md)
+for shared live/imported raw frames, with bounded worker-side decoding and local
+file operations. It has an explicitly labelled network fixture for prototype use.
+
 The separate **HID reports** view connects the selected HID collection through
 its own worker when built with `native-hid`; otherwise it reports Unsupported.
 Discovery, open and one-shot report output each require explicit user actions.

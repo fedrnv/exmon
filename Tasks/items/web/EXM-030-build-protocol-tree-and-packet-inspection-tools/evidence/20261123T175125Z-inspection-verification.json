@@ -1,0 +1,194 @@
+{
+  "schema": "exmon-verification/v1",
+  "task_id": "EXM-030",
+  "owner": "Codex exmon packet inspection",
+  "verified_at": "2026-11-23T17:51:25Z",
+  "base_revision": "0ab25322bd3090f4542b4b77530aadfc213e9e72",
+  "candidate_tree": "fe6897c721d1a57895a43a82ba186e5f56b56a1e",
+  "task_sha256": "0ae9c00476d5932ae4e7b0ad85b7ab3368b0dd2e6a565baa166ceb0bbc3bef4c",
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "native_activation": false,
+  "environment": {
+    "platform": "win32",
+    "arch": "x64",
+    "node": "v24.22.1",
+    "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)",
+    "cargo": "cargo 1.98.0 (797e8a9bc 2026-08-05)",
+    "qualification": "Windows VPS virtual prototype; no physical device/macOS qualification"
+  },
+  "unique_selected_tests": 151,
+  "test_counts": {
+    "app": 55,
+    "gui": 22,
+    "protocol": 12,
+    "storage": 15,
+    "transports": 47
+  },
+  "verification": [
+    {
+      "command": "cargo test -p exmon-app --test inspection --test incoming --test shell --test charts --test outgoing --test settings --locked",
+      "result": "PASS",
+      "passed": 55,
+      "log": "target/exm030-app-final.log",
+      "sha256": "af29d9cb859c7272e0c6d5efc5d9aaf1379ab6bfa917dfa328f7f9d5e1f0a6fb"
+    },
+    {
+      "command": "cargo test -p exmon-gui --test inspection --test incoming --test shell --test charts --test outgoing --test settings --locked -- --nocapture",
+      "result": "PASS",
+      "passed": 17,
+      "log": "target/exm030-gui-final.log",
+      "sha256": "954805cb9e37c1d6ea9e8c9597398cc361acfb80923d2ae6c697da2cf784ad86"
+    },
+    {
+      "command": "cargo test -p exmon-gui --test network_filters --test hid --locked",
+      "result": "PASS",
+      "passed": 5,
+      "log": "target/exm030-gui-routing.log",
+      "sha256": "9963e9b5179a5ea248daa017325642e300f12aa37d57b7fde0521a0586b37e0f"
+    },
+    {
+      "command": "cargo test -p exmon-protocol --test network --test network_filters --locked",
+      "result": "PASS",
+      "passed": 12,
+      "log": "target/exm030-protocol-final.log",
+      "sha256": "1353d3d97103f7df05330d90c6addef8d70f6df1a68c708605bb3e30ac4ead43"
+    },
+    {
+      "command": "cargo test -p exmon-storage --test pcap --test inspection_files --test settings_files --locked",
+      "result": "PASS",
+      "passed": 15,
+      "log": "target/exm030-storage-final.log",
+      "sha256": "aca52cbebe1197b3352001e3894fc4b67aaaeb8cd34b0712d013bee75f8acd72"
+    },
+    {
+      "command": "cargo test -p exmon-capture --test adapter --test synthetic --test ethernet --test sockets --test serial --test hid --test usb_transfers --test usbmon --test can --test transmit --locked",
+      "result": "PASS",
+      "passed": 47,
+      "log": "target/exm030-capture-final.log",
+      "sha256": "7fccb170c0ba08b54ede1fb3f33ee3e039c6b5a69522525aee81fa9ff7dbf98c"
+    },
+    {
+      "command": "cargo run -p exmon-gui --example native_inspection_smoke --locked",
+      "result": "PASS",
+      "log": "target/exm030-native.log",
+      "sha256": "d1be712c4e414263fc7beb74362eef422a37cc8b5f2ac22f1ca3b538a8c2c386"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets --locked -- -D warnings",
+      "result": "PASS",
+      "log": "target/exm030-clippy-final.log",
+      "sha256": "e7fce78849dbef1ea34703d1dfa620602c844b27679b398fe87cf51b84ec3883"
+    },
+    {
+      "command": "cargo fmt --all -- --check",
+      "result": "PASS",
+      "log": "target/exm030-format.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "node scripts/check-architecture.mjs",
+      "result": "PASS",
+      "log": "target/exm030-architecture.log",
+      "sha256": "4f389e2d9cdf167261ce323cd3ff4bfc6fb9335b6d69cac66fc14320ab8eaece"
+    },
+    {
+      "command": "git diff --check",
+      "result": "PASS",
+      "log": "target/exm030-diff-check.log",
+      "sha256": "14e595b0d09573ba6efc5110c6b05e0100993e773b0fb9eb9944579de89822da"
+    }
+  ],
+  "acceptance": {
+    "AC-01": "Independent raw wire fixtures for Ethernet/VLAN/IPv4 options/IPv6 extension/TCP options/UDP assert exact header/field/payload ranges. All truncated prefixes preserve raw bytes and checked node bounds. Actual GUI tree clicks select UDP34..42 with linked HEX/ASCII highlight. Search/filter/copy/export, invalid filter atomicity, pin/filter/eviction, bounded command+reply/input queues and capture pause/generation verified.",
+    "AC-02": "Identical Frame::prepare for live raw incoming batches and validated PCAP/PCAPNG imported observations. Exact bytes/nodes/ports/source timestamps match. Unknown links, fragments, encryption and truncated data stay inspectable. Simple packet without timestamp stays unknown; recorded NG direction retained. Import errors/issues/entry limits preserve prior committed view; reimport changes context; imported mode ignores live across capture generation."
+  },
+  "screenshots": [
+    {
+      "path": "target/exm030-visual/inspection-1360x900-1-dark.png",
+      "sha256": "43d8e64b163b6f7e23c6eddc6ff4027e3454139b4680ce43f76de4aab04fb1cf",
+      "inspected": true
+    },
+    {
+      "path": "target/exm030-visual/inspection-1360x900-1-light.png",
+      "sha256": "5a870b74f3b518ab441ca54f0e79a61e74c4634234a3be58e7af5474c6242623",
+      "inspected": true
+    },
+    {
+      "path": "target/exm030-visual/inspection-1360x900-1.5-dark.png",
+      "sha256": "c30f1cebf7de7ed585c5a9fdf0b219f87142bbcda36e9a7d71104be50d6af3db",
+      "inspected": true
+    },
+    {
+      "path": "target/exm030-visual/inspection-1360x900-1.5-light.png",
+      "sha256": "c648988a61cb54fe600da488cbea7c0ff2b5a8b78d0f188bf2ee2a9ac93629a0",
+      "inspected": true
+    },
+    {
+      "path": "target/exm030-visual/inspection-900x600-1-dark.png",
+      "sha256": "5dd94149045c2f223efd99cb687c87967e2a3ff74ed5e49c5722e6fb29478084",
+      "inspected": true
+    },
+    {
+      "path": "target/exm030-visual/inspection-900x600-1-light.png",
+      "sha256": "b125fb36f71377c65c2c7f094eda76126ba3f39b2ccdf2338c8a5693b9d2d830",
+      "inspected": true
+    },
+    {
+      "path": "target/exm030-visual/inspection-900x600-1.5-dark.png",
+      "sha256": "ce0e8758e6f91de97a9a353b466b2b580bd108ea96dbdcdb673d1f2c01c5737b",
+      "inspected": true
+    },
+    {
+      "path": "target/exm030-visual/inspection-900x600-1.5-light.png",
+      "sha256": "769610a6de36ea25b310662bdcb052faa92ceb4e27bca89632c8b06684294885",
+      "inspected": true
+    },
+    {
+      "path": "target/exm030-native.png",
+      "sha256": "c94ee3e58679e88ae20254daff1fadcde34449542df5edd4e860e185b38fbca3",
+      "inspected": true
+    }
+  ],
+  "visual_review": "All8 current size/theme/DPI screenshots and native image inspected. 900x600 and1360x900, dark/light,1x/1.5x. UDP bytes34..42 visible and correct; HEX pages horizontally scroll at narrow width; ASCII selected bytes also highlighted. Outer/tree/hex scrolling preserves access. Native8s hidden eframe/wgpu synthetic fixture/worker/render/save/clean-close smoke passed. No implicit TX/capture/device open.",
+  "responsiveness": {
+    "inspection_frames": 31,
+    "inspection_slowest_ms": 83.3028,
+    "threshold_ms": 200,
+    "other_consumer_frames": {
+      "charts": 73,
+      "incoming": 65,
+      "settings": 85,
+      "shell": 99
+    }
+  },
+  "limits": [
+    "History512 frames/8MiB conservative charge; one UI pin, Arc snapshots and separate bounded command/reference queues",
+    "Input8 batches<=96 rows/1MiB; commands+unconsumed replies share8 outstanding slots; UI one pending operation",
+    "Raw65536B/nodes<=256/filter<=8 ANDterms/1024B/pattern<=256 decodedB/256matches+more/HEXpage256B",
+    "File32MiB/10000entries/1MiBblock/64interfaces, regular local input; exact nonempty raw binary export/new file only"
+  ],
+  "corrections": "Development-only new test assumptions corrected: PCAP encoder requires explicit source timestamp and Unknown direction for legacy PCAP, so synthetic writer now supplies valid representable metadata. Pause test now clicks Pause after Start (Start intentionally resets it), and checks increasing newest packet identity rather than count at the512-frame retention cap. Existing accepted tests, safety limits and production semantics were not weakened.",
+  "review": [
+    "Reviewed all16 source/test/doc paths against published030 readiness; no new dependencies/schema/wire parser/transport/CI/allocator/normative changes",
+    "Incoming raw references submitted before display pause; decoding/parser/filter/search/file work stays off GUI; capture/scheduling untouched",
+    "Commands+unconsumed replies share bounded outstanding admission to prevent a lost successful copy/search reply; context/key exhaustion fail explicit",
+    "Explicit local files/no overwrite and raw privacy messaging; no credentials/device serials/sensitive captures added",
+    "No subagents or canonical full gate/independent review run; Epic gates/reviews remain separately qualified"
+  ],
+  "cleanup": "Synthetic temporary files removed by passing tests; bounded logs/images remain ignored under target; no generated artifacts added. Unrelated ignored .idea files preserved.",
+  "checkpoint": {
+    "goal": "ACTIVE",
+    "turn": "PROGRESS",
+    "current_item": "EXM-030",
+    "next": "After immediate publication/reconciliation, fresh Goal turn rereads rules/state/dependencies and selects next unblocked Windows/virtual item (inspect031); no031 claim or implementation in this turn.",
+    "deferred": "Physical exchange stand and macOS035/036/package037 are not passed; owner cross-Epic Windows exception remains effective."
+  },
+  "policy_manifest_sha256": "0bab782eb40dfdce82867dd60a1445fb27e3587b7a3f0d0119071e62f15b0aea",
+  "policy_source": {
+    "repository": "fedrnv/FDOS",
+    "commit": "cd07d0d0f4bf0644321fd09a1375b0fd87d0bc1c",
+    "path": "Tasks/tasks_file_structure_v5_7.md",
+    "git_blob_sha": "269124fdc48926c0c5fb1a53b0ffa47f78699aed",
+    "sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8"
+  }
+}

@@ -27,6 +27,8 @@ pub struct Shell {
     pub chart_view: bool,
     pub settings_view: bool,
     pub settings: crate::settings::Settings,
+    pub packet_view: bool,
+    pub inspection: crate::inspection::Inspector,
     incoming_copy: u64,
     running_config: Option<std::sync::Arc<exmon_domain::config::ProjectConfig>>,
     notice: Option<&'static str>,
@@ -59,6 +61,8 @@ impl Shell {
             chart_view: false,
             settings_view: false,
             settings: crate::settings::Settings::new().map_err(|_| ShellError::Unavailable)?,
+            packet_view: false,
+            inspection: Default::default(),
             notice: None,
             loaded: false,
             dirty: false,
@@ -140,6 +144,7 @@ impl Shell {
             let _ = self.incoming.worker.submit(batch);
         }
         self.incoming.poll();
+        self.inspection.poll(&self.incoming.inspection, &ctx);
         if let Some(config) = self.incoming.worker.configuration()
             && self
                 .running_config
@@ -195,17 +200,33 @@ impl Shell {
                             self.outgoing.disconnect();
                         }
                         if ui
-                            .selectable_label(!self.settings_view && !self.chart_view, "Traffic")
+                            .selectable_label(
+                                !self.settings_view && !self.chart_view && !self.packet_view,
+                                "Traffic",
+                            )
                             .clicked()
                         {
                             self.chart_view = false;
                             self.settings_view = false;
+                            self.packet_view = false;
                         }
                         if ui
-                            .selectable_label(!self.settings_view && self.chart_view, "Charts")
+                            .selectable_label(
+                                !self.settings_view && self.chart_view && !self.packet_view,
+                                "Charts",
+                            )
                             .clicked()
                         {
                             self.chart_view = true;
+                            self.settings_view = false;
+                            self.packet_view = false;
+                        }
+                        if ui
+                            .selectable_label(self.packet_view && !self.settings_view, "Packets")
+                            .clicked()
+                        {
+                            self.packet_view = true;
+                            self.chart_view = false;
                             self.settings_view = false;
                         }
                         if ui
@@ -302,7 +323,7 @@ impl Shell {
             self.outgoing.disconnect();
             self.incoming.view.clear();
         }
-        if self.hid_view && !self.settings_view {
+        if self.hid_view && !self.settings_view && !self.packet_view {
             self.hid.show(ui, &mut self.layout);
         } else {
             egui::Panel::bottom("app-status")
@@ -339,6 +360,9 @@ impl Shell {
             if self.settings_view {
                 egui::CentralPanel::default()
                     .show(ui, |ui| self.settings.show(ui, &self.incoming.view));
+            } else if self.packet_view {
+                egui::CentralPanel::default()
+                    .show(ui, |ui| self.inspection.show(ui, &self.incoming.inspection));
             } else if self.chart_view {
                 egui::CentralPanel::default().show(ui, |ui| {
                     self.charts.show(
