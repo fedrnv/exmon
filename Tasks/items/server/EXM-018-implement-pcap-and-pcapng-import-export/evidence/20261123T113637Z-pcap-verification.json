@@ -1,0 +1,172 @@
+{
+  "task_id": "EXM-018",
+  "owner": "Codex exmon capture files",
+  "verified_at": "2026-11-23T11:36:37Z",
+  "source_base": "2723872046bfb3e45fb45e558ee732a314dcf412",
+  "candidate_tree": "58d6ed6c47fd23575771d26dbc80dd088a3de999",
+  "task_sha256": "60a0567824123275cccd821814a6b26fa73db305cda089262ff3c0d427cf6da2",
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "hash_basis": "SHA256 of verified checkout bytes. candidate_tree is staged Git-normalized product source before closure records. Detailed logs and oracle/test tools/fixtures retained only in bounded ignored target store.",
+  "owner_exception": "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+  "environment": {
+    "host": "Windows Server2025 Datacenter x64 build26100 x86_64-pc-windows-msvc",
+    "rustc": "1.98.0 (88d9e12ae 2026-08-18)",
+    "cargo": "1.98.0 (797e8a9bc 2026-08-05)",
+    "node": "24.22.1",
+    "oracle": "Existing trusted Npcap1.90 runtime based on libpcap1.10.7 (64-bit time_t); actual pcap_lib_version() invoked from installed wpcap.dll and confirmed this exact string. Existing SDK1.17 Lib/x64 import library, pcap Rust wrapper2.5.0, LIBPCAP_VER=1.10.7 and DLL PATH. Independent offline reads/writes only; no capture/send/device/permission/setup change."
+  },
+  "files": [
+    {
+      "path": "crates/storage/src/lib.rs",
+      "sha256": "556f94b445f850585409dbe1764003d9b5a8c4649bad9724bb689e2a3ce51882",
+      "bytes": 133
+    },
+    {
+      "path": "crates/storage/src/pcap.rs",
+      "sha256": "c4fe987ca7737606e1273e5303e9b74fb508dee4c435ee24951bcd4e08792a60",
+      "bytes": 34463
+    },
+    {
+      "path": "crates/storage/tests/pcap.rs",
+      "sha256": "8def86a2a715cb2f17e3fcf56cd7cd696c26bce71c52ab7bb1fc340c1369e9a3",
+      "bytes": 28972
+    },
+    {
+      "path": "docs/capture-files.md",
+      "sha256": "ccee097c06d9417837b5567481bbc19e6e425a0a04d0ab2bcb02e02447709898",
+      "bytes": 8053
+    }
+  ],
+  "local_artifacts": [
+    {
+      "path": "target/exm018-evidence/focused.log",
+      "sha256": "628de201f02895fc6164f362daa73675fa18df050686206b75c979fff8739e68",
+      "bytes": 3290
+    },
+    {
+      "path": "target/exm018-evidence/regressions.log",
+      "sha256": "54039f988e4bdb566ae7f29af889c864bbe701564d0f4feced03e6935202ca44",
+      "bytes": 19158
+    },
+    {
+      "path": "target/exm018-evidence/quality.log",
+      "sha256": "8261b06060203f602270511ff6e87de1c33e14143ae25c1bb7d1a468a749f390",
+      "bytes": 1218
+    },
+    {
+      "path": "target/exm018-evidence/architecture.log",
+      "sha256": "4f389e2d9cdf167261ce323cd3ff4bfc6fb9335b6d69cac66fc14320ab8eaece",
+      "bytes": 180
+    },
+    {
+      "path": "target/exm018-evidence/oracle-final.log",
+      "sha256": "dfb9b6e123722246811ff2af76b8511ff65ef0c6011ca654735639d5f214c688",
+      "bytes": 1962
+    },
+    {
+      "path": "target/exm018-oracle/Cargo.toml",
+      "sha256": "d54372bceb1c12bef136c17546ad709210473492b4a57a09b335ac0536167968",
+      "bytes": 209
+    },
+    {
+      "path": "target/exm018-oracle/Cargo.lock",
+      "sha256": "7b23cba2cfd399181821fd8def63108a6d6423bc586c6d083a457811607615ea",
+      "bytes": 9004
+    },
+    {
+      "path": "target/exm018-oracle/src/main.rs",
+      "sha256": "329a7224bf69f9e8a6724a1883ac96d28a706c782b668e4a1f8b6e4541d5a281",
+      "bytes": 2685
+    },
+    {
+      "path": "target/debug/deps/pcap-474c3781617e3c2a.exe",
+      "sha256": "313447b14f0f2a05604e3e2f32e7b6453a963e5aa3d272ead387c1565cdd375e",
+      "bytes": 1305088
+    },
+    {
+      "path": "C:/Windows/System32/Npcap/wpcap.dll",
+      "sha256": "332f81cc1671a6d12ab4d20264a00ee16d12f6883745e05c92ee4030b3896a9f",
+      "bytes": 504760
+    }
+  ],
+  "acceptance": {
+    "AC-01": "PASS12 focused tests: independent literal classic PCAP plus independent builders for four byte-order/precision variants, unknown link/header bits, empty/truncated captures, exact timestamps; PCAPNG both endian sections/interfaces/options/opaque blocks, decimal and binary resolution/signed offset/u64 extremes/sub-ns values, SPB missing time, legacy PB and direction. Complete imports export byte-identically, selected output reparses with correct subset/interface/link/clock metadata and valid lengths. Encoder generated selected/all observations retain bytes/link/original/source timestamps, handles multiple source IDs and rejects nonrepresentable metadata instead of silently dropping it. Independent Npcap reads both generated formats and writes classic PCAP for production Reader, asserting exact bytes/length/link/nanoseconds.",
+    "AC-02": "PASS all prefixes of classic/NG fixture, deterministic per-byte masks1/128/255, precise bad magic/version/length/trailer/options/interface/section/time diagnostics, semantic malformed preservation and rejected Observation conversion, every retained/raw span within bounds. Actual1MiB opaque block,256 interfaces and1024 options caps reached, excess rejected; total/entry limits and one-byte Read tested. Injected partial read/write faults retain actual input bytes/output offset and terminal state with redacted errors. Generated1,000,000 records (33,000,024 bytes) consumed one at a time, raw entry<64 bytes, no retained history and maximum read request<=20 bytes. Source review confirms bounded state/allocation/counters and no threads/recursion/implicit external reference/TX."
+  },
+  "verification": [
+    {
+      "command": "cargo check -p exmon-storage --locked; cargo test -p exmon-storage --test pcap --locked",
+      "result": "PASS compilation and12 focused tests,0 failed/ignored; last standalone focused1.41s before final selected-rewrite output-limit guard. Final exact candidate repeats all12 in combined regression below.",
+      "log": "target/exm018-evidence/focused.log"
+    },
+    {
+      "command": "cargo test -p exmon-storage -p exmon-capture -p exmon-domain --locked",
+      "result": "PASS73 (12 new codec+11 existing storage/config/layout/fixture+44 existing capture+6 domain),0 failed/ignored and doctests. Final codec suite1.56s including million-record stream. Default-feature transport regression boundary; no native live/physical acceptance inferred.",
+      "log": "target/exm018-evidence/regressions.log"
+    },
+    {
+      "command": "cargo fmt --all; cargo fmt --all -- --check; cargo clippy --workspace --all-targets --locked -- -D warnings",
+      "result": "PASS final workspace format/lint, no warnings.",
+      "log": "target/exm018-evidence/quality.log"
+    },
+    {
+      "command": "node scripts/check-architecture.mjs; git diff --check; git diff --cached --check",
+      "result": "PASS six layer dependency graph and3 negative graph fixtures, source/staged whitespace.",
+      "log": "target/exm018-evidence/architecture.log"
+    },
+    {
+      "command": "LIBPCAP_LIBDIR=target/npcap-sdk-1.17/Lib/x64 LIBPCAP_VER=1.10.7 PATH=C:/Windows/System32/Npcap;<existing> CARGO_TARGET_DIR=target cargo run --locked --manifest-path target/exm018-oracle/Cargo.toml -- target/exm018-evidence/oracle-final",
+      "result": "PASS final exact source: independent Npcap reader validates generated PCAP and PCAPNG; independent Npcap writer output is validated by production Reader. Three oracle scenarios assert bytes/link/original/capture ns. Input/output explicitly disposable synthetic files only. Exact ignored oracle source/manifest/lock hashes recorded.",
+      "log": "target/exm018-evidence/oracle-final.log"
+    },
+    {
+      "command": "Review staged4 product paths; git diff --cached --stat/--numstat; git write-tree; git fetch origin main; git rev-parse HEAD origin/main; re-read018 task/claim/status/dependencies/rules",
+      "result": "PASS exact source tree bound above; HEAD/origin main both2723872, authoritative018 claim remains owned by Codex exmon capture files. Only4 intended product paths, Cargo.lock and all shared source/interfaces unchanged, no new product dependency. First018 version request absent before this closure."
+    }
+  ],
+  "resource_contract": {
+    "raw_block_bytes": 1048576,
+    "valid_packet_bytes": 65536,
+    "interfaces_per_section": 256,
+    "options_per_recognized_area": 1024,
+    "default_interfaces": 64,
+    "default_total_input_bytes": 1099511627776,
+    "default_entries": 100000000,
+    "hard_entries": 1000000000,
+    "io_interrupted_retries_per_operation": 8,
+    "notes": "One reader current raw unit, bounded interface table/options and owned returned entry; callers bound retained history. Exact total-limit EOF may probe one extra byte. Oversized container rejected before body allocation; malformed NG payload can remain in bounded raw block. Selected rewrite may hold one extra bounded output block and rejects result>1MiB. Encoder has<=256 source mappings and one<=65536-byte packet plus fixed framing; no output history/queue."
+  },
+  "policies": {
+    "time": "Preserve native ticks/resolution/signed offset without rounding. Separate source capture clock from caller monotonic time; no time for SPB. Negative/overflow/sub-ns bridge failures explicit.",
+    "malformed": "Retain raw bytes/semantic issues; invalid packets cannot become valid observations. Fatal container errors retain consumed unit with precise offset; poison rather than guessed resynchronization. Incomplete output never reported success.",
+    "export": "Complete raw archival copy byte-exact. Selection filters packets while retaining metadata, makes section lengths unknown, normalizes compatible minor2 to0, strips noncopyable custom block0x40000BAD/options19372/19373, upgrades legacy PB to EPB retaining known drop count. Opaque internals not interpreted; selection is not anonymization.",
+    "encoder": "Only raw-link network Observations, explicit source IDs, known original length and capture source timestamp. Generated classic PCAP limited to one source/link, Unknown direction and32-bit seconds; otherwise use NG or reject. No fabricated UTC/direction/link/original values. Partial write poisons writer; finish flush checked.",
+    "privacy": "No filesystem path/open/overwrite/reference resolver or TX capability in codec. Caller authorizes Read/Write sink and privacy/destination decisions, runs worker I/O. Error/Entry Debug redacted, explicit raw() intentionally sensitive."
+  },
+  "failures_corrected": [
+    "Initial NG fixture-count test FAILED1/10: two sections each contain6 entries, not7. Corrected expected full count14->12 and selected count12->10 from actual declared builder structure, preserving all payload/time/link/selection assertions. Candidate failure was corrected, not unchanged retry or a flaky acceptance.",
+    "Initial optional oracle build FAILED because pcap build script found only SDK import library and exposed its old baseline API, hiding precision functions. Rechecked existing adapter setup/source, set documented LIBPCAP_VER1.10.7 with installed Npcap DLL path and SDK; actual runtime version queried and confirmed1.90/libpcap1.10.7. Recompiled and all3 oracle scenarios pass. No faked runtime capability or automatic validator activation.",
+    "Clippy1.98 required is_multiple_of and a collapsed guarded if; applied equivalent changes without allows or weakening validation. Direct storage lint and final full workspace lint pass.",
+    "Review added compatible NG minor2 import, exact zero-tick extreme resolution conversion, strict classic direction/source metadata rejection, selected noncopyable metadata rules and legacy PB upgrade, and final rewrite output cap. Added direct tests and hard-cap/million-record instrumentation; final selected regressions and independent oracle rebuilt against exact candidate pass.",
+    "One local JS logging expression accessed output after text() returned undefined; shell hashing/review command had already succeeded. Reread compact manifest correctly; no source/evidence mutation or test result affected.",
+    "PowerShell formats ordinary Cargo stderr progress as NativeCommandError in redirected logs; actual tool/test/lint exits0 and summaries inspected."
+  ],
+  "reviewer": "Codex exmon capture files (author review, independent Epic review not claimed)",
+  "review": "Reviewed all4 staged files: magic/endian/version, fixed and variable field preconditions, positive/check-aligned length arithmetic and both trailers, known section extents/EOF, per-section ID reset, bounded options and duplicate fixed clock/flags handling, exact time conversion, raw byte spans, malformed-vs-domain boundary, source ID/TX direction preservation/rejection, output partial-write/flush state and subset rewrite framing. Checked all guarded expects/private raw invariants, bounded counters and worst per-call allocations. No unsafe code/new product dependencies, GUI thread work, network action, shared schema/config/Adapter or accepted lifecycle edits.",
+  "limitations": [
+    "Offline codec is library API; GUI file chooser/privacy/destination workflow, playback scheduling and session integration remain separate accepted tasks. No UI changed, visual N/A.",
+    "Unknown block internals and extension-specific fields remain opaque, not semantically validated. Noncopyable custom data is excluded on selected rewrite; other metadata remains potentially sensitive and stats describe original capture. This is not anonymization or full format-extension semantic support.",
+    "Files/records over configured budgets fail explicitly; over-limit bodies are not read/copied wholesale. Fatal errors stop parsing; original selected input remains the recovery source. Caller retains bounded raw errors/entries.",
+    "Raw byte-exact archival copying retains historical version/PB and semantic malformed source data; newly encoded/selected output follows documented normalization. Domain conversion can reject time/payload metadata that the raw representation still preserves.",
+    "No implicit file overwrite, atomic replacement/fsync, encryption, decompression, resolver or physical capture/transport. Caller handles authorized sink, storage quota and cancellation between bounded entries.",
+    "Windows qualification plus independent Windows offline oracle only;035 cross-platform/native,036 real stand,034 broader fuzz/security, release and Epic gate/review remain separate unpassed obligations."
+  ],
+  "cleanup": "Only4 intended product paths plus new018 evidence/Done/request. No accepted TASK/event/evidence/ADR/aggregate/version or unrelated .idea edits. Ignored logs<64KiB plus bounded oracle source/lock/synthetic files and normal executable/build caches retained for audit; no generated capture/log/binary staged. No background process/device/socket remains.",
+  "checkpoint": {
+    "task": "EXM-018 verified Done upon successful publication",
+    "goal": "ACTIVE; this turn is product PROGRESS, no global completion/blocker",
+    "next": "Fresh turn fetch/reconcile018 publication/allocator; read exact EXM019 configurable message framing TASK/all events/evidence/rules and functional prerequisites003/005/011/013. Publish claim if Planned/unowned and dependency-ready; implement all accepted framing modes/escaping/diagnostics/source ranges using virtual fixtures. Do not select/claim019 in018 turn.",
+    "authority": "Owner authorizes all possible Windows VPS/virtual tasks across Epics without prior Epic closure. Tools present, real devices and macOS deferred to later stands. Functional dependencies, one current task identity, published ownership and product safety remain binding.",
+    "publication": "Commit product+verification+Done+single first018 version request, immediately push main and reconcile unknown/rejected result before other commit/task. Allocator remains sole version writer under actual qualified adoption boundary."
+  }
+}
