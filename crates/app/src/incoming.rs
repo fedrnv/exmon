@@ -22,6 +22,9 @@ use std::{
     thread::{self, JoinHandle, ThreadId},
     time::{Duration, Instant},
 };
+pub(crate) fn prototype_config() -> Result<ProjectConfig, Error> {
+    exmon_storage::config::load_project(br#"{"schema_version":1,"protocols":[{"id":"sample32","name":"Sample telemetry","framing":{"kind":"fixed","length":32},"classification":{"length":32,"prefix":[165]},"fields":[{"id":"sequence","offset":2,"length":8,"representation":"unsigned","endian":"little"},{"id":"interface","offset":1,"length":1,"representation":"unsigned","endian":"little"}]},{"id":"sample8","name":"CAN sample","framing":{"kind":"fixed","length":8},"classification":{"length":8,"prefix":[165]},"fields":[{"id":"counter","offset":2,"length":4,"representation":"unsigned","endian":"little"}]}]}"#).map_err(|_|Error::Invalid)
+}
 pub const RETAINED: usize = 1024;
 pub const RETAINED_BYTES: usize = 8 * 1024 * 1024;
 const BATCH_BYTES: usize = 1024 * 1024;
@@ -137,7 +140,7 @@ pub struct Worker {
 impl Worker {
     pub fn prototype() -> Result<Self, Error> {
         Self::factory(|| {
-            let config=exmon_storage::config::load_project(br#"{"schema_version":1,"protocols":[{"id":"sample32","name":"Sample telemetry","framing":{"kind":"fixed","length":32},"classification":{"length":32,"prefix":[165]},"fields":[{"id":"sequence","offset":2,"length":8,"representation":"unsigned","endian":"little"},{"id":"interface","offset":1,"length":1,"representation":"unsigned","endian":"little"}]},{"id":"sample8","name":"CAN sample","framing":{"kind":"fixed","length":8},"classification":{"length":8,"prefix":[165]},"fields":[{"id":"counter","offset":2,"length":4,"representation":"unsigned","endian":"little"}]}]}"#).map_err(|_|Error::Invalid)?;
+            let config = prototype_config()?;
             Ok((config, Some((Framing::Fixed { length: 32 }, None))))
         })
     }
@@ -151,6 +154,17 @@ impl Worker {
         factory: impl FnOnce() -> Result<(ProjectConfig, Option<(Framing, Option<Escape>)>), Error>
         + Send
         + 'static,
+    ) -> Result<Self, Error> {
+        Self::factory_processor(move || {
+            let (c, s) = factory()?;
+            Processor::new(c, s)
+        })
+    }
+    pub(crate) fn prepared(processor: Processor) -> Result<Self, Error> {
+        Self::factory_processor(move || Ok(processor))
+    }
+    fn factory_processor(
+        factory: impl FnOnce() -> Result<Processor, Error> + Send + 'static,
     ) -> Result<Self, Error> {
         let shared = Arc::new(Shared {
             quit: AtomicBool::new(false),
@@ -168,7 +182,7 @@ impl Worker {
             .name("exmon-incoming".into())
             .spawn(move || {
                 let _ = state.owner.set(thread::current().id());
-                let mut processor = match factory().and_then(|(c, s)| Processor::new(c, s)) {
+                let mut processor = match factory() {
                     Ok(p) => p,
                     Err(_) => {
                         if let Ok(mut s) = state.status.lock() {
@@ -353,7 +367,8 @@ struct Stream {
     epoch: u64,
     last: Option<u64>,
 }
-struct Processor {
+pub(crate) struct Processor {
+    selected: Option<exmon_domain::config::Interface>,
     config: ProjectConfig,
     classifier: Classifier,
     codecs: BTreeMap<String, (Arc<Protocol>, Codec)>,
@@ -364,7 +379,7 @@ struct Processor {
     start: Instant,
 }
 impl Processor {
-    fn new(
+    pub(crate) fn new(
         config: ProjectConfig,
         stream_rule: Option<(Framing, Option<Escape>)>,
     ) -> Result<Self, Error> {
@@ -386,6 +401,7 @@ impl Processor {
         }
         Ok(Self {
             config,
+            selected: None,
             classifier,
             codecs,
             stream_rule,
@@ -394,6 +410,25 @@ impl Processor {
             revision: 1,
             start: Instant::now(),
         })
+    }
+    pub(crate) fn selected(config: ProjectConfig, selected: Option<&str>) -> Result<Self, Error> {
+        let interface = selected
+            .map(|id| {
+                config
+                    .interfaces
+                    .iter()
+                    .find(|i| i.id == id)
+                    .cloned()
+                    .ok_or(Error::Invalid)
+            })
+            .transpose()?;
+        let stream = interface
+            .as_ref()
+            .and_then(|i| config.protocols.iter().find(|p| p.id == i.protocol_id))
+            .map(|p| (p.framing.clone(), p.escape));
+        let mut p = Self::new(config, stream)?;
+        p.selected = interface;
+        Ok(p)
     }
     fn reset(&mut self) {
         self.stream = None;
@@ -456,12 +491,17 @@ impl Processor {
             sources: vec![],
         })
     }
-    fn process(
+    pub(crate) fn process(
         &mut self,
         generation: u64,
         record: Captured,
         status: &mut Status,
     ) -> Result<Vec<Arc<Row>>, Error> {
+        if let Some(selected) = &self.selected
+            && !profile_accepts(selected, &record.observation)
+        {
+            return Ok(vec![]);
+        }
         let observation = Arc::new(record.observation.clone());
         let mut raw = self.row(generation, &record, &observation)?;
         let is_stream = matches!(
@@ -783,4 +823,48 @@ impl View {
     pub fn retained_bytes(&self) -> usize {
         self.bytes
     }
+}
+
+/// Portable profile postfilter, shared by live processing and settings preview.
+fn profile_accepts(interface: &exmon_domain::config::Interface, o: &Observation) -> bool {
+    use exmon_domain::config::Transport;
+    let kind = match interface.transport {
+        Transport::Ethernet {} => TransportKind::Ethernet,
+        Transport::Tcp {} => TransportKind::Tcp,
+        Transport::Udp {} => TransportKind::Udp,
+        Transport::Serial { .. } => TransportKind::Serial,
+        Transport::Usb { .. } => TransportKind::Usb,
+        Transport::Can { .. } => TransportKind::Can,
+    };
+    if o.metadata().kind() != kind
+        || interface
+            .filter
+            .direction
+            .is_some_and(|d| d != o.direction())
+    {
+        return false;
+    }
+    if !interface.filter.ports.is_empty() {
+        match o.metadata() {
+            Metadata::Tcp { local, remote, .. } | Metadata::Udp { local, remote } => {
+                if !interface.filter.ports.contains(&local.port())
+                    && !interface.filter.ports.contains(&remote.port())
+                {
+                    return false;
+                }
+            }
+            _ => return false,
+        }
+    }
+    if !interface.filter.can_ids.is_empty() {
+        match o.metadata() {
+            Metadata::Can { id, .. } => {
+                if !interface.filter.can_ids.contains(id) {
+                    return false;
+                }
+            }
+            _ => return false,
+        }
+    }
+    true
 }

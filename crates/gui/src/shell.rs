@@ -25,7 +25,10 @@ pub struct Shell {
     pub outgoing: crate::outgoing::Outgoing,
     pub charts: crate::charts::Charts,
     pub chart_view: bool,
+    pub settings_view: bool,
+    pub settings: crate::settings::Settings,
     incoming_copy: u64,
+    running_config: Option<std::sync::Arc<exmon_domain::config::ProjectConfig>>,
     notice: Option<&'static str>,
     loaded: bool,
     dirty: bool,
@@ -51,8 +54,11 @@ impl Shell {
             incoming: crate::incoming::Incoming::new().map_err(|_| ShellError::Unavailable)?,
             outgoing: crate::outgoing::Outgoing::new().map_err(|_| ShellError::Unavailable)?,
             incoming_copy: 0,
+            running_config: None,
             charts: Default::default(),
             chart_view: false,
+            settings_view: false,
+            settings: crate::settings::Settings::new().map_err(|_| ShellError::Unavailable)?,
             notice: None,
             loaded: false,
             dirty: false,
@@ -72,6 +78,12 @@ impl Shell {
         if self.hid_view || self.hid.busy() {
             return Err(ShellError::Busy);
         }
+        let active = self.settings.controller.active();
+        if let Some(profile) = active.as_ref().and_then(|c| c.interface())
+            && profile_kind(profile) != self.transport()
+        {
+            return Err(ShellError::Invalid);
+        }
         let settings = if crate::network_filters::network(self.transport()) {
             self.network_filter
                 .settings(self.interface)
@@ -79,8 +91,15 @@ impl Shell {
         } else {
             Default::default()
         };
-        self.capture
-            .start_filtered(self.transport(), self.interface, settings)?;
+        self.capture.start_bounded(
+            self.transport(),
+            self.interface,
+            settings,
+            self.settings
+                .controller
+                .active()
+                .map_or_default(|c| c.safety),
+        )?;
         self.outgoing.disconnect();
         self.incoming.begin(self.capture.generation());
         self.notice = None;
@@ -121,6 +140,19 @@ impl Shell {
             let _ = self.incoming.worker.submit(batch);
         }
         self.incoming.poll();
+        if let Some(config) = self.incoming.worker.configuration()
+            && self
+                .running_config
+                .as_ref()
+                .is_none_or(|old| !std::sync::Arc::ptr_eq(old, &config))
+        {
+            let _ = self
+                .settings
+                .controller
+                .request(exmon_app::settings::Action::RefreshNames(config.clone()));
+            self.running_config = Some(config);
+        }
+        self.settings.poll();
         self.charts.poll(&self.incoming.charts);
         let before = self.layout;
         let size = ctx.input(|i| {
@@ -162,8 +194,29 @@ impl Shell {
                             self.hid_view = !self.hid_view;
                             self.outgoing.disconnect();
                         }
-                        ui.selectable_value(&mut self.chart_view, false, "Traffic");
-                        ui.selectable_value(&mut self.chart_view, true, "Charts");
+                        if ui
+                            .selectable_label(!self.settings_view && !self.chart_view, "Traffic")
+                            .clicked()
+                        {
+                            self.chart_view = false;
+                            self.settings_view = false;
+                        }
+                        if ui
+                            .selectable_label(!self.settings_view && self.chart_view, "Charts")
+                            .clicked()
+                        {
+                            self.chart_view = true;
+                            self.settings_view = false;
+                        }
+                        if ui
+                            .add_enabled(
+                                !self.hid.busy(),
+                                egui::Button::new("Settings").selected(self.settings_view),
+                            )
+                            .clicked()
+                        {
+                            self.settings_view = !self.settings_view;
+                        }
                         let title = if self.layout.theme == Theme::Dark {
                             "Light theme"
                         } else {
@@ -212,9 +265,9 @@ impl Shell {
                                 egui::Button::new("Start capture"),
                             )
                             .clicked()
-                            && self.start_capture().is_err()
+                            && let Err(error) = self.start_capture()
                         {
-                            self.notice = Some("Capture worker is busy or unavailable.");
+                            self.notice = Some(capture_failure(error));
                         }
                         if ui
                             .add_enabled(
@@ -240,11 +293,16 @@ impl Shell {
                 }
                 ui.add_space(6.);
             });
+        if let Some(active) = self.settings.controller.active()
+            && let Some(profile) = active.interface()
+        {
+            ui.label(format!("Processing profile: {} | {:?} | {} portable port filters / {} CAN filters; additional source filters above",profile.id,profile_kind(profile),profile.filter.ports.len(),profile.filter.can_ids.len()));
+        }
         if selection_before != (self.selected, self.interface) {
             self.outgoing.disconnect();
             self.incoming.view.clear();
         }
-        if self.hid_view {
+        if self.hid_view && !self.settings_view {
             self.hid.show(ui, &mut self.layout);
         } else {
             egui::Panel::bottom("app-status")
@@ -278,7 +336,10 @@ impl Shell {
                         ui.label("Layout saving unavailable; current session remains usable.");
                     }
                 });
-            if self.chart_view {
+            if self.settings_view {
+                egui::CentralPanel::default()
+                    .show(ui, |ui| self.settings.show(ui, &self.incoming.view));
+            } else if self.chart_view {
                 egui::CentralPanel::default().show(ui, |ui| {
                     self.charts.show(
                         ui,
@@ -310,6 +371,40 @@ impl Shell {
                 });
             }
         }
+        if self.capture.generation() < u64::MAX {
+            match self.settings.controller.activate() {
+                Ok(Some(activation)) => {
+                    self.outgoing.disconnect();
+                    if let Ok(generation) = self.capture.invalidate() {
+                        if let Some(profile) = activation.config.interface() {
+                            let kind = match profile.transport {
+                                exmon_domain::config::Transport::Ethernet {} => {
+                                    TransportKind::Ethernet
+                                }
+                                exmon_domain::config::Transport::Tcp {} => TransportKind::Tcp,
+                                exmon_domain::config::Transport::Udp {} => TransportKind::Udp,
+                                exmon_domain::config::Transport::Serial { .. } => {
+                                    TransportKind::Serial
+                                }
+                                exmon_domain::config::Transport::Usb { .. } => TransportKind::Usb,
+                                exmon_domain::config::Transport::Can { .. } => TransportKind::Can,
+                            };
+                            if let Some(i) = TRANSPORTS.iter().position(|(k, _)| *k == kind) {
+                                self.selected = i;
+                            }
+                        }
+                        self.network_filter = Default::default();
+                        let old = std::mem::replace(&mut self.incoming.worker, activation.worker);
+                        self.settings.controller.retire(old);
+                        self.incoming.draft = None;
+                        self.incoming.begin(generation);
+                        self.incoming_copy = self.incoming.copy_revision;
+                    }
+                }
+                Ok(None) => {}
+                Err(e) => self.settings.notice = Some(format!("{}: {}", e.path, e.message)),
+            }
+        }
         self.dirty |= before != self.layout;
         if self.loaded && self.dirty && self.preferences.save(self.layout).is_ok() {
             self.dirty = false;
@@ -326,5 +421,25 @@ impl Shell {
 impl eframe::App for Shell {
     fn ui(&mut self, ui: &mut egui::Ui, _: &mut eframe::Frame) {
         self.show(ui);
+    }
+}
+
+fn profile_kind(profile: &exmon_domain::config::Interface) -> TransportKind {
+    match profile.transport {
+        exmon_domain::config::Transport::Ethernet {} => TransportKind::Ethernet,
+        exmon_domain::config::Transport::Tcp {} => TransportKind::Tcp,
+        exmon_domain::config::Transport::Udp {} => TransportKind::Udp,
+        exmon_domain::config::Transport::Serial { .. } => TransportKind::Serial,
+        exmon_domain::config::Transport::Usb { .. } => TransportKind::Usb,
+        exmon_domain::config::Transport::Can { .. } => TransportKind::Can,
+    }
+}
+
+fn capture_failure(error: ShellError) -> &'static str {
+    match error {
+        ShellError::Invalid => {
+            "Selected source transport/filter does not match the validated processing profile; check Settings."
+        }
+        _ => "Capture worker is busy or unavailable.",
     }
 }

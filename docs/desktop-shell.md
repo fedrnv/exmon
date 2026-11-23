@@ -100,3 +100,7 @@ Upstream APIs were checked against
 
 Live chart tabs use bounded worker-prepared numeric histories, moving averages and
 interactive axes; see [chart controls and limits](charts.md).
+
+[Validated settings](settings.md) provide staged profile/binding/safety edits and
+a selected-raw-capture preview through the same incoming processor. Successful
+Apply stops capture/TX and clears stale source generations; restart explicitly.

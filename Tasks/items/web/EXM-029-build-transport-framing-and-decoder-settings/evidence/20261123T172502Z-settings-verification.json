@@ -1,0 +1,269 @@
+{
+  "schema": "exmon-verification/v1",
+  "task_id": "EXM-029",
+  "owner": "Codex exmon settings",
+  "verified_at": "2026-11-23T17:25:02Z",
+  "base_revision": "3bcfce6d079c0b3399fdbe6c4302d4a9c665db55",
+  "candidate_tree": "9dd30b9375617903c310cd732c6ca426e505eee3",
+  "task_sha256": "3572256971bf6a18577847e5f260d3ce628f39f420766b287919613723765e6a",
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "native_activation": false,
+  "scope_amendment": {
+    "path": "Tasks/items/web/EXM-029-build-transport-framing-and-decoder-settings/events/20261123T172205Z-codex-verification-amended-dbd6b7e2a4c941bb961c49429f0cb75b.md",
+    "sha256": "a897ba4b2bee8404c4a6f4e54fa97cf1fc08eb136f9713648d8b4400fdab5f65"
+  },
+  "environment": {
+    "platform": "win32",
+    "arch": "x64",
+    "node": "v24.22.1",
+    "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)",
+    "cargo": "cargo 1.98.0 (797e8a9bc 2026-08-05)",
+    "qualification": "Windows VPS virtual prototype, no physical I/O"
+  },
+  "unique_selected_tests": 180,
+  "test_counts": {
+    "app-final": 57,
+    "gui-final": 19,
+    "protocol-final": 41,
+    "storage-final": 15,
+    "transports-final": 48
+  },
+  "verification": [
+    {
+      "command": "cargo test -p exmon-app --lib --test settings --test shell --test incoming --test outgoing --test charts --test network_filters --test hid_worker --locked",
+      "result": "57 PASS:11 app internals,9 settings,3 shell,9 incoming,12 outgoing,6 charts,5 filters,2 HID with corrected actual-state observer",
+      "exit": 0,
+      "log": "target/exm029-app-final.log",
+      "sha256": "551e118d5f74bb55b22fdf652407762223bf23c3b00b47efb608761344e07f3c"
+    },
+    {
+      "command": "cargo test -p exmon-gui --locked -- --nocapture",
+      "result": "19 PASS initially; unchanged13 retained after negative-shape guard/navigation correction; final directly affected6 refreshed below",
+      "exit": 0,
+      "log": "target/exm029-gui-final.log",
+      "sha256": "e607577af98edfcc55fb7414d92f5ab045635977ca8b9e58e88175962e77273b"
+    },
+    {
+      "command": "cargo test -p exmon-gui --test settings --test charts --locked -- --nocapture",
+      "result": "Final6 PASS:4 settings and2 charts. Actual field/JSON/limits/file/preview/apply/schedule/navigation controls; latest8 matrix PNGs",
+      "exit": 0,
+      "log": "target/exm029-settings-charts-final.log",
+      "sha256": "556aa2c8602ab347c019a76bc68f30ffcfb391a6295636e621424386870de133"
+    },
+    {
+      "command": "cargo test -p exmon-storage --test configuration --test settings_files --locked",
+      "result": "15 PASS:13 schema compatibility/configuration,2 bounded files/local Windows paths/no overwrite",
+      "exit": 0,
+      "log": "target/exm029-storage-final.log",
+      "sha256": "1768e121f3d801aaf60268d8ef694c2d0a38303b1e0d6394edd4d2a025545879"
+    },
+    {
+      "command": "cargo test -p exmon-protocol --test framing --test fields --test codec --locked",
+      "result": "41 PASS:12 framing,15 fields,14 codec",
+      "exit": 0,
+      "log": "target/exm029-protocol-final.log",
+      "sha256": "e5440afaeb3615b9a44bc2e3585f984fbe438522c20079cae69dfc47547f50d0"
+    },
+    {
+      "command": "cargo test -p exmon-capture --locked",
+      "result": "48 implemented transport regressions PASS",
+      "exit": 0,
+      "log": "target/exm029-transports-final.log",
+      "sha256": "0cb2bea145e1329e24d9773ca834c31cf28a362a0a2f90fba52b8202e86c7f2f"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets --locked -- -D warnings",
+      "result": "Complete workspace/all targets PASS",
+      "exit": 0,
+      "log": "target/exm029-clippy-final.log",
+      "sha256": "9865569df9a8eba042b9e73036e5b92bcb368760a57507779226b6c66e062a3c"
+    },
+    {
+      "command": "cargo run -p exmon-gui --example native_settings_smoke --locked",
+      "result": "Actual Windows hidden eframe/wgpu edit/preview/apply/stop screenshot and clean close PASS;8s app deadline, off-GUI PNG write",
+      "exit": 0,
+      "log": "target/exm029-native-final.log",
+      "sha256": "e93a62f0a220b5b151265bfbf72ad23808c1da469423c10026a7f4c2e590bc0e"
+    },
+    {
+      "command": "node scripts/check-architecture.mjs",
+      "result": "Six layers/resolved graph/three negative fixtures PASS",
+      "exit": 0,
+      "log": "target/exm029-architecture.log",
+      "sha256": "4f389e2d9cdf167261ce323cd3ff4bfc6fb9335b6d69cac66fc14320ab8eaece"
+    },
+    {
+      "command": "cargo fmt --all --check",
+      "result": "Complete workspace PASS",
+      "exit": 0
+    },
+    {
+      "command": "git diff --check; git diff --cached --check",
+      "result": "PASS, reviewed20 implementation/test/doc paths",
+      "exit": 0
+    }
+  ],
+  "acceptance": {
+    "AC-01": "Structured64-field paged controls cover interfaces/transports/filters/framing/classification/fields/safety, enum variants/booleans/additions and full-schema staged JSON. Semantic indexed field and JSON line/column diagnostics reject invalid geometry/IDs/baud/limits/types/versions/unknown keys and enabled stored schedules. Actual invalid field/limits/JSON/Cancel/default controls leave active Arc/configuration and running capture unchanged. Compile/prepared activation and checked revisions fence stale/oversized/full queue/exhausted requests; independent queued edits both survive. Public Model builder and malformed JSON structural actions fail with errors, no worker panic. Existing bounded queue/batch/snapshot safety reaches actual capture. Successful Apply revokes actual10ms scheduled mock, capture and old generations/selection without restart. Portable profile and local selector exports remain separate, explicit runtime safety envelope roundtrips, invalid/future/unknown-enabled/oversize runtime imports preserve active state. Local file/no-overwrite/error cases pass.",
+    "AC-02": "Preview and activated incoming worker share the same actual Processor, selected interface postfilter, framer/classifier/codec/checksum path. UDP and split TCP vectors compare exact normalized bytes, engineering257.5V field text/numeric/validity, quality and source spans; mismatched ports produce no rows. Actual production GUI previews the selected captured instance after sustained capture/eviction and matches original received bytes/decoded field. Bounded retained raw chunks preserve timestamp/direction/interface/epoch/sequence; evicted pinned observations remain usable, missing earlier stream context is explicit. Native Windows edit to Windows preview -> selected raw preview -> Apply shows active revision, decoded32-byte data and stopped capture."
+  },
+  "contracts": {
+    "transaction": "All parsing/schema validation/serialization/file I/O/preview/compilation on settings worker. Incoming Processor reused via crate-local prepared/selected entrypoint, not duplicated codec. GUI routes bounded references and controls. Ready construction succeeds before active metadata commit; field edits/advanced dirty state/Cancel/new requests invalidate older prepared apply. Valid Apply stops capture/outgoing permission and schedules, advances generation, clears stale incoming/copy/chart context, retires old worker off GUI. No automatic reconnect/open/start/TX or schedule enable. Existing receive-name edits synchronize names only, preserve dirty draft/bindings/safety.",
+    "resources": "Eight admitted settings commands; project/bindings/file <=1MiB each, field text4096 bytes, pointer512, path4096. Form page64 leaves, invalid-field map<=64 with fail-closed overflow. Checked request clock blocks pending apply on exhaustion. Preview<=32 raw records/65536 total payload bytes,<=96 output rows/1MiB charged data, Arc snapshots. Existing decoder/framer/classifier/source limits retained; external retained snapshots/native/renderer and filesystem latency separate. Runtime capture limits:queue1..4096/1..16MiB,batch1..32/1..65536bytes,snapshot1..64 current synthetic capability; batch bytes cover snapshot.",
+    "files": "ProjectConfig and MachineBindings schema1 unchanged/separate. Runtime limit envelope schema_version1 with limits5 numeric fields; explicit new-file export never overwrites. Imports stage only. Reads bound selected regular local files, Windows network/device/ADS paths rejected, fixed error codes; failed write may leave incomplete new file. No upload/external reference execution/raw logs/default save. Project export warns of template bytes. Bindings remain inert data, never select physical devices.",
+    "scope": "Existing schema records for templates/charts/disabled schedules preserved as passive project data. Apply activates accepted processing/filter/safety settings, never hydrates runtime schedules/TX requests. Existing historical outgoing drafts remain disconnected and must be explicitly revalidated/reconnected. Only existing workspace serde/serde_json app edges added; lock has two dependency-edge lines, no package/version change. No domain schema/protocol algorithm/transport adapter/CI/allocator/normative or accepted-history change."
+  },
+  "visual_inspection": {
+    "result": "All9 final PNGs inspected: structured settings and normalized preview at900x600/1360x900,dark/light,1x/1.5x plus actual hidden native Windows edited/apply/idle screenshot. Fixed action toolbar remains visible while fields scroll; Settings/Traffic/Charts navigation and active view highlight verified. Accessibility checks enabled.",
+    "metrics": "Final settings80 frames/1s,max40.678ms,28256 packets advancing; direct charts80frames,max24.7432ms,21984packets. Retained incoming42frames/max64.6966ms/21536packets and shell72frames/max46.9052ms/13760packets. Existing>20frame/200ms thresholds unchanged; no broad soak/performance gate.",
+    "artifacts": [
+      {
+        "path": "target/exm029-visual/preview-1360x900-1-dark.png",
+        "sha256": "ed803446dc7f3169d05ad97834ffcd2861c7db1ddae51a593e3a92a7ae1a9ac4"
+      },
+      {
+        "path": "target/exm029-visual/preview-1360x900-1.5-light.png",
+        "sha256": "fde725e7b6cd442e15e519b9e92a2c5d17649108ae644768d10bf04035e3c5b0"
+      },
+      {
+        "path": "target/exm029-visual/preview-900x600-1-dark.png",
+        "sha256": "ac44bbc1fb37fd0157688c2e2777eea1472c535d4d5ebad093c95e459a576cac"
+      },
+      {
+        "path": "target/exm029-visual/preview-900x600-1.5-light.png",
+        "sha256": "a901b69071668b0713cd3a2e5e5ff99ed628aadec65df76b511943e778592232"
+      },
+      {
+        "path": "target/exm029-visual/settings-1360x900-1-dark.png",
+        "sha256": "cc4580121ada8e02e132b2a2c84b19cc167940283543c02b7b35b09bb21eccff"
+      },
+      {
+        "path": "target/exm029-visual/settings-1360x900-1.5-light.png",
+        "sha256": "c434608b922107de92e0e5d11cd5d2afe4eec8ff9e9684bd7a4e07ba5f52dbd8"
+      },
+      {
+        "path": "target/exm029-visual/settings-900x600-1-dark.png",
+        "sha256": "c3f35d00c2681d76dbd56a6f61fa8dede7a64bfdb8ed5e48204e92928b72c8d3"
+      },
+      {
+        "path": "target/exm029-visual/settings-900x600-1.5-light.png",
+        "sha256": "6e3b78b15fbc26c5b88a3af5278941a49e78fa00d9cf98274b0250bd73d3cd1a"
+      },
+      {
+        "path": "target/exm029-native.png",
+        "sha256": "ea8afdfbd07b980df72e662eddb586d92f4e2088e17bb56a1da5dff4ea51e753"
+      }
+    ]
+  },
+  "source_hashes": [
+    {
+      "path": "Cargo.lock",
+      "sha256": "9d3ebf83f6687eacbf292fd1999e3cb8bba7e3be2d26a6a5dec0a53b66c7be95"
+    },
+    {
+      "path": "crates/app/Cargo.toml",
+      "sha256": "39a36ac4307566ea593e8af088f530f956ade38711cb2b784bb2f83d2e76547a"
+    },
+    {
+      "path": "crates/app/src/incoming.rs",
+      "sha256": "da0608fcdf682d5309beade2cbf0949aacaeeed002cd6f9d28037c62e5118e46"
+    },
+    {
+      "path": "crates/app/src/lib.rs",
+      "sha256": "2937d2181430c9ccc10f80da9fc2ab55f0d7c32c06e29f3b11134251c28bd185"
+    },
+    {
+      "path": "crates/app/src/settings.rs",
+      "sha256": "c38606268e590ac2a2e0788b15ed84abef19062a10494af2252471c7149f7035"
+    },
+    {
+      "path": "crates/app/src/shell.rs",
+      "sha256": "5d9ee9eb0ae9e82ab2175d960e08ca93dc5465d4c914c5c74d490c168f8a1220"
+    },
+    {
+      "path": "crates/app/tests/hid_worker.rs",
+      "sha256": "a3f0d7c77316800b0f0fc395eb39711ced79d113c5a5a89840800071632ad12d"
+    },
+    {
+      "path": "crates/app/tests/settings.rs",
+      "sha256": "01a4fbe841750db90914749ddf24245c79cecabe83b61111148afd3d68578fa6"
+    },
+    {
+      "path": "crates/app/tests/shell.rs",
+      "sha256": "71fc0b97ed5ab5b20ac0f83c91dfaa93dc4ef4ff352c4959cec74fe66e010038"
+    },
+    {
+      "path": "crates/gui/examples/native_settings_smoke.rs",
+      "sha256": "2eb221b3ff41bb0cca463b942f906f9cebac4b600767b64244bbc15be8d7af60"
+    },
+    {
+      "path": "crates/gui/src/lib.rs",
+      "sha256": "c6c8a068aac59f90c1bfd13e782deac499710fc63f644d77c44896a2ce01461d"
+    },
+    {
+      "path": "crates/gui/src/settings.rs",
+      "sha256": "4c7c9163394093849186f365880c7b8f036b78de0ff50249160d52bd7696f4a8"
+    },
+    {
+      "path": "crates/gui/src/shell.rs",
+      "sha256": "49202620290283763f7598a595d79c67d750495aa7488ba3d6872c33b44a8524"
+    },
+    {
+      "path": "crates/gui/tests/settings.rs",
+      "sha256": "1f32a4cd4002e8ae05420360eb27bdb2ee8a377ace24f5e6f226e21fb0f103d7"
+    },
+    {
+      "path": "crates/storage/src/lib.rs",
+      "sha256": "fba88baa2e061b0bfa9af1411c2d14d11176cbb6fc45daa018e5be46efbffcc9"
+    },
+    {
+      "path": "crates/storage/src/settings_files.rs",
+      "sha256": "9d32c2e535f18ea7b4dc49818dc5af0f87c36e9bb0cc7409a56873e8994af7e7"
+    },
+    {
+      "path": "crates/storage/tests/settings_files.rs",
+      "sha256": "b2cba57a15ba577497f0c8df928224c6ffd7f7b2834fa7793c1b29917d37428c"
+    },
+    {
+      "path": "docs/desktop-shell.md",
+      "sha256": "eb8f8af745cb492f1d8dbf52f9c6d5902cea33047b875e9dbeb11e359b5e1796"
+    },
+    {
+      "path": "docs/incoming-traffic.md",
+      "sha256": "45e101fc6464ca2662caf5a7704905b317203242e4bb40c886d0eb830099b5f5"
+    },
+    {
+      "path": "docs/settings.md",
+      "sha256": "dd78eaca515b8534e7f1a2285dece61aad037bd5e6bc9f359b10fe3ae304a35c"
+    }
+  ],
+  "hash_basis": "SHA256 checkout bytes; candidate tree is Git-normalized20 staged product/test/doc paths before four closure/amendment records. Detailed UTF16LE PowerShell logs counted with BOM-aware decoding. Ignored bounded target cache retains logs/PNGs; generated outputs are not committed.",
+  "observed_failure": {
+    "classification": "Old selected HID regression fixture fabricated closed state on optional snapshot contention; cause corrected, not an unchanged retry or masked failure",
+    "log": "target/exm029-app-observed-hid-race.log",
+    "sha256": "9cf983c3088a82d6edf50f32805d8b4227287ee3f5e1e0bc12f70e41be3bc67e",
+    "production_hid_blob": "b346f53f6f619f16c3dad21d32ff05318c482d09",
+    "resolution": "Only test snapshot helper now waits <=2s for Some(actual state); all existing identities/epoch/permission/write-count assertions/deadlines retained. Open/send operations remain single requests, no automatic command retry and production HID module unchanged. Original Busy reopen failure preserved. Final complete selected app suite passes with corrected observation contract; dedicated scope amendment above."
+  },
+  "corrections": [
+    "Lowercase rx fixture did not match existing serialized Rx enum; corrected fixture, no schema weakening. Initial framing-variant test caught errors instead of asserting them; replaced by strict every-variant acceptance before qualification.",
+    "GUI field edit was correctly staged, but scrolling moved Validate offscreen and click did not reach it. Diagnostic assertions reproduced actual state; product now keeps Validate/Apply/Cancel/Preview in fixed toolbar. No relaxed test timeout, ignored failure or accessibility suppression.",
+    "Review strengthened full-queue/rejected-input blocking, independent edit order, bounded error/cache state, failed public builder and malformed structural-action guards, exact local binding/baud/framing paths and clock exhaustion. Exhaustion unit reproduced the missing invalidate guard and now passes with both entrypoints fail-closed.",
+    "Runtime safety has an explicit separately validated file envelope and GUI import/export roundtrip plus future version/type/unknown enabled/oversize negative tests; no silent session-only export limitation. Navigation and pending/applied notice state corrected and directly retested.",
+    "Clippy ASCII/if formatting warnings and missed fallible-builder fixture conversion corrected without lint suppression. Existing HID default-snapshot race was observed during additional verification, recorded and corrected only in the fixture per amendment."
+  ],
+  "review": "Author inspected all20-path diff and9 actual images: bounded producer/consumer call graph and input/file/schema error paths, source/profile filter consistency, shared preview/activation, compiler/request fences, actual TX/capture stop/generation and off-GUI retirement, schema separation and byte/privacy handling, root/index malformed shapes, invalid-field bounds and counter overflow, GUI buffer/pending state and navigation, and unchanged HID production blob with stricter test observer. This is author review, not independent Epic Level0.",
+  "limitations": [
+    "Windows virtual prototype only. Physical device/driver/electrical/timing/on-wire036, macOS/platform035 and packaged/install/release037 remain unpassed. No physical device open, driver/setup/signing or credentials inferred.",
+    "Bindings/serial/USB/CAN parameters are validated data; synthetic source selector stays explicit and physical integration remains later stand work. No selected processing profile supplies no implicit stream framing; missing preview context is explicit. Snapshot64 cap qualifies current synthetic backend only.",
+    "Runtime templates/charts/disabled schedules in project files remain passive records; imported permission or captured data never grants send/Enable authority. Historical outgoing drafts stay disconnected after Apply. No default payload/schedule persistence, canonical full-project gate, independent Epic review or Epic closure.",
+    "Local filesystem latency and externally retained/native/renderer memory are separate from finite app input/output limits; no hard realtime/total RSS/sandbox guarantee. Manual FDTasks5.7 retains native_activation=false and allocator actual qualification."
+  ],
+  "owner_exception": "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+  "checkpoint": {
+    "goal": "ACTIVE; this turn PROGRESS, no global blocker/completion",
+    "task": "EXM-029 verified Done upon successful publication",
+    "next": "Fresh goal turn fetch/reconcile029 closure/allocator and current rules. Read030 Tasks/items/web/EXM-030-build-protocol-tree-and-packet-inspection-tools/TASK.md/all events/evidence; verify009/018/026 Done and current owner. Claim030 if ready/unowned. Implement supported network protocol layer tree with HEX-range linking, search/copy/selection export/display filters, imported/live shared model and unsupported raw preservation. This is packet inspection, not session persistence; no030 claim or implementation this turn.",
+    "publication": "Immediately commit/pushmain coherent20 product paths plus verification-boundary amendment/evidence/Done/single first029 request; verify remote identity before another task/commit. Preserve .idea/unrelated work. Allocator alone assigns versions. No subagents."
+  }
+}

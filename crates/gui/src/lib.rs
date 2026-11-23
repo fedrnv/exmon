@@ -4,6 +4,7 @@ pub mod hid;
 pub mod incoming;
 mod network_filters;
 pub mod outgoing;
+pub mod settings;
 pub mod shell;
 pub use eframe::egui;
 pub use shell::Shell;

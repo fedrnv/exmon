@@ -72,3 +72,35 @@ fn preferences_are_loaded_and_saved_on_distinct_worker_without_capture_state() {
     drop(restored);
     std::fs::remove_file(path).unwrap();
 }
+#[test]
+fn portable_safety_limits_reach_actual_capture_and_invalidation_fences_old_batches() {
+    use exmon_app::network_filters::NetworkFilter;
+    use exmon_app::settings::Safety;
+    let mut w = CaptureWorker::spawn().unwrap();
+    let limits = Safety {
+        queue_items: 4,
+        queue_bytes: 32,
+        batch_items: 2,
+        batch_bytes: 8,
+        snapshot_bytes: 4,
+    };
+    w.start_bounded(TransportKind::Udp, 1, NetworkFilter::default(), limits)
+        .unwrap();
+    until(|| w.status().packets > 4);
+    let old = w.generation();
+    let batches = w.drain(4);
+    assert!(batches.iter().all(
+        |b| b.records.len() <= 2 && b.records.iter().all(|r| r.observation.bytes().len() == 4)
+    ));
+    let next = w.invalidate().unwrap();
+    assert!(next > old);
+    assert!(!w.status().requested);
+    let mut invalid = limits;
+    invalid.snapshot_bytes = 65;
+    assert!(
+        w.start_bounded(TransportKind::Udp, 1, NetworkFilter::default(), invalid)
+            .is_err()
+    );
+    assert_eq!(w.generation(), next);
+    assert!(!w.status().requested);
+}

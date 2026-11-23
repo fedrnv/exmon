@@ -73,7 +73,17 @@ fn setup() -> (HidWorker, Arc<Mutex<Audit>>) {
     (HidWorker::spawn(move || Fixture(source)).unwrap(), a)
 }
 fn snapshot(w: &HidWorker) -> Snapshot {
-    w.snapshot().unwrap_or_default()
+    let deadline = Instant::now() + Duration::from_secs(2);
+    loop {
+        if let Some(state) = w.snapshot() {
+            return state;
+        }
+        assert!(
+            Instant::now() < deadline,
+            "HID snapshot unavailable within observation deadline"
+        );
+        std::thread::sleep(Duration::from_millis(1));
+    }
 }
 #[test]
 fn exact_selected_worker_reports_and_stale_generations_never_fall_back() {

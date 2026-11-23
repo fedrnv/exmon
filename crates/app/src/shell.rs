@@ -1,10 +1,7 @@
 //! Nonblocking desktop controllers. Capture and filesystem work stay in workers.
 use crate::network_filters::{FilterPlan, NetworkFilter};
 pub use exmon_capture::adapter::Captured;
-use exmon_capture::{
-    adapter::{Limits, Session},
-    synthetic::Synthetic,
-};
+use exmon_capture::{adapter::Session, synthetic::Synthetic};
 use exmon_domain::{metrics::Counter, observation::TransportKind};
 pub use exmon_storage::layout::{Layout, LayoutError, Theme};
 use std::{
@@ -74,6 +71,7 @@ struct Start {
     interface: u64,
     generation: u64,
     filter: FilterPlan,
+    safety: crate::settings::Safety,
 }
 pub struct Batch {
     pub generation: u64,
@@ -132,17 +130,9 @@ impl CaptureWorker {
                         use exmon_capture::adapter::Adapter;
                         let result = (|| {
                             adapter.enumerate(2)?;
-                            let mut capture = Session::new(
-                                adapter,
-                                Limits {
-                                    queue_items: 64,
-                                    queue_bytes: 4096,
-                                    batch_items: 32,
-                                    batch_bytes: 2048,
-                                },
-                            )?;
+                            let mut capture = Session::new(adapter, start.safety.limits())?;
                             capture.open(start.interface)?;
-                            capture.configure(64)?;
+                            capture.configure(start.safety.snapshot_bytes)?;
                             capture.start()?;
                             Ok::<_, exmon_capture::adapter::Error>(capture)
                         })();
@@ -238,8 +228,23 @@ impl CaptureWorker {
         &self,
         kind: TransportKind,
         interface: u64,
-        mut settings: NetworkFilter,
+        settings: NetworkFilter,
     ) -> Result<(), ShellError> {
+        self.start_bounded(
+            kind,
+            interface,
+            settings,
+            crate::settings::Safety::default(),
+        )
+    }
+    pub fn start_bounded(
+        &self,
+        kind: TransportKind,
+        interface: u64,
+        mut settings: NetworkFilter,
+        safety: crate::settings::Safety,
+    ) -> Result<(), ShellError> {
+        safety.validate().map_err(|_| ShellError::Invalid)?;
         if !(1..=2).contains(&interface) {
             return Err(ShellError::Invalid);
         }
@@ -274,6 +279,7 @@ impl CaptureWorker {
                 interface,
                 generation,
                 filter: filter.clone(),
+                safety,
             })
             .is_err()
         {
@@ -287,6 +293,15 @@ impl CaptureWorker {
             thread.thread().unpark();
         }
         Ok(())
+    }
+    pub fn invalidate(&self) -> Result<u64, ShellError> {
+        self.stop();
+        self.control
+            .generation
+            .fetch_update(Ordering::AcqRel, Ordering::Acquire, |n| n.checked_add(1))
+            .ok()
+            .and_then(|n| n.checked_add(1))
+            .ok_or(ShellError::Unavailable)
     }
     pub fn stop(&self) {
         self.control.desired.store(false, Ordering::Release);

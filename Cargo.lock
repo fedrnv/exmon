@@ -1037,6 +1037,8 @@ dependencies = [
  "exmon-protocol",
  "exmon-storage",
  "pcap",
+ "serde",
+ "serde_json",
  "tracing",
  "tracing-subscriber",
 ]

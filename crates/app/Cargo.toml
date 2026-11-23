@@ -12,6 +12,8 @@ exmon-domain.workspace = true
 exmon-capture.workspace = true
 exmon-protocol.workspace = true
 exmon-storage.workspace = true
+serde.workspace = true
+serde_json.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
 pcap = { version = "2.5", optional = true }
