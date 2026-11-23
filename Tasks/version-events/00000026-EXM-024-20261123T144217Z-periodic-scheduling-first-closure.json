@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 26,
+  "version": "0.1.0.26",
+  "request_id": "EXM-024-20261123T144217Z-periodic-scheduling-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-024",
+  "summary": "Explicit bounded periodic transmission with deadline policy, immediate cancellation and measured timing",
+  "verification": [
+    "Tasks/items/server/EXM-024-implement-periodic-transmission-schedules/evidence/20261123T144217Z-scheduling-verification.json"
+  ],
+  "request_file": "Tasks/version-requests/20261123-EXM-024-periodic-scheduling.json",
+  "request_sha256": "b6b82c12063a35d2aa4b852ec106c7ee7f81fafdf559e111a555c5cc60ec2913"
+}
