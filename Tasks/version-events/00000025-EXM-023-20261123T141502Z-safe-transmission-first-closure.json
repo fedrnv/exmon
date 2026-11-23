@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 25,
+  "version": "0.1.0.25",
+  "request_id": "EXM-023-20261123T141502Z-safe-transmission-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-023",
+  "summary": "Explicit validated one-shot transport worker with typed bridges, framing and truthful bounded session outcomes",
+  "verification": [
+    "Tasks/items/server/EXM-023-implement-safe-transmission-commands/evidence/20261123T141502Z-transmission-verification.json"
+  ],
+  "request_file": "Tasks/version-requests/20261123-EXM-023-safe-transmission.json",
+  "request_sha256": "79505121681ad26f2fa5aa69b2b7929aaf6975a566b6a37d31acaa138191ba35"
+}
