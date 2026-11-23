@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 23,
+  "version": "0.1.0.23",
+  "request_id": "EXM-022-20261123T131738Z-codec-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-022",
+  "summary": "Exact preserved message drafts with atomic field and HEX edits, dependent checksums and pre-transmission validity",
+  "verification": [
+    "Tasks/items/server/EXM-022-implement-message-decoding-and-encoding/evidence/20261123T131738Z-codec-verification.json"
+  ],
+  "request_file": "Tasks/version-requests/20261123-EXM-022-codec.json",
+  "request_sha256": "4601461749c9c1e492232d6634babf9b03f4ce820990abaa49c0d58b8959ceeb"
+}
