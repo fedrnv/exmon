@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 22,
+  "version": "0.1.0.22",
+  "request_id": "EXM-021-20261123T130123Z-fields-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-021",
+  "summary": "Validated exact binary field definitions and codec with bounded checked derived values",
+  "verification": [
+    "Tasks/items/server/EXM-021-implement-binary-field-definitions/evidence/20261123T130123Z-fields-verification.json"
+  ],
+  "request_file": "Tasks/version-requests/20261123-EXM-021-fields.json",
+  "request_sha256": "41325481333ab071c09bfa811ae69f0db93519ddbc60d6b93e8bed894b0b295d"
+}
