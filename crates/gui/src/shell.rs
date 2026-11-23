@@ -1,9 +1,9 @@
 use eframe::egui::{self, Color32, RichText};
 use exmon_app::shell::{
-    CaptureStatus, CaptureWorker, Captured, Layout, PreferencesWorker, ShellError, Theme,
+    CaptureStatus, CaptureWorker, Layout, PreferencesWorker, ShellError, Theme,
 };
 use exmon_domain::observation::TransportKind;
-use std::{collections::VecDeque, path::PathBuf, time::Duration};
+use std::{path::PathBuf, time::Duration};
 pub const TRANSPORTS: [(TransportKind, &str); 6] = [
     (TransportKind::Ethernet, "Ethernet"),
     (TransportKind::Tcp, "TCP"),
@@ -21,11 +21,10 @@ pub struct Shell {
     pub layout: Layout,
     selected: usize,
     interface: u64,
-    history: VecDeque<Captured>,
+    pub incoming: crate::incoming::Incoming,
     notice: Option<&'static str>,
     loaded: bool,
     dirty: bool,
-    evicted: u64,
     layout_generation: u64,
 }
 impl Shell {
@@ -45,11 +44,10 @@ impl Shell {
             layout: Layout::default(),
             selected: 0,
             interface: 1,
-            history: VecDeque::new(),
+            incoming: crate::incoming::Incoming::new().map_err(|_| ShellError::Unavailable)?,
             notice: None,
             loaded: false,
             dirty: false,
-            evicted: 0,
             layout_generation: 0,
         })
     }
@@ -57,7 +55,7 @@ impl Shell {
         self.capture.status()
     }
     pub fn retained(&self) -> usize {
-        self.history.len()
+        self.incoming.view.rows.len()
     }
     pub fn transport(&self) -> TransportKind {
         TRANSPORTS[self.selected].0
@@ -75,8 +73,7 @@ impl Shell {
         };
         self.capture
             .start_filtered(self.transport(), self.interface, settings)?;
-        self.history.clear();
-        self.evicted = 0;
+        self.incoming.begin(self.capture.generation());
         self.notice = None;
         Ok(())
     }
@@ -111,14 +108,9 @@ impl Shell {
             if !status.requested || batch.generation != self.capture.generation() {
                 continue;
             }
-            for record in batch.records {
-                if self.history.len() == 1024 {
-                    self.history.pop_front();
-                    self.evicted = self.evicted.saturating_add(1);
-                }
-                self.history.push_back(record);
-            }
+            let _ = self.incoming.worker.submit(batch);
         }
+        self.incoming.poll();
         let before = self.layout;
         let size = ctx.input(|i| {
             i.viewport()
@@ -220,8 +212,7 @@ impl Shell {
                             self.stop_capture();
                         }
                         if ui.button("Clear view").clicked() {
-                            self.history.clear();
-                            self.evicted = 0;
+                            self.incoming.view.clear();
                         }
                     });
                     let kind = self.transport();
@@ -236,8 +227,7 @@ impl Shell {
                 ui.add_space(6.);
             });
         if selection_before != (self.selected, self.interface) {
-            self.history.clear();
-            self.evicted = 0;
+            self.incoming.view.clear();
         }
         if self.hid_view {
             self.hid.show(ui, &mut self.layout);
@@ -257,7 +247,7 @@ impl Shell {
                             status.backend_loss, status.application_drops
                         ));
                         ui.separator();
-                        ui.label(format!("History evictions: {}", self.evicted));
+                        ui.label(format!("History evictions: {}", self.incoming.view.evicted));
                         ui.label(format!("Filtered out: {}", status.filtered_out));
                     });
                     if status.failed {
@@ -279,72 +269,14 @@ impl Shell {
                 .default_size(width * self.layout.split)
                 .size_range(width * 0.25..=width * 0.75)
                 .show(ui, |ui| {
-                    ui.heading("Incoming");
-                    ui.label(
-                        RichText::new(format!(
-                            "{} / Mock {:02}",
-                            TRANSPORTS[self.selected].1, self.interface
-                        ))
-                        .weak(),
-                    );
-                    ui.separator();
-                    if self.history.is_empty() {
-                        ui.add_space(40.);
-                        ui.label("No incoming observations");
-                        ui.label(
-                            RichText::new("Start a mock interface to inspect traffic.").weak(),
-                        );
-                    } else {
-                        ui.label(
-                            RichText::new("SEQ        DIRECTION     BYTES (HEX)")
-                                .monospace()
-                                .weak(),
-                        );
-                        egui::ScrollArea::vertical()
-                            .id_salt("raw-observations")
-                            .auto_shrink([false, false])
-                            .stick_to_bottom(true)
-                            .show_rows(ui, 22., self.history.len(), |ui, rows| {
-                                for index in rows {
-                                    if let Some(record) = self.history.get(index) {
-                                        let bytes = record.observation.bytes();
-                                        let hex = bytes
-                                            .iter()
-                                            .take(12)
-                                            .map(|b| format!("{b:02X}"))
-                                            .collect::<Vec<_>>()
-                                            .join(" ");
-                                        ui.label(
-                                            RichText::new(format!(
-                                                "{:08}   RX   {}{}",
-                                                record.sequence,
-                                                hex,
-                                                if bytes.len() > 12 { " ..." } else { "" }
-                                            ))
-                                            .monospace(),
-                                        );
-                                    }
-                                }
-                            });
-                    }
+                    self.incoming.show(ui);
                     ui.take_available_space();
                 });
             if width > 0. {
                 self.layout.split = (left.response.rect.width() / width).clamp(0.25, 0.75);
             }
             egui::CentralPanel::default().show(ui, |ui| {
-                ui.heading("Outgoing");
-                ui.label(RichText::new("Transmission disabled").weak());
-                ui.separator();
-                ui.add_space(40.);
-                ui.label("No outgoing messages");
-                ui.label("Message templates and send controls will appear here when configured.");
-                ui.add_space(12.);
-                ui.label(
-                    RichText::new("Starting capture never sends data.")
-                        .small()
-                        .weak(),
-                );
+                self.incoming.outgoing(ui);
             });
         }
         self.dirty |= before != self.layout;

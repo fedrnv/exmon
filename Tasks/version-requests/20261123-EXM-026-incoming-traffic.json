@@ -1,0 +1,11 @@
+{
+    "type":  "task_closed",
+    "schema":  "fdtasks-version-request/v1",
+    "request_id":  "EXM-026-20261123T150841Z-incoming-traffic-first-closure",
+    "epic_id":  "EXM-EPIC-001",
+    "work_item_id":  "EXM-026",
+    "summary":  "Worker-prepared raw and per-type incoming inspection with stable selected context, pause and inert outgoing format copy",
+    "verification":  [
+                         "Tasks/items/web/EXM-026-build-incoming-message-tabs-and-raw-traffic-view/evidence/20261123T150841Z-incoming-verification.json"
+                     ]
+}

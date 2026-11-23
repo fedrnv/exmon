@@ -15,9 +15,11 @@ does not open physical interfaces, send data or arm schedules. Network-labelled 
 observations contain byte patterns, not qualified Ethernet/IP protocol fixtures.
 
 Incoming is on the left and Outgoing on the right, separated by a draggable
-vertical edge. Incoming retains the latest 1024 observations and renders only
-visible rows. Clear view affects display history. Outgoing is a disabled empty
-state until the independently accepted template/transmission tasks are integrated.
+vertical edge. [Incoming inspection](incoming-traffic.md) provides raw/type tabs,
+worker-decoded fields, stable instance selection, naming and display pause. It
+retains at most1024 combined raw/message rows and renders visible rows only.
+Clear view affects display history. Copying a received format creates an inert
+outgoing draft; editing/transmission controls remain separate work.
 Theme can be changed during capture. Source loss, application queue drops,
 display decimation and history evictions remain separate indicators.
 
@@ -37,8 +39,9 @@ channels: four start commands, eight batches of at most 32 observations, each
 with at most 64 bytes. The common Session queue is bounded to 64 items/4096 bytes.
 Stop/shutdown use atomics plus worker wake-up, so a full result queue cannot
 delay them. A generation tags every run; stale result batches are discarded.
-The view drains at most four batches per frame and retains at most 1024 records.
-Only visible rows format up to twelve payload bytes. There is no unbounded
+The view submits at most four capture batches per frame to the separate incoming
+processor, then drains at most four prepared batches. Only visible HEX/ASCII rows
+format up to sixteen payload bytes each. There is no unbounded
 drain, append-only display history or GUI-thread capture/decoding/storage I/O.
 
 When the display channel is full, capture counts continue and the skipped

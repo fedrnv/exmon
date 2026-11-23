@@ -1,0 +1,230 @@
+{
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "unique_selected_tests":  76,
+    "contracts":  {
+                      "boundaries":  "GUI owns no transport or codec and performs no capture/classification/decoding/storage/scheduling. Worker validates/compiles project definitions, source context and explicit stream rule, prepares typed fields/endpoints, retains raw captures separately from normalized messages. Native chunks are never silently treated as complete TCP/serial messages. Source spans, generation/interface/epoch/sequence and unknown qualities preserved.",
+                      "actions":  "Explicit names validate and update in-memory configuration/classifier revision only; no names/raw data/capture/TX/schedule authority saved in layout. Copy normalized format is immutable Row/Protocol/bytes/provenance only, no ticket/port/target/permission/schedule. Outgoing draft preview is not a send; full editing/send/schedules027. Pause drains presentation without capture stop or queued replay; selected immutable context remains pinned across new data and naming.",
+                      "metrics":  "Capture backend loss/application drops/capture decimation remain unchanged. Processor input-drop counts, prepared processing/output skips, automatic-group overflow, retention eviction and pause skips remain separate. Group counts/rates describe processed normalized messages after admission, not inferred wire delivery or throughput. Counters saturate; rate uses worker Instant elapsed time.",
+                      "resources":  "Input8 batches x\u003c=32 observations/\u003c=65536 total payload. Per observation\u003c=64 normalized outputs; output\u003c=96 rows/1MiB x8 batches, explicit skipped counters. View\u003c=1024 combined rows/8MiB charged plus at most one admitted1MiB selection pin and one admitted draft. Config admission\u003c=1MiB serialized JSON;\u003c=256 configured groups+64 automatic groups. Source framer limits bound temporary event/pending work separately; caller snapshots/native/renderer budgets separate, no total RSS/sandbox guarantee."
+                  },
+    "hash_basis":  "SHA256 of verified checkout bytes. Git-normalized candidate_tree is staged product before closure records; detailed logs and actual inspected PNGs retained only in bounded ignored local cache.",
+    "limitations":  [
+                        "Windows virtual prototype only. Physical adapter/device/driver/electrical timing and on-wire delivery036, native platform/macOS matrix035, packaged/install/release037 remain separate. No physical or packaged pass inferred.",
+                        "Prototype source definitions explicitly synthetic and fixed32 stream policy. Worker::configured accepts validated project+explicit stream framing; configuration UI/full import/session recording/chart controls remain their accepted tasks. Missing framing/config initialization fails explicitly; no partial classification claims from missing definitions.",
+                        "Names are in-memory project edits; no implicit project save. Raw unsupported Ethernet endpoint metadata is labelled unavailable rather than guessed. Historical selected instances retain original revisions; normalized source spans identify earlier captures, whose raw bytes can be evicted by documented retention.",
+                        "Output/frame/group caps deliberately decimate inspection; captured backend counters continue independently. Pinned/draft copies have separate bounded admission. Group average rates are not hard real-time or physical delivery proof. Trusted compiled code/native libraries are not sandboxed.",
+                        "No broad soak/performance/security gate, independent Epic review, Epic closure, release/signing/install or automatic build claimed. Manual FDTasks5.7 adoption does not upgrade native_activation=false or legacy allocator qualification."
+                    ],
+    "verification":  [
+                         {
+                             "command":  "cargo test -p exmon-app --test incoming --test shell --test network_filters --test hid_worker --locked",
+                             "result":  "18 PASS:9 incoming,2 shell,5 network-filter,2 HID-worker boundary tests",
+                             "log":  "target/exm026-app-final.log",
+                             "exit":  0
+                         },
+                         {
+                             "command":  "cargo test -p exmon-gui --locked -- --nocapture",
+                             "result":  "9 PASS initially:2 incoming,2 HID,3 network-filter,2 shell; all unchanged7 non-incoming GUI passes retained after final unavailable-definition guard fix",
+                             "log":  "target/exm026-gui-all-final.log",
+                             "exit":  0
+                         },
+                         {
+                             "command":  "cargo test -p exmon-gui --test incoming --locked -- --nocapture",
+                             "result":  "Final3 PASS including added invalid-definition generation failure case;10 unique GUI cases overall. Actual incoming UI77 frames/1s after warmup, max43.4176ms,21632 capture packets,26112 history evictions,4352 pause skips; \u003e20 frames/200ms ceiling preserved",
+                             "log":  "target/exm026-incoming-final.log",
+                             "exit":  0
+                         },
+                         {
+                             "command":  "cargo test -p exmon-capture --locked",
+                             "result":  "48 implemented transport regressions PASS",
+                             "log":  "target/exm026-transports-final.log",
+                             "exit":  0
+                         },
+                         {
+                             "command":  "cargo fmt --all --check",
+                             "result":  "Complete workspace PASS",
+                             "exit":  0
+                         },
+                         {
+                             "command":  "cargo clippy --workspace --all-targets --locked -- -D warnings",
+                             "result":  "Complete workspace PASS",
+                             "log":  "target/exm026-clippy-final.log",
+                             "exit":  0
+                         },
+                         {
+                             "command":  "cargo run -p exmon-gui --example native_incoming_smoke --locked",
+                             "result":  "Actual hidden Windows eframe/wgpu decoded synthetic view and inert outgoing copy screenshot PASS; bounded8s deadline, off-thread PNG write, clean close",
+                             "log":  "target/exm026-native-final.log",
+                             "exit":  0
+                         },
+                         {
+                             "command":  "node scripts/check-architecture.mjs",
+                             "result":  "Six layers/resolved graph/three negative fixtures PASS",
+                             "log":  "target/exm026-architecture.log",
+                             "exit":  0
+                         },
+                         {
+                             "command":  "git diff --check; git diff --cached --check",
+                             "result":  "PASS",
+                             "exit":  0
+                         }
+                     ],
+    "acceptance":  {
+                       "AC-02":  "Capture and processing distinct background workers; source ownership test and sustained production UI counts advance during pause/backpressure. Bounded input/output/history/group caps/overflow tested, including65KiB native records and queues. Incoming UI77 frames/one second, max43.4176ms vs200ms limit after warmup; actual capture21632 packets, view retained\u003c=1024 and selected context unchanged through eviction/pause. Existing shell101 frames/max18.5846ms also PASS. Actual final visual matrix inspected900x600/1360x900 dark/light1x/1.5x, scroll-accessible narrow fields; final native screenshot inspected. Physical/native stand/macOS/packaged qualification remains later.",
+                       "AC-01":  "Raw observations and normalized type instances use stable generation/row/group keys. Real worker framer/classifier/codec prepares timestamp/direction/endpoints/protocol/length/field validity and preserves raw/sources. GUI tabs select explicit immutable instances;9 app and3 incoming GUI tests prove counters/rates, configured+automatic rename, old snapshot immutability, source-generation exclusion, count+byte eviction with pinned selection, pause/resume, row clicks, exact copied bytes/definitions/provenance without target/TX authority. Incomplete/unknown data and invalid numeric fields remain visible without false zero/completeness."
+                   },
+    "owner_exception":  "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+    "verified_at":  "2026-11-23T15:08:41Z",
+    "owner":  "Codex exmon incoming traffic",
+    "review":  "Author inspected all10 product paths and exact actual tests/PNGs: off-GUI call graph, bounded two-worker/channel handoff, validated immutable schema/codec snapshots and renamed config revisions, raw/framed quality/provenance and sequence0/gap handling, prepared rows/count-byte charging, configured/automatic group caps and immutable selection, pause/source-generation rejection, failure-state publication across generation change, inert copy with no transmission path, old shell/filter/HID behavior and layer graph. Author review is not independent Epic Level0. No new dependency, transport/protocol/schema/CI/allocator or accepted-history change.",
+    "checkpoint":  {
+                       "authority":  "Owner authorizes safe Windows tools/virtual work across Epics; physical/macOS stands deferred035/036. Main only, no force push, preserve unrelated changes, no subagents this task.",
+                       "next":  "Fresh turn fetch/reconcile026 closure/allocator and current rules. Read exact027 outgoing-tabs/editor TASK/all events/evidence and published022/023/024/025 Done prerequisites. Claim027 if ready/unowned, implement manual/received-copy templates with raw/structured validation, explicit one-shot and disabled-by-default schedule controls/end-to-end mock tests. Reuse incoming Draft row bytes/protocol/provenance without treating it as target/permission; historical source/body/framing headers may require explicit revalidation. No027 claim/implementation in026 turn.",
+                       "task":  "EXM-026 verified Done upon successful publication",
+                       "goal":  "ACTIVE; this turn PROGRESS, no global blocker/completion",
+                       "publication":  "Immediately push coherent product+new evidence/Done+single first026 request to main and verify remote identity. Reconcile uncertain/rejected push before another commit/task; allocator alone writes versions at actual qualified boundary."
+                   },
+    "cleanup":  "Only10 declared product paths plus new026 evidence/Done/first request. Accepted TASK/events/evidence/ADRs/Cargo.lock/fixture corpus/CI/allocator and unrelated .idea preserved. No generated image/log/build output, capture/device serial, secret or user data staged. All local tests/smokes and their worker/socket handles terminal/closed; bounded ignored logs/PNGs/native layout/test caches retained, no helper service or new worktree.",
+    "candidate_tree":  "7c37f2c6793cbeb719b806582b23b5813ac16523",
+    "visuals":  [
+                    {
+                        "path":  "target/exm026-visual/incoming-900x600-1-dark.png",
+                        "sha256":  "46197c40e87beb9290a9f2a06795924c23a4feb92286010253244e58a3e85e89",
+                        "inspection":  "Author opened actual final PNG with view_image. Stable tabs/table/selected detail, readable themes/DPI, adaptive HEX/ASCII, parsed fields and separately displayed counts. Narrow detail uses normal scroll; wide/native show metadata/fields. Native also shows inert copied format. Synthetic data only; no physical/platform/packaged claim.",
+                        "bytes":  153201
+                    },
+                    {
+                        "path":  "target/exm026-visual/incoming-1360x900-1-dark.png",
+                        "sha256":  "54d80cfa7f2243602aabdc395428e033e07db90b4120423e5c8c7054d2230fd7",
+                        "inspection":  "Author opened actual final PNG with view_image. Stable tabs/table/selected detail, readable themes/DPI, adaptive HEX/ASCII, parsed fields and separately displayed counts. Narrow detail uses normal scroll; wide/native show metadata/fields. Native also shows inert copied format. Synthetic data only; no physical/platform/packaged claim.",
+                        "bytes":  215539
+                    },
+                    {
+                        "path":  "target/exm026-visual/incoming-900x600-1.5-light.png",
+                        "sha256":  "6ff5592ef31bd362e610193329b261f52418245de5188537c39c3809580bdf56",
+                        "inspection":  "Author opened actual final PNG with view_image. Stable tabs/table/selected detail, readable themes/DPI, adaptive HEX/ASCII, parsed fields and separately displayed counts. Narrow detail uses normal scroll; wide/native show metadata/fields. Native also shows inert copied format. Synthetic data only; no physical/platform/packaged claim.",
+                        "bytes":  282168
+                    },
+                    {
+                        "path":  "target/exm026-visual/incoming-1360x900-1.5-light.png",
+                        "sha256":  "d0b28715b715cbc639b7e2cb9b58c592fd6940356dc80c59000c2939b7c0ab64",
+                        "inspection":  "Author opened actual final PNG with view_image. Stable tabs/table/selected detail, readable themes/DPI, adaptive HEX/ASCII, parsed fields and separately displayed counts. Narrow detail uses normal scroll; wide/native show metadata/fields. Native also shows inert copied format. Synthetic data only; no physical/platform/packaged claim.",
+                        "bytes":  395139
+                    },
+                    {
+                        "path":  "target/exm026-native.png",
+                        "sha256":  "64a9e657fea713167492bbd4bec0b6c2a222d92b1ff69e0425c964e3a70f9fcc",
+                        "inspection":  "Author opened actual final PNG with view_image. Stable tabs/table/selected detail, readable themes/DPI, adaptive HEX/ASCII, parsed fields and separately displayed counts. Narrow detail uses normal scroll; wide/native show metadata/fields. Native also shows inert copied format. Synthetic data only; no physical/platform/packaged claim.",
+                        "bytes":  260240
+                    }
+                ],
+    "logs":  [
+                 {
+                     "path":  "target/exm026-app-final.log",
+                     "sha256":  "464640069c7081c3f84f3867737989c58a3b5a11c0ba0bad473c3648a9242735",
+                     "bytes":  5736
+                 },
+                 {
+                     "path":  "target/exm026-gui-all-final.log",
+                     "sha256":  "2f12a5b7645907f44014d790d1c94799f19c96619d2731be237f004d6574c3a0",
+                     "bytes":  5704
+                 },
+                 {
+                     "path":  "target/exm026-incoming-final.log",
+                     "sha256":  "9490c0fc7515669e6294bbe8cb9fa950f47daebec7fc715be11a6f3ae448f9c3",
+                     "bytes":  2074
+                 },
+                 {
+                     "path":  "target/exm026-transports-final.log",
+                     "sha256":  "75378d9455e6931ee5d8b7168cece8cfda4dd97be7e1ef4248222b61b1efb0f9",
+                     "bytes":  13408
+                 },
+                 {
+                     "path":  "target/exm026-clippy-final.log",
+                     "sha256":  "ef49e65a24c6d46f1968cb16a1cb7a66acc3b0299202828eda7ee5951aea8b2d",
+                     "bytes":  1070
+                 },
+                 {
+                     "path":  "target/exm026-native-final.log",
+                     "sha256":  "a021594de1920f2e30e2bf32f9733239ced42fcc881f090a38f5f6e31b7d616c",
+                     "bytes":  1592
+                 },
+                 {
+                     "path":  "target/exm026-architecture.log",
+                     "sha256":  "4f389e2d9cdf167261ce323cd3ff4bfc6fb9335b6d69cac66fc14320ab8eaece",
+                     "bytes":  180
+                 }
+             ],
+    "task_id":  "EXM-026",
+    "source_base":  "b972ca0e5ce815af0c2539d0af55d532132bc408",
+    "environment":  {
+                        "gui":  "Locked egui/eframe/egui_kittest0.37.0, actual Windows wgpu/headless interaction and hidden native viewport",
+                        "host":  "Windows Server2025 Datacenter x64 build26100 / x86_64-pc-windows-msvc",
+                        "node":  "24.22.1",
+                        "inputs":  "Explicit deterministic Synthetic adapters, source32/CAN8 protocol definitions, audited9 app fixtures including UDP/serial-like observations, native incomplete/invalid field cases,65536-byte record byte-budget inputs. No physical enumeration/open/output, external endpoint, credentials, signing, install/release or macOS runtime.",
+                        "cargo":  "1.98.0 (797e8a9bc 2026-08-05)",
+                        "rustc":  "1.98.0 (88d9e12ae 2026-08-18)"
+                    },
+    "corrections":  [
+                        "Initial generic channel construction needed explicit CaptureBatch/Rename element types. Python execution unavailable on this VPS; used existing Node for a bounded local text edit, no Python installation needed.",
+                        "Initial GUI rename test typed without focusing the TextEdit. Added the real focus action used by existing HID tests; actual rename and all subsequent assertions pass. No timing/behavior assertion weakened or unchanged functional failure retried.",
+                        "Visual review of900x600 found a cramped HEX header. Added adaptive8/16-byte rows, a collapsible source detail section, scrollable detail, truncated field/row labels with hover, and actual small-screen scroll-to-field interaction evidence.",
+                        "Source review changed stream last sequence sentinel to Option so valid sequence0 gaps are detected and carried unknown completeness across all fragments until a completed boundary. Tests prove no false completed message. Long byte/text field previews explicitly mark truncation and retain full data in HEX.",
+                        "Clippy required default struct initialization in a test and one collapsed conditional; corrected without allows. Final fmt/Clippy PASS.",
+                        "Final failure-path review found invalid initialization could publish failure at generation0 and be hidden after capture restart. Updated production GUI publication guard and fixed error label; dedicated real-GUI failure-generation test PASS, reran affected incoming suite/visual/native smoke. Unchanged7 GUI boundary regressions retained per impact policy.",
+                        "Normal Cargo stderr/cache-lock messages are represented by PowerShell NativeCommandError in redirected streams; actual terminal exit codes/test summaries inspected. Earlier failed diagnostics are ignored only; final evidence uses authoritative final PASS logs."
+                    ],
+    "files":  [
+                  {
+                      "path":  "crates/app/src/incoming.rs",
+                      "sha256":  "e2ec016e461fd6daebbc13b79d0bb345f9b3097f2c3592b5edcd4f29031b4963",
+                      "bytes":  28170
+                  },
+                  {
+                      "path":  "crates/app/src/lib.rs",
+                      "sha256":  "d643a1baa73f4e22726d3248893f225ad944d20e799c62baba5c91ddfd7765ba",
+                      "bytes":  917
+                  },
+                  {
+                      "path":  "crates/app/tests/incoming.rs",
+                      "sha256":  "c911e3899d95345c34c1e7d5027fe670d205a0101bf12c77249ce55fb7093fdd",
+                      "bytes":  11918
+                  },
+                  {
+                      "path":  "crates/gui/examples/native_incoming_smoke.rs",
+                      "sha256":  "b14e70568db4bedc7e2f318ccb35f842ebcb6fb3a1f4cacf2715ca89999742e4",
+                      "bytes":  4203
+                  },
+                  {
+                      "path":  "crates/gui/src/incoming.rs",
+                      "sha256":  "561e21a5d5b7c5d99e1a9fdf145fe6e1401359a9c3d952813b34860df3af1818",
+                      "bytes":  14255
+                  },
+                  {
+                      "path":  "crates/gui/src/lib.rs",
+                      "sha256":  "35149f75c422a61a1167398a7a9462dd0989cda259f370da8dd5e5fa19e7afa9",
+                      "bytes":  192
+                  },
+                  {
+                      "path":  "crates/gui/src/shell.rs",
+                      "sha256":  "8274fbd7697f603b7160209da5ef2c612870c3cbe8726cd88f25fa07c3bde60d",
+                      "bytes":  12200
+                  },
+                  {
+                      "path":  "crates/gui/tests/incoming.rs",
+                      "sha256":  "7215025c2e6715f9fc9b33ad5d73aef7d47f3cdb431396d8f96bbc3e4330159e",
+                      "bytes":  6299
+                  },
+                  {
+                      "path":  "docs/desktop-shell.md",
+                      "sha256":  "7bcb2221dbfb067520fd397b30b31d928416d59acc3aefb11340b1294ceb72a1",
+                      "bytes":  5629
+                  },
+                  {
+                      "path":  "docs/incoming-traffic.md",
+                      "sha256":  "f9cf31ded04438f01f6d7963ac6ba92908996747074e7f178c727efeb19e5314",
+                      "bytes":  5773
+                  }
+              ],
+    "task_sha256":  "07377ce586dedc7ce2232bcb0f9e3701474a81e91f29a121e1ce7675a2f30e50"
+}
