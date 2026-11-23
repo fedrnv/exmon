@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 16,
+  "version": "0.1.0.16",
+  "request_id": "EXM-010-20261123T101650Z-network-filters-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-010",
+  "summary": "Validated network filters with conservative BPF, exact postfilter and generation-safe displayed capture state",
+  "verification": [
+    "Tasks/items/server/EXM-010-implement-network-filters/evidence/20261123T101650Z-network-filters-verification.json"
+  ],
+  "request_file": "Tasks/version-requests/20261123-EXM-010-network-filters.json",
+  "request_sha256": "b6d91186f3e2229939e8dbca7eed0bfbe24217b62702c19478957906b741e908"
+}
