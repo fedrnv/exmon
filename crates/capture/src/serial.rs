@@ -78,6 +78,43 @@ pub struct Serial<S: Source> {
     clock: Option<Instant>,
     revision: u64,
 }
+impl<S: Source> crate::transmit::Port for Serial<S> {
+    fn info(&self) -> Result<crate::transmit::Info, Error> {
+        if self.clock.is_none() {
+            return Err(Error::InvalidState);
+        }
+        Ok(crate::transmit::Info {
+            identity: crate::transmit::Identity::Serial {
+                device: self.selected.ok_or(Error::InvalidState)? as u64,
+                revision: self.revision,
+            },
+            writable: Availability::Available,
+            max_bytes: MAX_PAYLOAD,
+        })
+    }
+    fn metadata(&self, packet: &crate::transmit::Packet<'_>) -> Result<Metadata, Error> {
+        self.info()?;
+        if crate::transmit::bytes(packet)?.is_empty() {
+            return Err(Error::InvalidConfig);
+        }
+        Ok(Metadata::Serial {
+            configuration_revision: self.revision,
+        })
+    }
+    fn submit(
+        &mut self,
+        packet: &crate::transmit::Packet<'_>,
+        cancel: &Cancellation,
+    ) -> Result<crate::transmit::Progress, Error> {
+        crate::transmit::allowed(&self.info()?, cancel)?;
+        self.metadata(packet)?;
+        Adapter::transmit(self, crate::transmit::bytes(packet)?)
+            .map(crate::transmit::Progress::accepted)
+    }
+    fn close(&mut self) -> Result<(), Error> {
+        Adapter::close(self)
+    }
+}
 impl<S: Source> Drop for Serial<S> {
     fn drop(&mut self) {
         self.source.close();

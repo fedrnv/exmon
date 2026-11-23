@@ -4,6 +4,7 @@ pub mod diagnostics;
 pub mod hid_worker;
 pub mod network_filters;
 pub mod shell;
+pub mod transmission;
 
 /// Initialize process logging once at the application entry point.
 ///

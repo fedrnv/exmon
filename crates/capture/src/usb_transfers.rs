@@ -122,6 +122,7 @@ pub trait Source: Send {
 }
 pub struct Usb<S: Source> {
     source: S,
+    inspected_device: Option<usize>,
     count: usize,
     descriptors: Option<Descriptors>,
     selected: Option<Selection>,
@@ -138,6 +139,7 @@ impl<S: Source> Usb<S> {
         }
         Ok(Self {
             source,
+            inspected_device: None,
             count: 0,
             descriptors: None,
             selected: None,
@@ -153,6 +155,7 @@ impl<S: Source> Usb<S> {
             return Err(Error::InvalidState);
         }
         self.count = 0;
+        self.inspected_device = None;
         self.descriptors = None;
         let devices = self.source.enumerate(64)?;
         if devices.len() > 64 {
@@ -171,6 +174,7 @@ impl<S: Source> Usb<S> {
             return Err(Error::InvalidConfig);
         }
         self.descriptors = None;
+        self.inspected_device = None;
         let descriptors = match self.source.inspect(index) {
             Ok(value) => value,
             Err(error) => {
@@ -183,6 +187,7 @@ impl<S: Source> Usb<S> {
             return Err(error);
         }
         self.descriptors = Some(descriptors);
+        self.inspected_device = Some(index);
         Ok(self.descriptors.as_ref().unwrap())
     }
     pub fn claim(&mut self, selection: Selection) -> Result<(), Error> {
@@ -313,8 +318,72 @@ impl<S: Source> Usb<S> {
             }
         }
         self.selected = None;
+        self.inspected_device = None;
         self.endpoints = [None, None];
         self.descriptors = None;
+    }
+}
+impl<S: Source> crate::transmit::Port for Usb<S> {
+    fn info(&self) -> Result<crate::transmit::Info, Error> {
+        let selection = self.selected.ok_or(Error::InvalidState)?;
+        let out = self.endpoints[Direction::Out.index()].ok_or(Error::Unsupported)?;
+        Ok(crate::transmit::Info {
+            identity: crate::transmit::Identity::Usb {
+                device: self.inspected_device.ok_or(Error::InvalidState)?,
+                configuration: selection.configuration,
+                interface: selection.interface,
+                alternate: selection.alternate,
+                endpoint: out.address,
+                interrupt: out.kind == Kind::Interrupt,
+                packet_size: out.packet_size,
+            },
+            writable: crate::adapter::Availability::Available,
+            max_bytes: 65536,
+        })
+    }
+    fn metadata(
+        &self,
+        packet: &crate::transmit::Packet<'_>,
+    ) -> Result<exmon_domain::observation::Metadata, Error> {
+        crate::transmit::bytes(packet)?;
+        let crate::transmit::Identity::Usb { endpoint, .. } = self.info()?.identity else {
+            return Err(Error::Backend);
+        };
+        Ok(exmon_domain::observation::Metadata::Usb {
+            endpoint,
+            completed: false,
+        })
+    }
+    fn submit(
+        &mut self,
+        packet: &crate::transmit::Packet<'_>,
+        cancel: &crate::adapter::Cancellation,
+    ) -> Result<crate::transmit::Progress, Error> {
+        crate::transmit::allowed(&self.info()?, cancel)?;
+        self.metadata(packet)?;
+        self.submit_out(crate::transmit::bytes(packet)?)?;
+        Ok(crate::transmit::Progress::Pending)
+    }
+    fn completion(&mut self) -> Result<crate::transmit::Progress, Error> {
+        use crate::transmit::{Completion as C, Progress};
+        Ok(match self.poll(Direction::Out)? {
+            None => Progress::Pending,
+            Some(c) => Progress::Complete {
+                accepted: c.actual_length,
+                status: match c.status {
+                    Status::Success => C::Accepted,
+                    Status::Timeout => C::Timeout,
+                    Status::Stall => C::Stall,
+                    Status::Disconnected => C::Disconnected,
+                    Status::Cancelled => C::Cancelled,
+                    Status::Fault => C::Fault,
+                },
+            },
+        })
+    }
+    fn close(&mut self) -> Result<(), Error> {
+        self.stop();
+        Ok(())
     }
 }
 impl<S: Source> Drop for Usb<S> {

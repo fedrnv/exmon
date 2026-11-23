@@ -46,6 +46,10 @@ revision and interface epoch, validate actual transport capabilities/lengths and
 require explicit user authorization immediately before submission. Codec validity
 does not prove an unknown protocol, physical device or electrical setting valid.
 
+The [one-shot transmission worker](transmission.md) performs the selected
+transport binding, current revision checks, outbound framing and attempt history
+above this codec. Codec construction/validation alone never invokes it.
+
 ## Declarative checksum plan
 
 Protocol schema version 1 has an optional `checksums` list, omitted when empty:

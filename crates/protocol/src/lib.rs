@@ -7,4 +7,5 @@ pub mod fields;
 pub mod framing;
 pub mod network;
 pub mod network_filter;
+pub mod outbound;
 pub mod tcp_reassembly;

@@ -16,6 +16,7 @@ pub mod native_usbmon;
 pub mod serial;
 pub mod sockets;
 pub mod synthetic;
+pub mod transmit;
 pub mod usb_transfers;
 pub mod usbmon;
 pub mod virtual_can;

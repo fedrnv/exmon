@@ -129,6 +129,60 @@ pub struct Can<S: Source> {
     snapshot: usize,
     clock: Option<Instant>,
 }
+impl<S: Source> crate::transmit::Port for Can<S> {
+    fn info(&self) -> Result<crate::transmit::Info, Error> {
+        if self.clock.is_none() {
+            return Err(Error::InvalidState);
+        }
+        let channel = self
+            .channels
+            .get(self.selected.ok_or(Error::InvalidState)?)
+            .ok_or(Error::Backend)?;
+        Ok(crate::transmit::Info {
+            identity: crate::transmit::Identity::Can {
+                channel: channel.id,
+            },
+            writable: channel.tx,
+            max_bytes: 8,
+        })
+    }
+    fn metadata(&self, packet: &crate::transmit::Packet<'_>) -> Result<Metadata, Error> {
+        let crate::transmit::Packet::Can(frame) = packet else {
+            return Err(Error::InvalidConfig);
+        };
+        let crate::transmit::Identity::Can { channel } = self.info()?.identity else {
+            return Err(Error::Backend);
+        };
+        if frame.error() {
+            return Err(Error::Unsupported);
+        }
+        Ok(Metadata::Can {
+            channel,
+            id: frame.id_word() & ID_MASK,
+            extended: frame.id_word() & EFF != 0,
+            fd: false,
+            remote: frame.remote(),
+            error: false,
+            dlc: frame.dlc(),
+        })
+    }
+    fn submit(
+        &mut self,
+        packet: &crate::transmit::Packet<'_>,
+        cancel: &Cancellation,
+    ) -> Result<crate::transmit::Progress, Error> {
+        crate::transmit::allowed(&self.info()?, cancel)?;
+        self.metadata(packet)?;
+        let crate::transmit::Packet::Can(frame) = packet else {
+            return Err(Error::InvalidConfig);
+        };
+        self.send_frame(frame, cancel)?;
+        Ok(crate::transmit::Progress::accepted(frame.data().len()))
+    }
+    fn close(&mut self) -> Result<(), Error> {
+        Adapter::close(self)
+    }
+}
 impl<S: Source> Can<S> {
     pub fn new(source: S, options: Options) -> Result<Self, Error> {
         options.validate()?;

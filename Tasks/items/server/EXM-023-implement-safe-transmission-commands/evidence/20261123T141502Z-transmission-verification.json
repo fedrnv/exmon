@@ -1,0 +1,319 @@
+{
+    "task_id":  "EXM-023",
+    "owner":  "Codex exmon safe transmission",
+    "verified_at":  "2026-11-23T14:15:02Z",
+    "source_base":  "8068faeca6bc2da24ef4ee49fa29ce745db298e3",
+    "candidate_tree":  "be7a052e47aa09915e22bc69733120aae40ddb09",
+    "task_sha256":  "ed7de4d681a64500d23c9e0778af3711442372773d11ec4d4b091e5d742f9017",
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "hash_basis":  "SHA256 of verified checkout bytes; candidate_tree is Git-normalized staged product before closure records. Detailed bounded logs and test executables retained only in ignored local cache.",
+    "owner_exception":  "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+    "hid_phase":  "Tasks/items/server/EXM-014-implement-usb-hid-support/events/20261123T132059Z-codex-owner-amended-ed01bd73071a4a588f4cf52c06cf8984.md",
+    "environment":  {
+                        "host":  "Windows Server2025 Datacenter x64 build26100 x86_64-pc-windows-msvc",
+                        "rustc":  "1.98.0 (88d9e12ae 2026-08-18)",
+                        "cargo":  "1.98.0 (797e8a9bc 2026-08-05)",
+                        "node":  "24.22.1",
+                        "devices":  "Actual ordinary Windows TCP/UDP loopback only, synthetic payloads; audited Serial/HID/classicCAN/USB fixture Sources. No physical enumeration/open/output, driver/install/elevation, external network endpoint, VM or macOS runtime."
+                    },
+    "files":  [
+                  {
+                      "path":  "crates/app/src/lib.rs",
+                      "sha256":  "529678489367834878790345f813f41d075841c228f20860764cdf3a5a42358b",
+                      "bytes":  880
+                  },
+                  {
+                      "path":  "crates/app/src/transmission.rs",
+                      "sha256":  "e0bde6c501436e2ed604d3ae778ffbc1567e4246ffdde55985d60ce343068434",
+                      "bytes":  49460
+                  },
+                  {
+                      "path":  "crates/app/tests/transmission.rs",
+                      "sha256":  "7b8d1e2109278f495def0e8a15f3166f3aa4e4d80d2a2aaab84d0f488d8e7a69",
+                      "bytes":  30385
+                  },
+                  {
+                      "path":  "crates/capture/src/can.rs",
+                      "sha256":  "d2be3d93c265ad2d78d53249bc86458b7958a712110bef53740c31e90d9c9f23",
+                      "bytes":  11654
+                  },
+                  {
+                      "path":  "crates/capture/src/hid.rs",
+                      "sha256":  "eb7874ab7f2a9ec60620fc90da01e0367b7381da022b05701deb0028bc6cb127",
+                      "bytes":  8467
+                  },
+                  {
+                      "path":  "crates/capture/src/lib.rs",
+                      "sha256":  "eb7e922093e5ba9987df2c7689205385e57c69795d172cebc463a42928ad6796",
+                      "bytes":  499
+                  },
+                  {
+                      "path":  "crates/capture/src/serial.rs",
+                      "sha256":  "d152c3b5853dcc7ddd8d00eb44f04fab3ab9273e63a7721870fd6388d99f5bc6",
+                      "bytes":  8859
+                  },
+                  {
+                      "path":  "crates/capture/src/transmit.rs",
+                      "sha256":  "4273866e0aca8b0a133d83b92284747bf5d2a53aa55e9591af50b900ec2abf55",
+                      "bytes":  8069
+                  },
+                  {
+                      "path":  "crates/capture/src/usb_transfers.rs",
+                      "sha256":  "328b7dbb86b750eb057adc8187be82268d6ed8ade44b95702ace65b4a2a030a7",
+                      "bytes":  14512
+                  },
+                  {
+                      "path":  "crates/capture/tests/transmit.rs",
+                      "sha256":  "65199099ec1680f410a372b76186ae468626df5f09a4d8fe68d2b24a47363197",
+                      "bytes":  12382
+                  },
+                  {
+                      "path":  "crates/protocol/src/lib.rs",
+                      "sha256":  "10b1b5f8b4183465fe69765660f386162cb0fc2a06be6a842720124437437aef",
+                      "bytes":  261
+                  },
+                  {
+                      "path":  "crates/protocol/src/outbound.rs",
+                      "sha256":  "f74d82ee7500b35e21feaa05dd9d15fa86739a2f0d30955661998a3ce6ce41fb",
+                      "bytes":  4636
+                  },
+                  {
+                      "path":  "crates/protocol/tests/outbound.rs",
+                      "sha256":  "86db59e448c1313a5fa766e5e29dce35fb18d73adb875e607372a81be78d5a1e",
+                      "bytes":  5380
+                  },
+                  {
+                      "path":  "docs/message-codec.md",
+                      "sha256":  "0d133fad482920ed39f421b9f59c2b12c68d6fc30b022f5011c22523d700dc28",
+                      "bytes":  7165
+                  },
+                  {
+                      "path":  "docs/transmission.md",
+                      "sha256":  "3e2c13fdb9f63237e1e65d5f6abfc57243c9fd9f6a84885929a6445320e6899f",
+                      "bytes":  9690
+                  }
+              ],
+    "unchanged_inputs":  [
+                             {
+                                 "path":  "Cargo.lock",
+                                 "sha256":  "177947ec9fc79d0a1bd808158151fbae05a444534ced1a934ea310a519289cf1",
+                                 "bytes":  108514
+                             },
+                             {
+                                 "path":  "fixtures/traffic/corpus.json",
+                                 "sha256":  "e45111cc5c12aeb44e4843f6530f45ad716350e73ad05f197c9257b82d179295",
+                                 "bytes":  73047
+                             },
+                             {
+                                 "path":  "crates/domain/src/config.rs",
+                                 "sha256":  "3168e1ee9c6ef7b084007349ba88437ea1dd4bc1f5868991f96d523f02969457",
+                                 "bytes":  19671
+                             },
+                             {
+                                 "path":  "crates/domain/src/fields.rs",
+                                 "sha256":  "9a852f8ea49e897753db06658f2187ea037621e62b9d8636b54bf3978ffea79e",
+                                 "bytes":  18223
+                             },
+                             {
+                                 "path":  "crates/domain/src/observation.rs",
+                                 "sha256":  "3cb6e31a37c6583f7b40ff8d8975e44a0b44065376cff8159d02928e2f831631",
+                                 "bytes":  6315
+                             },
+                             {
+                                 "path":  "crates/protocol/src/fields.rs",
+                                 "sha256":  "d1a1eba26a3c84916b363d77413661c8914472587d39074b1698549831f3eb91",
+                                 "bytes":  20610
+                             },
+                             {
+                                 "path":  "crates/protocol/src/codec.rs",
+                                 "sha256":  "f3096fa5847ef32e4f850e2d54cd1a44dffd78b71728a807e247bb185e313928",
+                                 "bytes":  11518
+                             },
+                             {
+                                 "path":  "crates/protocol/src/framing.rs",
+                                 "sha256":  "ed6495472fc503a70a1a003be20ec45f8b33693de65619718c2c3db1d9ea1d94",
+                                 "bytes":  23977
+                             }
+                         ],
+    "local_logs":  [
+                       {
+                           "path":  "target/exm023-evidence/outbound.log",
+                           "sha256":  "485d1eab7468abf124a5946c791a2a9a86a14185cbdf6cc9f962471fa981620e",
+                           "bytes":  1652
+                       },
+                       {
+                           "path":  "target/exm023-evidence/bridges.log",
+                           "sha256":  "ec279a4235ed26ef2b1c677807374951dbb58edbcfcd329bfc1b54dfc7d0f5e9",
+                           "bytes":  2138
+                       },
+                       {
+                           "path":  "target/exm023-evidence/focused-final.log",
+                           "sha256":  "1919edae73831f29875f013eb3df24796fd0aaf0cf1e8b2dd867a0180482dd72",
+                           "bytes":  7072
+                       },
+                       {
+                           "path":  "target/exm023-evidence/regression.log",
+                           "sha256":  "df45c2f8b05c108aa83644822405fd53668b41687cc6404a7044c1ae3202ccb3",
+                           "bytes":  41802
+                       },
+                       {
+                           "path":  "target/exm023-evidence/app-final.log",
+                           "sha256":  "d0a599775c9c48bcd4f194e6f768b07485422f680e1cdedd00fb0e7265de3be3",
+                           "bytes":  9630
+                       },
+                       {
+                           "path":  "target/exm023-evidence/configuration.log",
+                           "sha256":  "08e98d2145b876a24921f01b8a6523a6046e5bd6c38c741381d4e3e4d696a793",
+                           "bytes":  3076
+                       },
+                       {
+                           "path":  "target/exm023-evidence/fmt.log",
+                           "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                           "bytes":  0
+                       },
+                       {
+                           "path":  "target/exm023-evidence/clippy.log",
+                           "sha256":  "d59fc534aab93b9f2b704b015b2ff93b555507a3bc7e1fd8091cbc256bf5d782",
+                           "bytes":  1082
+                       },
+                       {
+                           "path":  "target/exm023-evidence/native-clippy.log",
+                           "sha256":  "b30d01d7963f177fd722316987a5ef6ef9d9e20081d87814bdee2b3cf71dd3aa",
+                           "bytes":  1788
+                       },
+                       {
+                           "path":  "target/exm023-evidence/linux-check.log",
+                           "sha256":  "d70deee74295930cd7714b1e6b58dd2813bb2dd4f71616552b92f34dfc71113e",
+                           "bytes":  1186
+                       },
+                       {
+                           "path":  "target/exm023-evidence/architecture.log",
+                           "sha256":  "4f389e2d9cdf167261ce323cd3ff4bfc6fb9335b6d69cac66fc14320ab8eaece",
+                           "bytes":  180
+                       }
+                   ],
+    "local_binaries":  [
+                           {
+                               "path":  "target/debug/deps/transmission-e735b08327d2c2fe.exe",
+                               "sha256":  "1ebf5a65471797618d58d8a53ee140489de99fcb856c1308b4ecdbbb297b3c51",
+                               "bytes":  3374080
+                           },
+                           {
+                               "path":  "target/debug/deps/transmit-73c9afe1850bc219.exe",
+                               "sha256":  "05481dcc4adb6b1757324234d08710c220636bc6631c7947a484fbc47a8291d2",
+                               "bytes":  1190912
+                           },
+                           {
+                               "path":  "target/debug/deps/transmit-982982dea6571efd.exe",
+                               "sha256":  "83ad47af24f9d1d7fdefae1767e1d0227232e57074d097e9ebe3031cb61136c4",
+                               "bytes":  1187328
+                           },
+                           {
+                               "path":  "target/debug/deps/outbound-72c1c2b3757754f8.exe",
+                               "sha256":  "c84fdc996e81fc86971940cd200675e990fb10d49a4ace2ce6db6a6a7f6038f8",
+                               "bytes":  883712
+                           },
+                           {
+                               "path":  "target/debug/deps/exmon_app-b2f8de759a3c6aea.exe",
+                               "sha256":  "1f32b8ba916fe5b6f3811a81171b2ef452599f67976ce62ae879adf37fcfacd7",
+                               "bytes":  3844608
+                           }
+                       ],
+    "acceptance":  {
+                       "AC-01":  "PASS19 current application integration tests +2 private transmission units,4 typed capture bridge tests and3 outbound tests. Wrong kind/native identity/protocol/template revision, stale/recreated worker ticket, denied permission, changed template/config generation and canceled queued work never submit. Opening and submission leases serialize revocation with dispatch; deterministic barriers exercise before-lease, already-leased and factory rearm races. Constructor/clone/registration alone never sends. Typed exact serial/HID collection/report mode, CAN id/DLC/RTR/error rejection, TCP connection/epoch and UDP destination, USB claimed device/interface/OUT endpoint preserved. Actual Windows TCP/UDP loopback and audited Sources exercise production bridges; raw/structured clone-edit-checksum-framing path sends exact intended bytes. Framing vectors cover all rules, header preservation, lengths/endian/escapes/ambiguous controls,128 independent escaped vectors and65536 bounds.",
+                       "AC-02":  "PASS explicit session/interface/epoch/template/revision/source provenance and optional monotonic time/requested count; unresolved requested length stays None. Success, known partial/zero acceptance, pending async, short/error/stall/removal/cancel/timeout and unknown acceptance remain distinct. Known accepted prefixes use existing Direction::Tx Observation, no fake success on failure. USB completion metadata marks completed only for actual successful completion; no implicit retry. Unchanged live Busy permits later explicit Send. Queued/full/canceled/revision failures retain separate history;128-item/1MiB eviction and queue/loss counters explicit. One-second pending watchdog, post-close known completion, unexpected worker failure/lost outcome, generation/attempt/history exhaustion and ticket namespace tested. Physical delivery/ACK/real timing never inferred."
+                   },
+    "verification":  [
+                         {
+                             "command":  "cargo test -p exmon-protocol --test outbound --locked",
+                             "result":  "Initial focused PASS2; independent128-vector/length-header/max-size test added and final combined regression PASS3. No functional failures or ignored acceptance.",
+                             "log":  "target/exm023-evidence/outbound.log"
+                         },
+                         {
+                             "command":  "cargo test -p exmon-capture --test transmit --locked",
+                             "result":  "PASS4,0 failed/ignored,0.01s. Actual Windows TCP client and UDP loopback plus audited Serial/HID/CAN/USB sources. Final unchanged capture source also PASS in combined regression.",
+                             "log":  "target/exm023-evidence/bridges.log"
+                         },
+                         {
+                             "command":  "cargo test -p exmon-app --test transmission --lib -p exmon-protocol --test outbound --locked",
+                             "result":  "Intermediate PASS17 worker integration+2 app unit+2 protocol unit+3 outbound tests; later direct worker/metadata/history refinements covered by final full app rerun below.",
+                             "log":  "target/exm023-evidence/focused-final.log"
+                         },
+                         {
+                             "command":  "cargo test -p exmon-capture -p exmon-domain -p exmon-protocol -p exmon-app --locked",
+                             "result":  "PASS172 (app30,capture48,domain6,protocol88),0 failed/ignored+doctests,exit0. Subsequent source changes restricted to app worker/tests/docs;142 non-app checks remain exact-source PASS and were not redundantly rerun.",
+                             "log":  "target/exm023-evidence/regression.log"
+                         },
+                         {
+                             "command":  "cargo test -p exmon-app --locked",
+                             "result":  "Final PASS33 (3 unit including2 transmission units,2 diagnostics,2 HID worker,5 network filters,2 shell,19 transmission),0 failed/ignored+doctests,exit0. Replaces earlier app30 evidence after shutdown/metadata/namespace/Busy/counter refinements. Final unique selected175 with unchanged142 non-app checks.",
+                             "log":  "target/exm023-evidence/app-final.log"
+                         },
+                         {
+                             "command":  "cargo test -p exmon-storage --test configuration --locked",
+                             "result":  "PASS12,0 failed/ignored,0.22s,exit0. Total187 unique selected checks (33 app+48 capture+6 domain+88 protocol+12 configuration). No blanket full-project/Epic gate claimed.",
+                             "log":  "target/exm023-evidence/configuration.log"
+                         },
+                         {
+                             "command":  "cargo fmt --all -- --check",
+                             "result":  "PASS final source exit0",
+                             "log":  "target/exm023-evidence/fmt.log"
+                         },
+                         {
+                             "command":  "cargo clippy --workspace --all-targets --locked -- -D warnings",
+                             "result":  "PASS final source/all six crates and targets,exit0,no lint allowances",
+                             "log":  "target/exm023-evidence/clippy.log"
+                         },
+                         {
+                             "command":  "cargo clippy -p exmon-capture --features native-hid,native-usb,native-can --all-targets --locked -- -D warnings",
+                             "result":  "PASS Windows native feature compilation/lint,exit0. Not physical runtime or Windows vendor CAN support.",
+                             "log":  "target/exm023-evidence/native-clippy.log"
+                         },
+                         {
+                             "command":  "cargo check -p exmon-capture --features native-hid,native-usb,native-can --target x86_64-unknown-linux-gnu --locked",
+                             "result":  "PASS Linux target compilation only,exit0. No Linux native runtime or stand test rerun.",
+                             "log":  "target/exm023-evidence/linux-check.log"
+                         },
+                         {
+                             "command":  "node scripts/check-architecture.mjs; git diff --check; git diff --cached --check",
+                             "result":  "PASS six-layer resolved graph+three negative fixtures, working/staged whitespace",
+                             "log":  "target/exm023-evidence/architecture.log"
+                         },
+                         {
+                             "command":  "Review15 staged product paths; git write-tree; git fetch origin main; git rev-parse HEAD origin/main; verify task/current claim/dependencies/rules and first request absence",
+                             "result":  "PASS exact candidate tree above, HEAD/origin8068fae published current023 owner unchanged,007/012/013/014/015/017/022 Done under retained qualification boundaries. Governing rules/Cargo.lock/accepted history unchanged; only declared paths. No competing claim or publication uncertainty."
+                         }
+                     ],
+    "contract":  {
+                     "control":  "Idle worker has no source. Explicit bind calls only trusted selected factory on worker after opening lease; expected identity checked before activation. Current logical binding+native identity/capability/state and immutable template/field/checksum/framing validity checked again before submission lease. Atomic generation and worker-instance Arc namespace prevent queued/ABA/recreated-worker tickets. Close independent of queue, no implicit reconnect/retry/payload schedule. Already leased completion honest.",
+                     "preparation":  "Raw literal API/wire bytes or structured normalized body plus explicit preserved length header. Existing022 Codec validation produces bounded indexed field/checksum diagnostics, no fabricated zero. Explicit clone retains SourceRef, fields/unknown bytes and immutable body. Outbound encodes all accepted framing rules and proves exactly one requested normalized message through production Framer. HID unnumbered prefix explicit once; CAN typed. Idle-gap early Send rejected Busy without scheduling, reset only for a new explicit binding.",
+                     "bridges":  "Small Port/Info/Packet/Progress contract in capture, no protocol dependency. Existing Serial/HID/CAN implementations expose selected state and metadata through Port; no behavioral rewrite of RX. USB tracks inspected index and actual async OUT completion; native and shared controllers still validate descriptors/requests/status/count. SocketPort owns one selected TCP peer or explicit UDP destination and native epoch. Passive Ethernet/usbmon and absent vendor platforms remain unsupported.",
+                     "outcomes":  "Each attempt/event retains session/interface/epoch/template/revision/source and explicit rejected/pending/complete/failed outcome. Requested/accepted counts unknown when unresolvable, no invented zero. TX observations hold known API-accepted prefixes, typed metadata and unknown original wire length; not independent wire capture or delivery proof. Async watchdog/cancel/shutdown gather available completion, otherwise acceptance unknown. Worker failure revokes and exposes unreconciled outcome loss.",
+                     "bounds":  "4 queued commands;65,536 body/wire bytes;64 templates with conservative1MiB aggregate retained-data/compiled-index/node/copy charge;128 history events/1MiB charged history;read at most4 records. Admission count/byte checks before queuing/copying, unused external protocol Arc released after compilation. Metadata locks contain no backend I/O. Optional snapshot on contention avoids false zero metrics; health counts saturate, sequence/generation exhaustion revokes. Trusted factory/algorithm/adapter state and temporary Framer output obey their own bounds; no total RSS/native-code sandbox guarantee."
+                 },
+    "review":  "Author reviewed all15 product paths and actual selected tests: typed exact target identity/report convention/epoch and active capability, immutable source/template revisions, worker-instance namespace, opening/submission CAS and control-lock ordering, revoke/cancel/queue-full/Drop/panic/exhaustion boundaries, raw/structured validation and framing reconstruction, actual async counts/status/metadata and no auto retry, unknown requested/acceptance/time, same-domain TX observation/history retention/loss, private/redacted Debug, per-count/byte charges before copies and bounded output. Shared capture/protocol sibling ban preserved; no unsafe, new dependency or GUI/backend thread violation. Author review is not independent Epic Level0.",
+    "corrections":  [
+                        "Initial new CAN test omitted existing Options.mode; added explicit Classic. Structural admission initially treated existing Classification.mask Vec as optional; used actual Vec length. A transient misplaced else during a patch was fixed before final compile. These were candidate compile/format errors, not published or passing behavior.",
+                        "Clippy required four collapsed if statements and a borrowed slice rather than cloning the expected test vector; corrected without allows or changing assertions. Final complete workspace lint PASS.",
+                        "Source review replaced possible check/store activation race with serialized exact CAS, added opening lease and worker-instance ticket namespace, fail-closed exhaustion/poison handling and source teardown guard; deterministic before/after lease, canceled factory and recreated-worker tests pass.",
+                        "Refined unknown requested length to Option, rejected invalid result widths/counts without success, retained known post-close async completion, bounded aggregate compiled-template admission/released unrelated protocol memory, separated first field/checksum diagnostics before framing, made snapshot contention explicit and counters saturating. Final app rerun covers exact updated source.",
+                        "Preserved a still-live unchanged connection on transient Busy without any retry, and reset idle-gap accounting only on explicit new binding; direct tests confirm both. Added real HID bridge normalization and explicit USB completion metadata assertions.",
+                        "PowerShell redirects normal Cargo stderr/build-cache waits as NativeCommandError text. Actual exits/test summaries inspected; live tool sessions polled to terminal state without restart. All final tests pass, no functional flaky acceptance or ignored criteria."
+                    ],
+    "limitations":  [
+                        "Windows VPS actual ordinary TCP/UDP loopback and deterministic source fixtures only. Real HID/serial/USB/CAN/wire timing/electrical/Stop latency and device descriptor fidelity remain036; native runtime/platform matrix including macOS remains035. Linux check is compilation only. No physical pass inferred.",
+                        "General backend command API only, outgoing editor GUI027 and periodic scheduling024 separate. Existing HID-specific UI retains its separate worker. Session persistence/export tasks must consume these bounded domain observation/attempt records with caller-supplied coherent IDs/revisions; no recording implementation claimed.",
+                        "Native factories/ports/checksum callbacks are trusted linked code with finite/nonblocking and resource contracts; no arbitrary CPU/allocation/I/O sandbox or hard cancellation of an already started driver write. Panic hooks may execute; trusted code must not include private data. Permission/setup/release authority not expanded.",
+                        "Partial/zero API acceptance is never retried silently and never proves delivery, bus ACK or on-wire packet completeness. Raw continuation requires another explicitly reviewed Send. Unknown cancellation/timeouts preserve None. USB completed metadata describes transfer completion, not full requested message delivery.",
+                        "Normalized framing rebuild requires explicit preserved length header; ambiguous unescaped payloads and oversized escaped wire rejected. Idle-burst timing is host-side gating only, not electrical proof. Fields/checksums validated from immutable declared schema, not inference of unknown device protocol.",
+                        "Callers must signal actual configuration/permission/interface changes and bind current revisions; trusted factory must open exactly user-selected source on worker. No imported factory execution, automatic hardware discovery or accidental passive capture TX. Retained external caller snapshots/native code state have separate budgets."
+                    ],
+    "cleanup":  "Only15 declared product paths plus new023 evidence/completed/first request; existing TASK/events/evidence/ADRs/fixture corpus/Cargo.lock/CI/allocator and unrelated .idea unchanged. No binary/log/private capture/device serial/credential staged. Bounded ignored logs\u003c128KiB and ordinary test executable caches retained. All owned tests/checks/workers/loopback sockets terminal/closed; no background helper/VM/device handle introduced.",
+    "checkpoint":  {
+                       "task":  "EXM-023 verified Done upon successful publication",
+                       "goal":  "ACTIVE; this turn PROGRESS, no global blocker/completion",
+                       "next":  "Fresh turn fetch/reconcile023 closure/allocator; read exact024 periodic transmission TASK/all events/evidence/current rules and023 dependency. Publish024 claim if ready/unowned. Implement interval/start-stop/finite-count/drift/missed-deadline policy, explicit per-session activation, immediate revocation and measured/simulated-load timing; never auto-arm on startup/import/reconnect. No024 claim/implementation in023 turn.",
+                       "authority":  "Owner permits safe Windows tools/virtual work across Epics before earlier closure; physical/macOS later stands. Functional prerequisites, one identity/turn, explicit physical open/TX action and immediate publication retained.",
+                       "publication":  "Commit coherent product+evidence+Done+single first023 request and immediately pushmain. Reconcile rejected/unknown publication before another commit/task; allocator alone writes versions at actual supported adoption boundary."
+                   }
+}

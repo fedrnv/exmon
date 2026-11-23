@@ -34,6 +34,60 @@ pub struct Hid<S: Source> {
     maximum: usize,
     clock: Option<Instant>,
 }
+impl<S: Source> crate::transmit::Port for Hid<S> {
+    fn info(&self) -> Result<crate::transmit::Info, Error> {
+        use crate::transmit::{Identity, Info};
+        if self.clock.is_none() {
+            return Err(Error::InvalidState);
+        }
+        let selected = self.selected.ok_or(Error::InvalidState)?;
+        let d = self.devices.get(selected).ok_or(Error::Backend)?;
+        Ok(Info {
+            identity: Identity::Hid {
+                collection: selected as u64,
+                vendor: d.vendor_id,
+                product: d.product_id,
+                page: d.usage_page,
+                usage: d.usage,
+                numbered: self.mode == ReportMode::Numbered,
+                capacity: self.maximum,
+            },
+            writable: Availability::Available,
+            max_bytes: self.maximum,
+        })
+    }
+    fn metadata(&self, packet: &crate::transmit::Packet<'_>) -> Result<Metadata, Error> {
+        self.info()?;
+        let b = crate::transmit::bytes(packet)?;
+        if b.is_empty()
+            || b.len() > self.maximum
+            || (b[0] == 0) != (self.mode == ReportMode::Unnumbered)
+        {
+            return Err(Error::InvalidConfig);
+        }
+        let d = self.devices[self.selected.ok_or(Error::InvalidState)?];
+        Ok(Metadata::Hid {
+            vendor_id: d.vendor_id,
+            product_id: d.product_id,
+            usage_page: d.usage_page,
+            usage: d.usage,
+            report_id: b[0],
+        })
+    }
+    fn submit(
+        &mut self,
+        packet: &crate::transmit::Packet<'_>,
+        cancel: &Cancellation,
+    ) -> Result<crate::transmit::Progress, Error> {
+        crate::transmit::allowed(&self.info()?, cancel)?;
+        self.metadata(packet)?;
+        Adapter::transmit(self, crate::transmit::bytes(packet)?)
+            .map(crate::transmit::Progress::accepted)
+    }
+    fn close(&mut self) -> Result<(), Error> {
+        Adapter::close(self)
+    }
+}
 impl<S: Source> Hid<S> {
     pub fn new(source: S, mode: ReportMode) -> Self {
         Self {
