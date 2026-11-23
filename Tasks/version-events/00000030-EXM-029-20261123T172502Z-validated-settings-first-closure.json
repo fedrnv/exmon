@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 30,
+  "version": "0.1.0.30",
+  "request_id": "EXM-029-20261123T172502Z-validated-settings-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-029",
+  "summary": "Transactional validated settings with shared-pipeline selected-capture preview and separate profile/binding/safety import/export",
+  "verification": [
+    "Tasks/items/web/EXM-029-build-transport-framing-and-decoder-settings/evidence/20261123T172502Z-settings-verification.json"
+  ],
+  "request_file": "Tasks/version-requests/20261123-EXM-029-validated-settings.json",
+  "request_sha256": "20b9fa569d11d8e050da470c8bb4b55a848afe108781e6336b5da52ee8334b0e"
+}
