@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 19,
+  "version": "0.1.0.19",
+  "request_id": "EXM-018-20261123T113637Z-capture-files-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-018",
+  "summary": "Bounded streaming PCAP/PCAPNG import and complete or selected export with exact raw/time/link inspection",
+  "verification": [
+    "Tasks/items/server/EXM-018-implement-pcap-and-pcapng-import-export/evidence/20261123T113637Z-pcap-verification.json"
+  ],
+  "request_file": "Tasks/version-requests/20261123-EXM-018-capture-files.json",
+  "request_sha256": "4b5d2c02f0e8ef104ac6372872680a4f7132987a848ab182b93263e018e20095"
+}
