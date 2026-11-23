@@ -1,0 +1,11 @@
+{
+  "schema": "fdtasks-version-request/v1",
+  "request_id": "EXM-028-20261123T162541Z-live-charts-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-028",
+  "summary": "Bounded live multi-series charts with interactive axes, strict ranges and deterministic moving averages",
+  "verification": [
+    "Tasks/items/web/EXM-028-build-real-time-chart-tabs/evidence/20261123T162541Z-charts-verification.json"
+  ]
+}

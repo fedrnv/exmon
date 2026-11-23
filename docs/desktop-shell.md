@@ -97,3 +97,6 @@ EXM-035/037; no release, install, signing or stand qualification is inferred.
 Upstream APIs were checked against
 [eframe 0.37](https://docs.rs/eframe/0.37.0/eframe/) and
 [egui_kittest 0.37](https://docs.rs/egui_kittest/0.37.0/egui_kittest/).
+
+Live chart tabs use bounded worker-prepared numeric histories, moving averages and
+interactive axes; see [chart controls and limits](charts.md).

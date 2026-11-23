@@ -3,6 +3,7 @@ use exmon_app::incoming::{self, Draft, Status, View, Worker};
 pub struct Incoming {
     pub copy_revision: u64,
     pub worker: Worker,
+    pub charts: exmon_app::charts::Worker,
     pub view: View,
     pub status: Status,
     pub draft: Option<Draft>,
@@ -14,6 +15,7 @@ impl Incoming {
         Ok(Self {
             copy_revision: 0,
             worker: Worker::prototype()?,
+            charts: exmon_app::charts::Worker::new().map_err(|_| incoming::Error::Unavailable)?,
             view: View::default(),
             status: Status::default(),
             draft: None,
@@ -23,11 +25,16 @@ impl Incoming {
     }
     pub fn begin(&mut self, generation: u64) {
         self.view.reset(generation);
+        self.charts.begin(generation);
         self.status = Status::default();
         let _ = self.worker.begin(generation);
     }
     pub fn poll(&mut self) {
         for batch in self.worker.drain() {
+            let _ = self.charts.submit(incoming::PreparedBatch {
+                generation: batch.generation,
+                rows: batch.rows.clone(),
+            });
             self.view.apply(batch);
         }
         if let Some(s) = self.worker.status()

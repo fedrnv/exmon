@@ -1,5 +1,6 @@
 //! Exchange Monitor app layer. See docs/domain-model.md for the domain contract.
 
+pub mod charts;
 pub mod diagnostics;
 pub mod hid_worker;
 pub mod incoming;

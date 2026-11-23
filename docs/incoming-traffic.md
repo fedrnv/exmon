@@ -82,3 +82,7 @@ native Windows screenshot smoke with an eight-second bound. Detailed streams and
 images stay in ignored target output. These checks qualify the Windows virtual
 prototype; physical/native stand qualification, other OS/packaged targets and
 broader performance/soak or release acceptance remain separate035/036/037 tasks.
+
+The worker also prepares checked numeric engineering projections for
+[chart tabs](charts.md). Batches reach the independent chart worker before
+incoming display pause/retention; raw observations remain unchanged.

@@ -38,6 +38,8 @@ pub struct Key {
     pub id: u64,
 }
 pub struct FieldView {
+    /// Checked engineering projection prepared off GUI; invalid values are gaps.
+    pub numeric: Option<f64>,
     pub name: String,
     pub value: String,
     pub invalid: bool,
@@ -76,7 +78,7 @@ impl Row {
             + self
                 .fields
                 .iter()
-                .map(|f| f.name.len() + f.value.len() + 64)
+                .map(|f| f.name.len() + f.value.len() + 80)
                 .sum::<usize>()
     }
     pub fn copy_format(self: &Arc<Self>) -> Option<Draft> {
@@ -568,6 +570,18 @@ impl Processor {
                                     if let Some(def) = protocol.fields.get(field.index) {
                                         row.fields.push(FieldView {
                                             name: def.id.clone(),
+                                            numeric: if field.violations.is_empty()
+                                                && report.checksums.iter().all(|c| c.result.is_ok())
+                                                && quality == Quality::Complete
+                                            {
+                                                field
+                                                    .number
+                                                    .as_ref()
+                                                    .ok()
+                                                    .and_then(|n| n.to_f64().ok())
+                                            } else {
+                                                None
+                                            },
                                             value: field_text(
                                                 &field.raw,
                                                 &field.number,

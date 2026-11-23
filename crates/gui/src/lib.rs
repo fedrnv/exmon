@@ -1,4 +1,5 @@
 //! Single-window desktop view; all capture and storage are application workers.
+pub mod charts;
 pub mod hid;
 pub mod incoming;
 mod network_filters;

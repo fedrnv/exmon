@@ -23,6 +23,8 @@ pub struct Shell {
     interface: u64,
     pub incoming: crate::incoming::Incoming,
     pub outgoing: crate::outgoing::Outgoing,
+    pub charts: crate::charts::Charts,
+    pub chart_view: bool,
     incoming_copy: u64,
     notice: Option<&'static str>,
     loaded: bool,
@@ -49,6 +51,8 @@ impl Shell {
             incoming: crate::incoming::Incoming::new().map_err(|_| ShellError::Unavailable)?,
             outgoing: crate::outgoing::Outgoing::new().map_err(|_| ShellError::Unavailable)?,
             incoming_copy: 0,
+            charts: Default::default(),
+            chart_view: false,
             notice: None,
             loaded: false,
             dirty: false,
@@ -117,6 +121,7 @@ impl Shell {
             let _ = self.incoming.worker.submit(batch);
         }
         self.incoming.poll();
+        self.charts.poll(&self.incoming.charts);
         let before = self.layout;
         let size = ctx.input(|i| {
             i.viewport()
@@ -157,6 +162,8 @@ impl Shell {
                             self.hid_view = !self.hid_view;
                             self.outgoing.disconnect();
                         }
+                        ui.selectable_value(&mut self.chart_view, false, "Traffic");
+                        ui.selectable_value(&mut self.chart_view, true, "Charts");
                         let title = if self.layout.theme == Theme::Dark {
                             "Light theme"
                         } else {
@@ -271,27 +278,37 @@ impl Shell {
                         ui.label("Layout saving unavailable; current session remains usable.");
                     }
                 });
-            let width = ui.available_width();
-            let left = egui::Panel::left(("incoming", self.layout_generation))
-                .resizable(true)
-                .default_size(width * self.layout.split)
-                .size_range(width * 0.25..=width * 0.75)
-                .show(ui, |ui| {
-                    self.incoming.show(ui);
-                    ui.take_available_space();
+            if self.chart_view {
+                egui::CentralPanel::default().show(ui, |ui| {
+                    self.charts.show(
+                        ui,
+                        self.incoming.worker.configuration(),
+                        &self.incoming.charts,
+                    )
                 });
-            if width > 0. {
-                self.layout.split = (left.response.rect.width() / width).clamp(0.25, 0.75);
-            }
-            egui::CentralPanel::default().show(ui, |ui| {
-                if self.incoming_copy != self.incoming.copy_revision {
-                    self.incoming_copy = self.incoming.copy_revision;
-                    if let Some(draft) = &self.incoming.draft {
-                        self.outgoing.copy_received(&draft.row);
-                    }
+            } else {
+                let width = ui.available_width();
+                let left = egui::Panel::left(("incoming", self.layout_generation))
+                    .resizable(true)
+                    .default_size(width * self.layout.split)
+                    .size_range(width * 0.25..=width * 0.75)
+                    .show(ui, |ui| {
+                        self.incoming.show(ui);
+                        ui.take_available_space();
+                    });
+                if width > 0. {
+                    self.layout.split = (left.response.rect.width() / width).clamp(0.25, 0.75);
                 }
-                self.outgoing.show(ui, self.incoming.worker.configuration());
-            });
+                egui::CentralPanel::default().show(ui, |ui| {
+                    if self.incoming_copy != self.incoming.copy_revision {
+                        self.incoming_copy = self.incoming.copy_revision;
+                        if let Some(draft) = &self.incoming.draft {
+                            self.outgoing.copy_received(&draft.row);
+                        }
+                    }
+                    self.outgoing.show(ui, self.incoming.worker.configuration());
+                });
+            }
         }
         self.dirty |= before != self.layout;
         if self.loaded && self.dirty && self.preferences.save(self.layout).is_ok() {

@@ -1,0 +1,192 @@
+{
+  "schema": "exmon-verification/v1",
+  "task_id": "EXM-028",
+  "owner": "Codex exmon charts",
+  "verified_at": "2026-11-23T16:25:41Z",
+  "base_revision": "3d7e14cd5c4b6c78636b6897ce8a70e7dfa3beb7",
+  "candidate_tree": "53817535e9d25e37e599bd6f34d454fb88a62406",
+  "task_sha256": "372777e97fc95f14a0b7f270f48d1985bc1410dc575592c23d7dc1595710411f",
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "native_activation": false,
+  "environment": {
+    "platform": "win32",
+    "arch": "x64",
+    "rustc": "rustc 1.98.0 (88d9e12ae 2026-08-18)",
+    "cargo": "cargo 1.98.0 (797e8a9bc 2026-08-05)",
+    "node": "v24.22.1",
+    "qualification": "Windows VPS virtual prototype"
+  },
+  "unique_selected_tests": 129,
+  "verification": [
+    {
+      "command": "cargo test -p exmon-app --lib --test charts --test incoming --test outgoing --test shell --locked",
+      "result": "37 PASS:8 app internals incl gated chart queue,6 charts,9 incoming,12 outgoing,2 shell",
+      "exit": 0,
+      "log": "target/exm028-app-final.log",
+      "sha256": "80554bcc91ff9b42299e185ab23e7c150545498593977cabda3b024059e94db8"
+    },
+    {
+      "command": "cargo test -p exmon-gui --locked -- --nocapture",
+      "result": "15 PASS:1 clipping unit,2 charts,2 HID,3 incoming,3 filters,2 outgoing,2 shell",
+      "exit": 0,
+      "log": "target/exm028-gui-final.log",
+      "sha256": "8d8b21bc5f954ca9924feefd4189033dcb592af150424d2ff976d6943ad6c9b8"
+    },
+    {
+      "command": "cargo test -p exmon-capture --locked",
+      "result": "48 implemented transport regressions PASS",
+      "exit": 0,
+      "log": "target/exm028-transports-final.log",
+      "sha256": "b0b38efd6ea4eb03c4d202c2193ad600403858de8e1e81a8046580636efed4e7"
+    },
+    {
+      "command": "cargo test -p exmon-protocol --test fields --test codec --locked",
+      "result": "29 PASS:15 fields,14 codec",
+      "exit": 0,
+      "log": "target/exm028-codec-final.log",
+      "sha256": "003f9ecea6487d0845defbfeb61d2c369e448c36e1b03882b729c1ffe8bbe2ab"
+    },
+    {
+      "command": "cargo clippy --workspace --all-targets --locked -- -D warnings",
+      "result": "Complete workspace/all targets PASS",
+      "exit": 0,
+      "log": "target/exm028-clippy-final.log",
+      "sha256": "c0dba0b34506bc7cea8bdd4e6d0c2de925dff45298f3bc45bdbace5a50139528"
+    },
+    {
+      "command": "cargo run -p exmon-gui --example native_charts_smoke --locked",
+      "result": "Actual Windows eframe/wgpu two-series live chart/average screenshot,8s deadline, off-GUI PNG write and clean close PASS",
+      "exit": 0,
+      "log": "target/exm028-native-final.log",
+      "sha256": "331418f48365eadb1737a3ef0d879c65b9fd8fec452698d4702a91bb6f9e3036"
+    },
+    {
+      "command": "node scripts/check-architecture.mjs",
+      "result": "Six layers/resolved graph/three negative fixtures PASS",
+      "exit": 0,
+      "log": "target/exm028-architecture.log",
+      "sha256": "4f389e2d9cdf167261ce323cd3ff4bfc6fb9335b6d69cac66fc14320ab8eaece"
+    },
+    {
+      "command": "cargo fmt --all --check",
+      "result": "Complete workspace PASS",
+      "exit": 0
+    },
+    {
+      "command": "git diff --check; git diff --cached --check",
+      "result": "PASS, reviewed13 product paths",
+      "exit": 0
+    }
+  ],
+  "acceptance": {
+    "AC-01": "200000-sample fixture proves4096 retention,<=512 rendered ordered extrema/endpoints and exact evictions. Full4 charts x8 series x4096 windows bounded; gated full8 input queue64 submissions under100ms with visible loss. Actual GUI two numeric series/tabs/window64/average3/time-index/zoom/pan/autoscale/reset/valid and NaN manual ranges. Final48 frames/1s,max64.8731ms below200ms,16992 capture packets advancing. Five actual visual/native images inspected.",
+    "AC-02": "Independent signed deterministic110-value trailing averages for lengths1/2/7/64, partial windows/gap51 compare at1e-9. Reverse time/NaN/Infinity, window/average/generation reset, extreme finite values covered. Actual incoming decoder -> worker verifies42,integer2^53+1 precision gap,44/mean44; original received bytes unchanged. Raw+MA extrema/endpoints and segment IDs survive decimation. GUI invalid average0 retains3."
+  },
+  "contracts": {
+    "layers": "Incoming worker prepares checked finite numeric engineering Option<f64> using Number::to_f64; violations/checksum/unknown quality/precision loss remain gaps. No displayed-string parsing. GUI routes bounded immutable batches before incoming pause/retention. Chart worker owns histories/averages/minmax decimation; GUI draws bounded lines and handles controls only. No capture/native I/O/storage/TX authority in chart GUI.",
+    "bounds": "4 charts,8 series/chart,4096 retained and512 rendered points/series. Eight input batches<=96 rows/1MiB charged each; latest bounded config, bounded strings. Numeric projection increases conservative incoming field charge16 bytes. Rolling recent<=average<=4096; immutable Arc point snapshots. Capture/native/renderer/external retained snapshots have separate budgets.",
+    "loss": "Chart input drops/invalid samples/history evictions/render reductions separate from upstream losses. Missing input serials break continuity at queue gaps; invalid/time/generation gaps reset average and segment identity. Partial averages divide by admitted valid samples, scaled sums periodically rebased; unrepresentable averages absent. Exact sample indices stop admission at2^53. Relative capture time and observed-sample lines do not reconstruct missing wire data.",
+    "controls": "Multiple per-template-independent chart tabs/series, labels/units/legends, time/index, button/wheel zoom, pointer pan, autoscale/reset and finite increasing manual X/Y spans. Invalid settings preserve previous valid state. Window/average changes reset affected history. Shared Y units documented; use separate tabs for incompatible units. f64 segment clipping precedes bounded screen conversion, preserves visible slopes. Dashed MA limited16 steps/segment; ordinary vertical scroll on small windows."
+  },
+  "visual_inspection": {
+    "result": "All5 final PNGs inspected:900x600/1360x900 dark/light1x/1.5x and actual native Windows capture/two-series/MA. Accessible controls and complete legends retained; checks enabled.",
+    "metrics": "Chart48 frames/max64.8731ms/16992packets; incoming51frames/max125.6626ms/15232packets; shell82frames/max30.9121ms/14272packets. Existing>20frames/200ms thresholds unchanged, no broad soak claim.",
+    "artifacts": [
+      {
+        "path": "target/exm028-visual/charts-1360x900-1-dark.png",
+        "sha256": "10ddf6506c239e42580ed39e4e7130badeb0e393d8097c620d4b868ed7c9c6f1"
+      },
+      {
+        "path": "target/exm028-visual/charts-1360x900-1.5-light.png",
+        "sha256": "fa7503bf7fc1782d803d412484a8a17eba69b5d13daf9c99c2bf1328a8347c6d"
+      },
+      {
+        "path": "target/exm028-visual/charts-900x600-1-dark.png",
+        "sha256": "5676cf7cfa2581c042d78b722ecb7259497caa4eddf481200d9eea0911728368"
+      },
+      {
+        "path": "target/exm028-visual/charts-900x600-1.5-light.png",
+        "sha256": "cbbf69eaeaaa1b1bf4bf5aa59876414a3f548e77801ec862a7020b0c585627e5"
+      },
+      {
+        "path": "target/exm028-native.png",
+        "sha256": "9334080265bcee7fbce2501ab3401b56e3be13e025359158b02cd12d6c490594"
+      }
+    ]
+  },
+  "source_hashes": [
+    {
+      "path": "crates/app/src/charts.rs",
+      "sha256": "35d024eee2640de72c7427b80149a24444e615d4152404ab68bae716ecfff14e"
+    },
+    {
+      "path": "crates/app/src/incoming.rs",
+      "sha256": "48b68720f3a5898a024030b1670be3c9a31915c7b6f9bdd6b978e8380f6bddb0"
+    },
+    {
+      "path": "crates/app/src/lib.rs",
+      "sha256": "1abc2883e0e5425957470514096209d56e8628fbf7fee5d151fe34af4f9d7779"
+    },
+    {
+      "path": "crates/app/tests/charts.rs",
+      "sha256": "a5dbf1537183449f30a36581eaac89c32824aa0165907dcbd6993dd9ab058be8"
+    },
+    {
+      "path": "crates/gui/examples/native_charts_smoke.rs",
+      "sha256": "e57ac872295eb1e54557162eb89be1cee729b62f65ceeeb110176f4db8a1c541"
+    },
+    {
+      "path": "crates/gui/src/charts.rs",
+      "sha256": "831f25e0887085f88acd2ca23c8401095f0b5b0f252a1fac62f2da56145f3d49"
+    },
+    {
+      "path": "crates/gui/src/incoming.rs",
+      "sha256": "fb6acf1a6404300ae58572324b92a1a4cdc2a78be3a1651a0c2461925619cd00"
+    },
+    {
+      "path": "crates/gui/src/lib.rs",
+      "sha256": "96d527f62ab1c56b311e937f4ab6760eda0ce5b8dc3f5386a72d1938c0908701"
+    },
+    {
+      "path": "crates/gui/src/shell.rs",
+      "sha256": "969549601bfa88038cdf583d5a8e3c8ff569003b3720b55c2a57f6674afee729"
+    },
+    {
+      "path": "crates/gui/tests/charts.rs",
+      "sha256": "f049c51413432b28b95e104aba0cae27a1624e4b82b40583b98166e1ea7b4141"
+    },
+    {
+      "path": "docs/charts.md",
+      "sha256": "9e601e21a98e9785d3df959d970baa40eae7e469ac9c49a5447bbc8e30527035"
+    },
+    {
+      "path": "docs/desktop-shell.md",
+      "sha256": "100344c6300b92a0863f33074512e8f9b579858f774c8b1cdd2a02e5698683af"
+    },
+    {
+      "path": "docs/incoming-traffic.md",
+      "sha256": "13e71a67cd669e0f6f421ce3a48d4d46b410d39cc0aaa7dac4d010fb82c25a63"
+    }
+  ],
+  "hash_basis": "SHA256 checkout bytes; Git-normalized candidate13-file tree before closure records. Logs are PowerShell UTF16LE, count inspected with BOM-aware decoding. Logs/PNGs stay in ignored bounded target cache, no generated outputs committed.",
+  "review": "Author inspected13-path diff, actual tests and5 PNGs: worker and GUI call graph, bounded queue/Drop/failure guard, finite checked numeric/checksum/quality projection, generation/serial loss, independent average/extrema/gap vectors, window/range validation and plot clipping, original RX/TX/HID/filter behavior. Author review is not independent Epic Level0.",
+  "corrections": [
+    "Allocator-only publication race: rejected unpublisheda47d854 saved in target/exm028-rejected-claim.json/reflog. Refreshed53b7eb3; new unique3d7e14c claim published before implementation. No competing owner or lost-claim replay.",
+    "Unavailable TextEdit.accessible_name compile failure corrected to actual response.labelled_by; accessibility checks retained.",
+    "Initial GUI fixture appended text to populated window and correctly timed out on invalid config; fixture now sends actual Ctrl+A before typing. Full final GUI suite passes, no product input weakening.",
+    "Clippy is_multiple_of correction, plot extraction delimiter correction, full queue/serial fencing and f64 line clipping completed before final checks. Evidence test counter initially read PS logs as UTF8; fixed BOM-aware read,129 actual tests."
+  ],
+  "limitations": [
+    "Windows virtual prototype only; physical/device/driver/electrical/on-wire036,macOS/platform035,packaged/install/release037 remain unpassed. No physical open/TX or signing/credentials inferred.",
+    "Chart settings session-local; settings/import/export persistence remains029/030. No spectral/instrument work, canonical whole-project gate, independent Epic review or Epic closure.",
+    "Shared Y axis units in legends; use separate tabs for incompatible units. Upstream omitted observations not reconstructed. Finite f64 projection/arithmetic cannot represent every value; absent points/averages never become zero. Extreme autoscale fallback bounded.",
+    "No total RSS/hard realtime/sandbox guarantee for trusted process/native libraries or external retained snapshots. No dependency/Cargo.lock/protocol/domain schema/transport/CI/allocator/rule/accepted-history changes. Manual5.7 keeps native_activation=false."
+  ],
+  "owner_exception": "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+  "checkpoint": {
+    "goal": "ACTIVE; turn PROGRESS, no global blocker/completion",
+    "task": "EXM-028 verified Done upon successful publication",
+    "next": "Fresh goal turn fetch/reconcile028 closure/allocator and rules. Read029 Tasks/items/web/EXM-029-build-transport-framing-and-decoder-settings/TASK.md/all events/evidence; confirm003/019/021/025 published Done and current ownership. Claim029 if ready/unowned; implement full validated settings/selected-capture pipeline-consistent preview/profile-binding separation/apply-cancel-import-export-safe defaults. No029 work this turn.",
+    "publication": "Immediately commit/pushmain coherent product+evidence+Done+single first028 request; verify exact remote identity. Reconcile unknown/rejected push before another commit/task. Allocator solely writes versions; preserve .idea/unrelated work, no subagents."
+  }
+}
