@@ -1,0 +1,186 @@
+{
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "task_sha256":  "91c46f83bee5ed9c069e01d376736c2fdcce7b86e18a587f418ffad34a807f36",
+    "corrections":  [
+                        "Initial focused assertions raced nonblocking snapshots: wait on exact post-attempt counters and retry optional snapshot reads. Do not treat contention as zero/missing status. No assertions or timing/acceptance criteria weakened.",
+                        "Initial implementation republished empty schedule snapshots every millisecond, provoking old one-shot fixture contention; skip all scheduler snapshot/clock work when no schedules exist. Final complete49 app tests and191 core regression PASS.",
+                        "One needless borrowed reference in test helper corrected for Clippy. An initial combined documentation patch failed atomically, then applied against exact current headings.",
+                        "Safety review moved ticket namespace/current checks before replacement revocation so stale workers cannot cancel current grants, repeated capability check after gated preparation, retained rejected schedule attribution with unknown submitted time, and fails closed on exhausted activation identity. Dedicated tests PASS.",
+                        "PowerShell normal Cargo stderr/cache-lock messages appear as NativeCommandError text in redirected logs; terminal exits and test summaries inspected. No live tool sessions restarted. Earlier failed logs retained only as ignored diagnostics; final logs authoritative."
+                    ],
+    "owner":  "Codex exmon periodic scheduling",
+    "owner_exception":  "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+    "task_id":  "EXM-024",
+    "source_base":  "df80391bff647d08a62c11fc520b42b411aed80e",
+    "logs":  [
+                 {
+                     "path":  "target/exm024-regression-final.log",
+                     "sha256":  "8ab2f22fdcffb7775a5299389fd808a644c754ebcaa3433773d7c24fdfbae1c0",
+                     "bytes":  44764
+                 },
+                 {
+                     "path":  "target/exm024-configuration-final.log",
+                     "sha256":  "ff02bf10d2e7cf2c20a6026bf5f6b2234bdd72936f5b653870e1841a7f3f759c",
+                     "bytes":  3564
+                 },
+                 {
+                     "path":  "target/exm024-clippy-final.log",
+                     "sha256":  "51f158bad6da5a20f27d7a72c8c3d43debe2a2e1df3f5a1df3ebb540c7e09dd7",
+                     "bytes":  1190
+                 },
+                 {
+                     "path":  "target/exm024-native.log",
+                     "sha256":  "5cdd7d4f8a26f4077a0fed8782fca6ea15bd2dfb1caa0cab9de6df16df50ec86",
+                     "bytes":  1514
+                 },
+                 {
+                     "path":  "target/exm024-architecture.log",
+                     "sha256":  "4f389e2d9cdf167261ce323cd3ff4bfc6fb9335b6d69cac66fc14320ab8eaece",
+                     "bytes":  180
+                 },
+                 {
+                     "path":  "target/exm024-loopback-final.log",
+                     "sha256":  "9139b4393486bd2e3b6409891142b20e67aac4db13ae224c170f229c161afee3",
+                     "bytes":  1546
+                 }
+             ],
+    "files":  [
+                  {
+                      "path":  "crates/app/src/lib.rs",
+                      "sha256":  "6ab89db6f9a6a7b16546a1acd84b7094b2cf4a0966caee434b44d3c70c12496c",
+                      "bytes":  899
+                  },
+                  {
+                      "path":  "crates/app/src/scheduler.rs",
+                      "sha256":  "03040aae8388eb909fc3e6bf97d68010b3a86967cd6eced16971064fc66e8493",
+                      "bytes":  11404
+                  },
+                  {
+                      "path":  "crates/app/src/transmission.rs",
+                      "sha256":  "c9caab717a196fa59afea79dd6146f9c6dd792b806e99815d61c3a7670bc78c0",
+                      "bytes":  65521
+                  },
+                  {
+                      "path":  "crates/app/tests/scheduling.rs",
+                      "sha256":  "c3f409a880a5bcf11224622a3fb7007eb988208f72ede067dbeacb542f397051",
+                      "bytes":  23752
+                  },
+                  {
+                      "path":  "crates/domain/src/config.rs",
+                      "sha256":  "aaf88933b46b9ef4a495d6c9b7ed0212dbab13ee59a50683f3916662767c2f40",
+                      "bytes":  20432
+                  },
+                  {
+                      "path":  "crates/domain/src/lib.rs",
+                      "sha256":  "a508715d24d75fd62fc724e479fd9ee393cde70f979c0d70fb6a38e926ee7f66",
+                      "bytes":  2121
+                  },
+                  {
+                      "path":  "crates/domain/src/schedule.rs",
+                      "sha256":  "7dbb67b1f462514cbd4542172cd8e14b18365c9c464939347bc298890518e5fd",
+                      "bytes":  1417
+                  },
+                  {
+                      "path":  "crates/storage/tests/configuration.rs",
+                      "sha256":  "d04fe8c34c86b596898bf81d631d21c51dfb22857e66f3570d5b4115c7ac50fb",
+                      "bytes":  21460
+                  },
+                  {
+                      "path":  "docs/configuration.md",
+                      "sha256":  "fb6310d7283e3442a0c1a8ff5217ac13c92fcf10d33c2c85e86eeed514e04376",
+                      "bytes":  7771
+                  },
+                  {
+                      "path":  "docs/scheduling.md",
+                      "sha256":  "8bac1fafe01c0176f5629d36a5cf78d54a7991201434ad973f86d101d76cbfee",
+                      "bytes":  4725
+                  },
+                  {
+                      "path":  "docs/transmission.md",
+                      "sha256":  "92e670cf4406c38d469da484cd5ce09aca356e8d55aa7f31695fd343e62df8b3",
+                      "bytes":  9767
+                  }
+              ],
+    "contracts":  {
+                      "timing":  "Interval1..86400000ms, optional positive u64 count, optional bounded lateness default oneinterval. FixedRate original grid, FixedDelay actual completion. Skip drops older periods and selects at most latest eligible; Stop disables. Count actual source calls including attempted Busy/errors; skipped/unsubmitted do not consume. No catch-up queue/retry; backward/unavailable/overflow fail closed. Status/timing counters and per-attempt unknown values explicit in scheduling clock domain separate from observation timestamps.",
+                      "safety":  "Explicit per-session ticket and immutable template binding, per-activation atomic staged/enabled/leased/revoked grant plus cancellation. Stop/last handle drop independent of queue/native I/O. Final binding lease and grant fence after pure info/metadata/codec validation and renewed monotonic deadline check; no implicit continuation of partial/unknown outcome. Global changes revoke grants; pending cancel may close common port and require rebind/enable. Trusted finite source calls already leased can honestly complete after Stop.",
+                      "execution":  "Same existing TX background worker/common typed dispatch, one due internal command at a time, four-item normal queue; cyclic schedule selection alternates with manual queue to bound starvation. No GUI timer/thread/I/O, no payload backlog. No new dependency/Cargo.lock/capture/protocol/GUI behavior change; domain shared options keep sibling-layer ban.",
+                      "resources":  "Runtime/grant maps and status\u003c=64, no missed-period payload queue, history128/1MiB charged data/four-record reads retained. New commands carry fixed-size settings/grants. No payload timing logs. Trusted clocks/adapters/native internals and external retained snapshots have their own budgets; no total RSS/sandbox/hard realtime claim."
+                  },
+    "cleanup":  "Only11 declared product files plus new024 evidence/completed/first request. Accepted TASK/events/evidence/ADRs, Cargo.lock/fixtures/CI/allocator and unrelated .idea preserved. No generated build output/log/capture/device serial/secret staged. All verification processes/workers/loopback sockets terminal/closed; bounded ignored logs/test caches retained.",
+    "limitations":  [
+                        "Windows host-side/virtual tests only; physical device/electrical/driver cancellation latency and delivery timing remain036, macOS/other platform native runtime035. No physical pass inferred; real stand not a blocker for024 accepted host-side scope.",
+                        "Controller/API support only; outgoing GUI027 and incoming026/calendar050 remain their own tasks. Caller must resolve config template IDs, keep handles, notify real binding/config/permission changes, and explicitly re-enable after loss.",
+                        "Port.info and trusted Clock must be finite/nonblocking. A driver call already leased is not forcibly recalled; actual known/unknown acceptance stays honest. Host timing is not hard realtime or independent wire delivery proof. Native feature lint is compilation only; Linux target unchanged/no new Linux runtime claimed.",
+                        "No whole-project canonical gate/Epic closure/independent review/release/automatic build claimed. FDTasks5.7 manual adoption does not upgrade native_activation=false; existing path-scoped allocator alone writes versions at qualified boundary."
+                    ],
+    "candidate_tree":  "87410850abab0a6234848f04860e99a87c39f9ea",
+    "verification":  [
+                         {
+                             "command":  "cargo test -p exmon-app -p exmon-capture -p exmon-domain -p exmon-protocol --locked",
+                             "result":  "191 tests PASS:49 app (including15 scheduling/19 one-shot/4 library),48 capture,6 domain,88 protocol; zero failures/ignored; doc tests0",
+                             "log":  "target/exm024-regression-final.log",
+                             "exit":  0
+                         },
+                         {
+                             "command":  "cargo test -p exmon-storage --test configuration --locked",
+                             "result":  "13 PASS",
+                             "log":  "target/exm024-configuration-final.log",
+                             "exit":  0
+                         },
+                         {
+                             "command":  "cargo fmt --all --check",
+                             "result":  "complete workspace PASS",
+                             "exit":  0
+                         },
+                         {
+                             "command":  "cargo clippy --workspace --all-targets --locked -- -D warnings",
+                             "result":  "complete workspace PASS",
+                             "log":  "target/exm024-clippy-final.log",
+                             "exit":  0
+                         },
+                         {
+                             "command":  "cargo clippy -p exmon-capture --features native-hid,native-usb,native-can --all-targets --locked -- -D warnings",
+                             "result":  "Windows native feature compilation/lint PASS; no physical runtime claim",
+                             "log":  "target/exm024-native.log",
+                             "exit":  0
+                         },
+                         {
+                             "command":  "node scripts/check-architecture.mjs",
+                             "result":  "six layers/resolved graph/three negative fixtures PASS",
+                             "log":  "target/exm024-architecture.log",
+                             "exit":  0
+                         },
+                         {
+                             "command":  "cargo test -p exmon-app --test scheduling actual_windows_udp_loopback_measures_five_periodic_submissions --locked -- --nocapture",
+                             "result":  "5 submissions/0 missed/max_lateness_ns1467400/elapsed_ms254; interval50ms, finitecount5, soft250ms lateness,3s overall bound",
+                             "log":  "target/exm024-loopback-final.log",
+                             "exit":  0
+                         },
+                         {
+                             "command":  "git diff --check; git diff --cached --check",
+                             "result":  "PASS",
+                             "exit":  0
+                         }
+                     ],
+    "acceptance":  {
+                       "AC-02":  "15 scheduling tests plus activation-counter exhaustion unit: deterministic exact grid/fixed delay/finite count/skip/stop/lateness/overflow/backward-unavailable clock; simulated95/200ms jumps and preparation gates;64 cyclic schedules; full queue stop before final lease; synchronous already-leased known completion and pending cancellation/watchdog unknown outcome; attempted Busy count/later slot continuation and partial/unknown/capability-loss stop. Actual Windows UDP measured five50ms host-side calls in254ms, max1.4674ms lateness. Existing19 transmission regressions and all implemented default transports retained.",
+                       "AC-01":  "No auto activation: imported/old defaults/new schema validate and roundtrip disabled; enabledtrue invalid. Loading/conversion/clone/bind/register/recreated worker/reconnect/permission invalidation never grant periodic authority. Explicit actual current ticket/session/template enables, stale worker ticket cannot revoke replacement, old handles cannot affect fresh activation, final owner handle drop stops."
+                   },
+    "verified_at":  "2026-11-23T14:42:17Z",
+    "hash_basis":  "SHA256 of verified checkout bytes; candidate_tree is Git-normalized staged product before new closure records. Detailed bounded logs only in ignored local cache.",
+    "checkpoint":  {
+                       "next":  "Fresh turn fetch/reconcile024 publication/allocator and current rules.026 incoming message tabs/raw traffic is functionally ready from published010/020/025 Done; read its exact TASK, all events/evidence and dependencies before claiming. No026 claim or implementation this turn. Continue safe Windows/virtual work across Epics while physical/macOS035/036 remain separate.",
+                       "task":  "EXM-024 verified Done upon successful publication",
+                       "goal":  "ACTIVE; this turn PROGRESS, no global blocker/completion",
+                       "publication":  "Immediately push coherent product/evidence/Done/single first request commit to main; reconcile rejected or unknown publication before another task/commit. Allocator alone writes versions at its actual supported boundary."
+                   },
+    "review":  "Author inspected all11 product paths, deadline arithmetic and engine transitions, checked counters/zero/default validation, runtime/grant lifecycle/control lock ordering, current-worker identity before replacement, final lease and revalidation, pending cancellation/completion/Busy/partial decisions, fairness and aggregate bounds, truthful history/timing clock domains, layer graph and unchanged one-shot outcomes. Author review is not independent Epic Level0. No UI change, visual inspection not applicable.",
+    "environment":  {
+                        "devices":  "Actual localhost UDP only with synthetic bytes. Audited serial-like fake ports and trusted virtual clock, bounded barriers/load. No physical enumeration/open/send, macOS runtime, external endpoint, installation, signing, credential or release action.",
+                        "host":  "Windows Server2025 Datacenter x64 build26100 x86_64-pc-windows-msvc",
+                        "cargo":  "1.98.0 (797e8a9bc 2026-08-05)",
+                        "node":  "24.22.1",
+                        "rustc":  "1.98.0 (88d9e12ae 2026-08-18)"
+                    }
+}

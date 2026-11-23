@@ -3,8 +3,9 @@
 `exmon_app::transmission::TxWorker` owns selected transport ports, preparation,
 one-shot submission and bounded session attempt history on a background thread.
 Construction starts an idle worker: it performs no discovery, open or send.
-The general command API is implemented here; outgoing GUI controls and periodic
-scheduling remain separate EXM-027/024 work. Existing HID-specific controls keep
+The general command API is implemented here; outgoing GUI controls remain
+EXM-027 work. [Periodic scheduling](scheduling.md) uses this same worker and
+submission path with separate explicit activation. Existing HID-specific controls keep
 their separate selected-collection worker.
 
 ## Binding and explicit actions

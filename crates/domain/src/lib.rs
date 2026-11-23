@@ -9,6 +9,7 @@ pub mod fields;
 pub mod metrics;
 pub mod network_filter;
 pub mod observation;
+pub mod schedule;
 
 /// Direction relative to the selected capture interface.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]

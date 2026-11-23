@@ -22,6 +22,52 @@ fn fixture() -> Value {
 fn load(value: &Value) -> Result<ProjectConfig, LoadError> {
     load_project(&serde_json::to_vec(value).unwrap())
 }
+#[test]
+fn schedule_options_roundtrip_disabled_defaults_and_reject_invalid_imports() {
+    use exmon_domain::schedule::{Drift, Missed};
+    let old = load(&fixture()).unwrap();
+    let s = &old.schedules[0];
+    assert_eq!(s.count, None);
+    assert_eq!(s.drift, Drift::FixedRate);
+    assert_eq!(s.missed, Missed::Skip);
+    assert_eq!(s.max_lateness_ms, None);
+    let saved = String::from_utf8(save_project(&old).unwrap()).unwrap();
+    for name in [
+        "\"count\"",
+        "\"drift\"",
+        "\"missed\"",
+        "\"max_lateness_ms\"",
+    ] {
+        assert!(!saved.contains(name));
+    }
+    let mut value = fixture();
+    value["schedules"][0]["count"] = json!(7);
+    value["schedules"][0]["drift"] = json!("fixed_delay");
+    value["schedules"][0]["missed"] = json!("stop");
+    value["schedules"][0]["max_lateness_ms"] = json!(0);
+    let config = load(&value).unwrap();
+    assert!(!config.schedules[0].enabled);
+    assert_eq!(
+        config,
+        load_project(&save_project(&config).unwrap()).unwrap()
+    );
+    for (key, bad) in [
+        ("enabled", json!(true)),
+        ("count", json!(0)),
+        ("count", json!(-1)),
+        ("count", json!(1.5)),
+        ("drift", json!("fast")),
+        ("missed", json!("retry")),
+        ("max_lateness_ms", json!(86400001)),
+        ("interval_ms", json!(0)),
+        ("interval_ms", json!(86400001)),
+        ("extra", json!(0)),
+    ] {
+        let mut invalid = value.clone();
+        invalid["schedules"][0][key] = bad;
+        assert!(load(&invalid).is_err(), "{key}");
+    }
+}
 
 #[test]
 fn all_transports_and_defaults_roundtrip_deterministically() {

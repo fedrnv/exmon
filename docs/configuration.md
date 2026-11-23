@@ -57,7 +57,7 @@ same project; no filesystem or external reference resolution occurs.
 | Filter | Optional Rx/Tx/Unknown direction, port list for TCP/UDP, CAN id list for CAN. Ports are u16; CAN ids are at most 29 bits. Empty lists impose no constraint. |
 | Chart | Protocol/numeric-field references, samples 1..65536, optional positive moving_average no larger than samples. |
 | Template | Id, reference to a TX-permitted logical interface, 1..65536 payload bytes. Backend-specific TX/frame validation is required again before actual submission. |
-| Schedule | Id, template reference, interval_ms 1..86400000, enabled default false. Persisted true is rejected; explicit runtime enable remains a separate action. |
+| Schedule | Id, template reference, interval_ms 1..86400000, enabled default false. Optional positive count, drift fixed_rate/fixed_delay, missed skip/stop, max_lateness_ms 0..86400000. Default additions omitted. Persisted true is rejected; explicit runtime enable remains a separate action. See [scheduling semantics](scheduling.md). |
 
 Numeric ranges in schema validation are portable safety bounds, not guarantees
 that an OS driver or device accepts that setting. Serial baud is 1..4000000,

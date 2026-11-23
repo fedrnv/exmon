@@ -360,8 +360,27 @@ pub struct Schedule {
     pub id: String,
     pub template_id: String,
     pub interval_ms: u32,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub count: Option<u64>,
+    #[serde(default, skip_serializing_if = "crate::schedule::Drift::is_default")]
+    pub drift: crate::schedule::Drift,
+    #[serde(default, skip_serializing_if = "crate::schedule::Missed::is_default")]
+    pub missed: crate::schedule::Missed,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_lateness_ms: Option<u32>,
     #[serde(default)]
     pub enabled: bool,
+}
+impl Schedule {
+    pub fn options(&self) -> crate::schedule::Options {
+        crate::schedule::Options {
+            interval_ms: self.interval_ms,
+            count: self.count,
+            drift: self.drift,
+            missed: self.missed,
+            max_lateness_ms: self.max_lateness_ms,
+        }
+    }
 }
 
 /// Local selectors are intentionally absent from ProjectConfig and Protocol.
@@ -579,9 +598,9 @@ impl ProjectConfig {
                 "reference an existing template",
             )?;
             check(
-                (1..=86_400_000).contains(&s.interval_ms),
+                s.options().validate().is_ok(),
                 "schedule.interval_ms",
-                "interval must be 1..86400000 milliseconds",
+                "use valid interval, positive count and bounded lateness window",
             )?;
         }
         Ok(())

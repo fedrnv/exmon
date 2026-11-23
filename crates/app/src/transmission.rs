@@ -1,4 +1,5 @@
 //! Explicit one-shot worker. Preparation, source factories and submissions never run on UI.
+use crate::scheduler::{self, Clock, Engine, Grant, Handle, Reason, Spec, State, Status, Timing};
 use exmon_capture::{
     adapter::{Availability, Cancellation, Error as BackendError},
     can::Frame,
@@ -409,6 +410,7 @@ pub enum Outcome {
 }
 #[derive(Clone, Debug)]
 pub struct Attempt {
+    pub scheduled: Option<Timing>,
     pub timestamp_ns: Option<u64>,
     pub sequence: u64,
     pub id: u64,
@@ -431,6 +433,7 @@ impl Attempt {
 }
 #[derive(Clone, Default, Debug)]
 pub struct Snapshot {
+    pub schedules: Vec<Status>,
     pub ticket: Option<Ticket>,
     pub identity: Option<Identity>,
     pub templates: Vec<(u64, u64)>,
@@ -449,6 +452,9 @@ struct History {
     lost: u64,
 }
 struct Shared {
+    schedule_clock: Arc<dyn Clock>,
+    grants: Mutex<BTreeMap<u64, Arc<Grant>>>,
+    activation: AtomicU64,
     inflight: AtomicU64,
     owner: Arc<()>,
     clock: Instant,
@@ -470,9 +476,17 @@ impl Shared {
         }
     }
     fn revoke(&self) {
+        self.stop_schedules(Reason::Stale);
         self.authority.fetch_or(REVOKED, Ordering::AcqRel);
         if let Ok(c) = self.cancel.lock() {
             c.cancel();
+        }
+    }
+    fn stop_schedules(&self, why: Reason) {
+        if let Ok(grants) = self.grants.lock() {
+            for grant in grants.values() {
+                grant.stop(why);
+            }
         }
     }
     fn change(&self) -> Result<u64, Failure> {
@@ -576,6 +590,11 @@ impl Shared {
 }
 type Factory = Box<dyn FnOnce() -> Result<Box<dyn Port>, BackendError> + Send>;
 enum Command {
+    Schedule {
+        ticket: Ticket,
+        spec: Spec,
+        grant: Arc<Grant>,
+    },
     Bind {
         generation: u64,
         key: Binding,
@@ -587,6 +606,7 @@ enum Command {
         spec: TemplateSpec,
     },
     Send {
+        due: Option<Due>,
         ticket: Ticket,
         template: u64,
         revision: u64,
@@ -600,7 +620,14 @@ pub struct TxWorker {
 }
 impl TxWorker {
     pub fn spawn() -> Result<Self, Failure> {
+        Self::spawn_with_clock(Arc::new(scheduler::MonotonicClock::default()))
+    }
+    /// Inject only a trusted, bounded, nonblocking monotonic source.
+    pub fn spawn_with_clock(clock: Arc<dyn Clock>) -> Result<Self, Failure> {
         let shared = Arc::new(Shared {
+            schedule_clock: clock,
+            grants: Mutex::new(BTreeMap::new()),
+            activation: AtomicU64::new(0),
             inflight: AtomicU64::new(0),
             owner: Arc::new(()),
             clock: Instant::now(),
@@ -723,6 +750,7 @@ impl TxWorker {
             Some(Failure::Stale)
         } else {
             self.enqueue(Command::Send {
+                due: None,
                 ticket: ticket.clone(),
                 template,
                 revision,
@@ -736,6 +764,65 @@ impl TxWorker {
             return Err(failure);
         }
         Ok(id)
+    }
+    /// Explicit activation for this worker, session, binding and template revision.
+    /// Dropping the final returned handle revokes the activation.
+    pub fn enable_schedule(&self, ticket: &Ticket, spec: Spec) -> Result<Handle, Failure> {
+        let _guard = self
+            .shared
+            .control
+            .lock()
+            .map_err(|_| Failure::Disconnected)?;
+        if !Arc::ptr_eq(&ticket.owner, &self.shared.owner)
+            || self.shared.authority.load(Ordering::Acquire) & !SUBMITTED != ticket.generation
+        {
+            return Err(Failure::Stale);
+        }
+        let mut grants = self
+            .shared
+            .grants
+            .lock()
+            .map_err(|_| Failure::Disconnected)?;
+        if let Some(old) = grants.get(&spec.id) {
+            old.stop(Reason::Replaced);
+        }
+        spec.validate().map_err(|_| Failure::Validation)?;
+        grants.retain(|id, grant| *id == spec.id || grant.stopped().is_none());
+        if !grants.contains_key(&spec.id) && grants.len() >= 64 {
+            return Err(Failure::Capacity);
+        }
+        let activation =
+            self.shared
+                .activation
+                .fetch_update(Ordering::AcqRel, Ordering::Acquire, |v| v.checked_add(1));
+        let activation = match activation {
+            Ok(value) => value + 1,
+            Err(_) => {
+                drop(grants);
+                self.shared.stop_schedules(Reason::Exhausted);
+                self.shared.revoke();
+                self.shared
+                    .close_generation
+                    .store(ticket.generation, Ordering::Release);
+                return Err(Failure::Exhausted);
+            }
+        };
+        let grant = Grant::new(activation);
+        let handle = Handle::new(grant.clone());
+        grants.insert(spec.id, grant.clone());
+        drop(grants);
+        if let Err(error) = self.enqueue(Command::Schedule {
+            ticket: ticket.clone(),
+            spec,
+            grant: grant.clone(),
+        }) {
+            grant.stop(Reason::Invalid);
+            return Err(error);
+        }
+        Ok(handle)
+    }
+    pub fn stop_schedules(&self) {
+        self.shared.stop_schedules(Reason::User);
     }
     /// Revoke first, independently of a full command queue; never waits on source I/O.
     pub fn close(&self) {
@@ -786,6 +873,7 @@ impl TxWorker {
 }
 impl Drop for TxWorker {
     fn drop(&mut self) {
+        self.shared.stop_schedules(Reason::Shutdown);
         self.shared.revoke();
         self.shared.quit.store(true, Ordering::Release);
         if let Some(handle) = self.thread.take() {
@@ -795,6 +883,7 @@ impl Drop for TxWorker {
 }
 fn rejected(id: u64, binding: Binding, template: u64, revision: u64, failure: Failure) -> Attempt {
     Attempt {
+        scheduled: None,
         timestamp_ns: None,
         sequence: 0,
         id,
@@ -808,7 +897,246 @@ fn rejected(id: u64, binding: Binding, template: u64, revision: u64, failure: Fa
         validation: Validation::default(),
     }
 }
+struct Due {
+    id: u64,
+    activation: u64,
+    grant: Arc<Grant>,
+}
+struct Scheduled {
+    ticket: Ticket,
+    spec: Spec,
+    grant: Arc<Grant>,
+    engine: Engine,
+}
+#[derive(Default)]
+struct Schedules {
+    items: BTreeMap<u64, Scheduled>,
+    cursor: u64,
+}
+impl Schedules {
+    fn sync(&mut self, shared: &Shared) {
+        if self.items.is_empty() {
+            return;
+        }
+        let now = shared.schedule_clock.now_ns();
+        for item in self.items.values_mut() {
+            item.engine.tick(now);
+            if let Some(why) = item.grant.stopped() {
+                item.engine.stop(why);
+            }
+            if let State::Stopped(why) = item.engine.state() {
+                item.grant.stop(why);
+            }
+        }
+        shared.update(|s| {
+            s.schedules = self
+                .items
+                .values()
+                .map(|i| Status {
+                    id: i.spec.id,
+                    revision: i.spec.revision,
+                    activation: i.grant.activation,
+                    state: i.engine.state(),
+                    next_ns: i.engine.next_ns(),
+                    stats: i.engine.stats().clone(),
+                })
+                .collect()
+        });
+    }
+    fn add(&mut self, shared: &Shared, ticket: Ticket, spec: Spec, grant: Arc<Grant>, valid: bool) {
+        let compatible = self
+            .items
+            .get(&spec.id)
+            .is_none_or(|old| spec.revision > old.spec.revision || spec == old.spec);
+        self.items
+            .retain(|id, item| *id == spec.id || item.grant.stopped().is_none());
+        if !valid || !compatible || (!self.items.contains_key(&spec.id) && self.items.len() >= 64) {
+            grant.stop(Reason::Invalid);
+            return;
+        }
+        let Ok(mut engine) = Engine::new(spec.options) else {
+            grant.stop(Reason::Invalid);
+            return;
+        };
+        match shared.schedule_clock.now_ns() {
+            Ok(now) => engine.arm(now),
+            Err(_) => engine.stop(Reason::Clock),
+        }
+        if let State::Stopped(why) = engine.state() {
+            grant.stop(why);
+        }
+        grant.activate();
+        self.items.insert(
+            spec.id,
+            Scheduled {
+                ticket,
+                spec,
+                grant,
+                engine,
+            },
+        );
+    }
+    fn due(&mut self, shared: &Shared) -> Option<Command> {
+        let now = shared.schedule_clock.now_ns().ok()?;
+        // Cyclic selection bounds starvation without storing missed-period work.
+        let ids: Vec<_> = self
+            .items
+            .range((
+                std::ops::Bound::Excluded(self.cursor),
+                std::ops::Bound::Unbounded,
+            ))
+            .chain(self.items.range(..=self.cursor))
+            .map(|(id, _)| *id)
+            .collect();
+        for id in ids {
+            let item = self.items.get_mut(&id)?;
+            if item.grant.stopped().is_some() {
+                continue;
+            }
+            if item.engine.offer(now).is_some() {
+                self.cursor = id;
+                let Ok(attempt) =
+                    shared
+                        .attempt
+                        .fetch_update(Ordering::AcqRel, Ordering::Acquire, |v| v.checked_add(1))
+                else {
+                    item.engine.stop(Reason::Exhausted);
+                    item.grant.stop(Reason::Exhausted);
+                    shared.stop_schedules(Reason::Exhausted);
+                    shared.revoke();
+                    return None;
+                };
+                return Some(Command::Send {
+                    ticket: item.ticket.clone(),
+                    template: item.spec.template,
+                    revision: item.spec.template_revision,
+                    id: attempt + 1,
+                    due: Some(Due {
+                        id,
+                        activation: item.grant.activation,
+                        grant: item.grant.clone(),
+                    }),
+                });
+            }
+        }
+        None
+    }
+    fn item(&mut self, due: &Due) -> Option<&mut Scheduled> {
+        self.items
+            .get_mut(&due.id)
+            .filter(|i| i.grant.activation == due.activation)
+    }
+    fn timing(&mut self, due: &Due) -> Option<Timing> {
+        let item = self.item(due)?;
+        let stats = item.engine.stats();
+        Some(Timing {
+            id: due.id,
+            activation: due.activation,
+            deadline_ns: stats.deadline_ns?,
+            decision_ns: stats.decision_ns?,
+            submitted_ns: None,
+            completed_ns: None,
+        })
+    }
+    fn reject(&mut self, shared: &Shared, due: &Due, error: Failure) {
+        if let Some(item) = self.item(due) {
+            if error == Failure::Backend(BackendError::Busy) {
+                match shared.schedule_clock.now_ns() {
+                    Ok(now) => item.engine.skip(now),
+                    Err(_) => item.engine.stop(Reason::Clock),
+                }
+            } else {
+                item.engine.stop(Reason::Invalid);
+            }
+            if let State::Stopped(why) = item.engine.state() {
+                item.grant.stop(why);
+            }
+        }
+    }
+    fn commit(&mut self, shared: &Shared, due: &Due) -> Option<Timing> {
+        let item = self.item(due)?;
+        if !due.grant.acquire() {
+            item.engine
+                .stop(due.grant.stopped().unwrap_or(Reason::Stale));
+            return None;
+        }
+        let now = shared.schedule_clock.now_ns();
+        let committed = match now {
+            Ok(now) => item.engine.commit(now),
+            Err(_) => {
+                item.engine.stop(Reason::Clock);
+                false
+            }
+        };
+        if !committed {
+            due.grant.release();
+            if let State::Stopped(why) = item.engine.state() {
+                due.grant.stop(why);
+            }
+            return None;
+        }
+        let stats = item.engine.stats();
+        Some(Timing {
+            id: due.id,
+            activation: due.activation,
+            deadline_ns: stats.deadline_ns?,
+            decision_ns: stats.decision_ns?,
+            submitted_ns: stats.submitted_ns,
+            completed_ns: None,
+        })
+    }
+    fn finish(&mut self, shared: &Shared, due: &Due, attempt: &mut Attempt) {
+        if let Some(item) = self.item(due) {
+            if let Some(why) = due.grant.stopped() {
+                item.engine.stop(why);
+            }
+            let why = match attempt.outcome {
+                Outcome::Complete {
+                    accepted: Some(n),
+                    status: Completion::Accepted,
+                } if Some(n) == attempt.requested => None,
+                Outcome::Complete {
+                    status: Completion::Accepted,
+                    ..
+                } => Some(Reason::Partial),
+                Outcome::Failed {
+                    error: BackendError::Busy,
+                    ..
+                } if item.spec.options.missed == scheduler::Missed::Skip => None,
+                Outcome::Failed {
+                    error: BackendError::Busy,
+                    ..
+                } => Some(Reason::Busy),
+                _ => Some(Reason::Backend),
+            };
+            // A finite-count completion must not conceal a partial/error outcome.
+            if let Some(why) = why {
+                item.engine.stop(why);
+            }
+            match shared.schedule_clock.now_ns() {
+                Ok(now) => {
+                    item.engine.finish(now);
+                    if let Some(t) = &mut attempt.scheduled {
+                        t.completed_ns = t
+                            .submitted_ns
+                            .filter(|submitted| now >= *submitted)
+                            .map(|_| now);
+                    }
+                }
+                Err(_) => item.engine.stop(Reason::Clock),
+            }
+            due.grant.release();
+            if let Some(why) = due.grant.stopped() {
+                item.engine.stop(why);
+            }
+            if let State::Stopped(why) = item.engine.state() {
+                due.grant.stop(why);
+            }
+        }
+    }
+}
 struct Pending {
+    due: Option<Due>,
     attempt: Attempt,
     template: Arc<Template>,
     metadata: Metadata,
@@ -829,6 +1157,7 @@ impl Drop for Active {
 struct Exit(Arc<Shared>);
 impl Drop for Exit {
     fn drop(&mut self) {
+        self.0.stop_schedules(Reason::Shutdown);
         self.0.revoke();
         self.0.quit.store(true, Ordering::Release);
         if thread::panicking()
@@ -849,6 +1178,7 @@ impl Drop for Exit {
 }
 fn terminal(
     shared: &Shared,
+    schedules: &mut Schedules,
     mut pending: Pending,
     result: Result<Progress, BackendError>,
     clock: Instant,
@@ -899,12 +1229,17 @@ fn terminal(
             }
         }
     }
+    if let Some(due) = &pending.due {
+        schedules.finish(shared, due, &mut pending.attempt);
+    }
     shared.record(pending.attempt);
     shared.release(pending.generation);
     shared.update(|s| s.pending = false);
     successful
 }
 fn run(shared: Arc<Shared>, rx: mpsc::Receiver<Command>) {
+    let mut schedules = Schedules::default();
+    let mut prefer_schedule = false;
     let mut active: Option<Active> = None;
     let _exit = Exit(shared.clone());
     let mut pending: Option<Pending> = None;
@@ -912,6 +1247,16 @@ fn run(shared: Arc<Shared>, rx: mpsc::Receiver<Command>) {
     let clock = shared.clock;
     let mut last_write: Option<(Instant, u64)> = None;
     while !shared.quit.load(Ordering::Acquire) {
+        schedules.sync(&shared);
+        if schedules.items.values().any(|i| i.grant.enabled())
+            && active.as_ref().is_some_and(|a| {
+                !a.port
+                    .info()
+                    .is_ok_and(|info| info == a.info && info.writable == Availability::Available)
+            })
+        {
+            shared.revoke();
+        }
         let authority = shared.authority.load(Ordering::Acquire);
         let closing = authority & !3 == shared.close_generation.load(Ordering::Acquire)
             && authority & REVOKED != 0;
@@ -939,6 +1284,7 @@ fn run(shared: Arc<Shared>, rx: mpsc::Receiver<Command>) {
                 };
                 terminal(
                     &shared,
+                    &mut schedules,
                     p,
                     Ok(completed.unwrap_or(Progress::Complete {
                         accepted: None,
@@ -951,6 +1297,7 @@ fn run(shared: Arc<Shared>, rx: mpsc::Receiver<Command>) {
                 s.ticket = None;
                 s.identity = None;
             });
+            shared.revoke();
         }
         if closing {
             if let Some(mut a) = active.take() {
@@ -969,7 +1316,11 @@ fn run(shared: Arc<Shared>, rx: mpsc::Receiver<Command>) {
             if matches!(result, Ok(Progress::Pending)) {
                 pending = Some(p)
             } else {
-                let failed = !terminal(&shared, p, result, clock);
+                let busy_live = matches!(result, Err(BackendError::Busy))
+                    && active
+                        .as_ref()
+                        .is_some_and(|a| a.port.info().is_ok_and(|info| info == a.info));
+                let failed = !terminal(&shared, &mut schedules, p, result, clock) && !busy_live;
                 if failed {
                     shared.revoke();
                     if let Some(mut a) = active.take() {
@@ -982,10 +1333,29 @@ fn run(shared: Arc<Shared>, rx: mpsc::Receiver<Command>) {
                 }
             }
         }
-        if pending.is_none()
-            && let Ok(command) = rx.try_recv()
-        {
+        let command = if pending.is_some() {
+            None
+        } else if prefer_schedule {
+            schedules.due(&shared).or_else(|| rx.try_recv().ok())
+        } else {
+            rx.try_recv().ok().or_else(|| schedules.due(&shared))
+        };
+        if let Some(command) = command {
+            prefer_schedule = !prefer_schedule;
             match command {
+                Command::Schedule {
+                    ticket,
+                    spec,
+                    grant,
+                } => {
+                    let valid = shared.current(ticket.generation)
+                        && shared.authority.load(Ordering::Acquire) & REVOKED == 0
+                        && active.as_ref().is_some_and(|a| a.key == ticket.binding)
+                        && templates
+                            .get(&spec.template)
+                            .is_some_and(|t| t.spec.revision == spec.template_revision);
+                    schedules.add(&shared, ticket, spec, grant, valid);
+                }
                 Command::Bind {
                     generation,
                     key,
@@ -1109,6 +1479,7 @@ fn run(shared: Arc<Shared>, rx: mpsc::Receiver<Command>) {
                     }
                 }
                 Command::Send {
+                    due,
                     ticket,
                     template,
                     revision,
@@ -1117,6 +1488,9 @@ fn run(shared: Arc<Shared>, rx: mpsc::Receiver<Command>) {
                     shared.inflight.store(id, Ordering::Release);
                     let mut record =
                         rejected(id, ticket.binding, template, revision, Failure::Stale);
+                    if let Some(due) = &due {
+                        record.scheduled = schedules.timing(due);
+                    }
                     let validation = (|| {
                         if !shared.current(ticket.generation)
                             || shared.authority.load(Ordering::Acquire) & REVOKED != 0
@@ -1169,6 +1543,9 @@ fn run(shared: Arc<Shared>, rx: mpsc::Receiver<Command>) {
                             return Err(e);
                         }
                         let metadata = a.port.metadata(&t.packet()).map_err(Failure::Backend)?;
+                        if due.is_some() && !a.port.info().is_ok_and(|latest| latest == info) {
+                            return Err(Failure::Binding);
+                        }
                         Observation::new(
                             0,
                             Direction::Tx,
@@ -1181,6 +1558,9 @@ fn run(shared: Arc<Shared>, rx: mpsc::Receiver<Command>) {
                     })();
                     match validation {
                         Err(e) => {
+                            if let Some(due) = &due {
+                                schedules.reject(&shared, due, e);
+                            }
                             record.outcome = Outcome::Rejected(e);
                             shared.record(record);
                             if matches!(
@@ -1215,6 +1595,9 @@ fn run(shared: Arc<Shared>, rx: mpsc::Receiver<Command>) {
                                 )
                                 .is_err()
                             {
+                                if let Some(due) = &due {
+                                    schedules.reject(&shared, due, Failure::Stale);
+                                }
                                 shared.record(record);
                                 continue;
                             }
@@ -1225,7 +1608,19 @@ fn run(shared: Arc<Shared>, rx: mpsc::Receiver<Command>) {
                                 shared.record(record);
                                 continue;
                             };
+                            let cancel = if let Some(due) = &due {
+                                let Some(timing) = schedules.commit(&shared, due) else {
+                                    shared.release(ticket.generation);
+                                    shared.record(record);
+                                    continue;
+                                };
+                                record.scheduled = Some(timing);
+                                due.grant.cancel.clone()
+                            } else {
+                                cancel
+                            };
                             let p = Pending {
+                                due,
                                 attempt: record,
                                 template: t.clone(),
                                 metadata,
@@ -1249,7 +1644,8 @@ fn run(shared: Arc<Shared>, rx: mpsc::Receiver<Command>) {
                                     && active.as_ref().is_some_and(|a| {
                                         a.port.info().is_ok_and(|info| info == a.info)
                                     });
-                                let failed = !terminal(&shared, p, result, clock) && !busy_live;
+                                let failed = !terminal(&shared, &mut schedules, p, result, clock)
+                                    && !busy_live;
                                 if failed {
                                     shared.revoke();
                                     if let Some(mut a) = active.take() {
@@ -1281,6 +1677,7 @@ fn run(shared: Arc<Shared>, rx: mpsc::Receiver<Command>) {
     if let Some(p) = pending {
         terminal(
             &shared,
+            &mut schedules,
             p,
             Ok(completed.unwrap_or(Progress::Complete {
                 accepted: None,
@@ -1298,6 +1695,40 @@ fn run(shared: Arc<Shared>, rx: mpsc::Receiver<Command>) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn schedule_activation_exhaustion_revokes_all_without_reusing_identity() {
+        let w = TxWorker::spawn().unwrap();
+        w.shared.authority.store(4, Ordering::Release);
+        let ticket = Ticket {
+            owner: w.shared.owner.clone(),
+            generation: 4,
+            binding: key(),
+        };
+        let grant = Grant::new(1);
+        grant.activate();
+        w.shared.grants.lock().unwrap().insert(1, grant.clone());
+        w.shared.activation.store(u64::MAX, Ordering::Release);
+        let spec = Spec {
+            id: 2,
+            revision: 1,
+            template: 1,
+            template_revision: 1,
+            options: scheduler::Options {
+                interval_ms: 1,
+                count: None,
+                drift: scheduler::Drift::FixedRate,
+                missed: scheduler::Missed::Skip,
+                max_lateness_ms: None,
+            },
+        };
+        assert_eq!(
+            w.enable_schedule(&ticket, spec).unwrap_err(),
+            Failure::Exhausted
+        );
+        assert_eq!(grant.stopped(), Some(Reason::Exhausted));
+        assert_eq!(w.shared.activation.load(Ordering::Acquire), u64::MAX);
+        assert_ne!(w.shared.authority.load(Ordering::Acquire) & REVOKED, 0);
+    }
     fn key() -> Binding {
         Binding {
             session: 1,

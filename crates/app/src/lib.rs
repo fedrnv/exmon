@@ -3,6 +3,7 @@
 pub mod diagnostics;
 pub mod hid_worker;
 pub mod network_filters;
+pub mod scheduler;
 pub mod shell;
 pub mod transmission;
 
