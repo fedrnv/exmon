@@ -67,6 +67,44 @@ fn framing_and_numeric_variants_roundtrip() {
     }
 }
 #[test]
+fn binary_field_schema_extensions_roundtrip_and_reject_unsafe_definitions() {
+    let old = String::from_utf8(save_project(&load(&fixture()).unwrap()).unwrap()).unwrap();
+    for new in ["\"bits\"", "\"constant\"", "\"constraints\"", "\"derived\""] {
+        assert!(!old.contains(new));
+    }
+    let mut value = fixture();
+    value["protocols"][0]["fields"] = json!([
+        {"id":"a","offset":0,"length":2,"representation":"unsigned","endian":"little","bits":{"offset":0,"width":4},"constant":{"kind":"unsigned","value":1},"enumeration":[{"value":{"kind":"unsigned","value":1},"name":"Ready"},{"value":{"kind":"unsigned","value":2},"name":"Busy"}],"constraints":{"min":{"kind":"unsigned","value":0},"max":{"kind":"unsigned","value":15},"enum_closed":true}},
+        {"id":"b","offset":0,"length":2,"representation":"unsigned","endian":"big","bits":{"offset":0,"width":4},"scale":0.5,"bias":-1.0,"unit":"V"},
+        {"id":"float","offset":2,"length":4,"representation":"float","endian":"little","constant":{"kind":"float32","bits":1065353216},"constraints":{"finite":true}},
+        {"id":"d","offset":0,"length":0,"representation":"derived","endian":"little","derived":[{"op":"field","id":"a"},{"op":"literal","value":{"kind":"unsigned","value":2}},{"op":"mul"}],"unit":"counts"}
+    ]);
+    value["charts"][0]["field_id"] = json!("d");
+    let config = load(&value).unwrap();
+    let bytes = save_project(&config).unwrap();
+    assert_eq!(load_project(&bytes).unwrap(), config);
+    assert!(!config.schedules[0].enabled);
+    assert!(!config.interfaces[1].tx_allowed);
+    for (path, bad) in [
+        ("/protocols/0/fields/1/bits/offset", json!(8)),
+        ("/protocols/0/fields/0/bits/width", json!(0)),
+        ("/protocols/0/fields/0/constant/value", json!(16)),
+        ("/protocols/0/fields/0/enumeration/1/name", json!("Ready")),
+        ("/protocols/0/fields/0/constraints/min/value", json!(16)),
+        ("/protocols/0/fields/3/derived/0/id", json!("d")),
+        ("/protocols/0/fields/3/derived/0/id", json!("missing")),
+        ("/protocols/0/fields/3/derived/2/op", json!("execute")),
+        ("/protocols/0/fields/3/length", json!(1)),
+    ] {
+        let mut invalid = value.clone();
+        *invalid.pointer_mut(path).unwrap() = bad;
+        assert!(load(&invalid).is_err(), "{path}");
+    }
+    let mut invalid = value.clone();
+    invalid["protocols"][0]["fields"][1]["bits"]["unknown"] = json!(true);
+    assert!(load(&invalid).is_err());
+}
+#[test]
 fn classification_rules_and_explicit_names_roundtrip_without_changing_tx_defaults() {
     let old = load(&fixture()).unwrap();
     let encoded = String::from_utf8(save_project(&old).unwrap()).unwrap();

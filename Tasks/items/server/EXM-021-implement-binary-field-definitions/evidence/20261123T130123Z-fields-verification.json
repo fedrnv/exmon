@@ -1,0 +1,186 @@
+{
+    "task_id":  "EXM-021",
+    "owner":  "Codex exmon binary fields",
+    "verified_at":  "2026-11-23T13:01:23Z",
+    "source_base":  "462b4f024a3035a30c931c508f5f383edc4f3cd5",
+    "candidate_tree":  "725e538e260ca30bb9d7b93f69a0b3e05ac06873",
+    "task_sha256":  "0c744d228e4025e5b767344a851f53ed81c9de19c6052119fc1dbf0d402a168d",
+    "policy_sha256":  "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+    "hash_basis":  "SHA256 of verified checkout bytes; candidate_tree is Git-normalized staged product before closure records. Detailed bounded logs and focused executable remain ignored locally.",
+    "owner_exception":  "Tasks/items/server/EXM-008-implement-ethernet-interface-discovery-and-raw-capture/events/20261123T091743Z-codex-owner-amended-d9f16d1424bef5f78fabeb8823e23fc1.md",
+    "environment":  {
+                        "host":  "Windows Server2025 Datacenter x64 build26100 x86_64-pc-windows-msvc",
+                        "rustc":  "1.98.0 (88d9e12ae 2026-08-18)",
+                        "cargo":  "1.98.0 (797e8a9bc 2026-08-05)",
+                        "node":  "24.22.1",
+                        "devices":  "Pure field/schema processing. No new physical/native interface, external traffic, installation or privileges. Default-feature synthetic/loopback transport regressions only; no stand or macOS qualification."
+                    },
+    "files":  [
+                  {
+                      "path":  "crates/domain/src/config.rs",
+                      "sha256":  "25666f01d08562719b332a498526644d2e19a1168ef5bf294320b96c14abd7cb",
+                      "bytes":  19357
+                  },
+                  {
+                      "path":  "crates/domain/src/fields.rs",
+                      "sha256":  "9a852f8ea49e897753db06658f2187ea037621e62b9d8636b54bf3978ffea79e",
+                      "bytes":  18223
+                  },
+                  {
+                      "path":  "crates/domain/src/lib.rs",
+                      "sha256":  "b5f0d84105644538c627f422e109a41ee8760bab116414feaf2aaa2401e35955",
+                      "bytes":  2085
+                  },
+                  {
+                      "path":  "crates/protocol/src/fields.rs",
+                      "sha256":  "d1a1eba26a3c84916b363d77413661c8914472587d39074b1698549831f3eb91",
+                      "bytes":  20610
+                  },
+                  {
+                      "path":  "crates/protocol/src/lib.rs",
+                      "sha256":  "e47a01abb7d48f1ca582fba5e4b17a8b9930cee7317a7b4e65453f1dec4c4e2b",
+                      "bytes":  210
+                  },
+                  {
+                      "path":  "crates/protocol/tests/fields.rs",
+                      "sha256":  "e58abed7a4e6d4bc953d4d24b72078598e4cc3673f6c921cbff8d4845bdf2308",
+                      "bytes":  33366
+                  },
+                  {
+                      "path":  "crates/storage/tests/configuration.rs",
+                      "sha256":  "b3b6fd24e75c1560d701933a09238a2f2c62db20f995b6452ea6c7d6c646febb",
+                      "bytes":  17832
+                  },
+                  {
+                      "path":  "docs/binary-fields.md",
+                      "sha256":  "3d2403fd6c1ad1c57044951e85ea493e9cbf4b36813e84cd8738a7a1d2948753",
+                      "bytes":  6258
+                  },
+                  {
+                      "path":  "docs/configuration.md",
+                      "sha256":  "7b4d48cd7383b97f07ca4b33caad045352ed47e23c0adc6b3988d685f787b19b",
+                      "bytes":  7107
+                  }
+              ],
+    "unchanged_inputs":  [
+                             {
+                                 "path":  "fixtures/traffic/corpus.json",
+                                 "sha256":  "e45111cc5c12aeb44e4843f6530f45ad716350e73ad05f197c9257b82d179295",
+                                 "bytes":  73047
+                             },
+                             {
+                                 "path":  "Cargo.lock",
+                                 "sha256":  "177947ec9fc79d0a1bd808158151fbae05a444534ced1a934ea310a519289cf1",
+                                 "bytes":  108514
+                             }
+                         ],
+    "local_artifacts":  [
+                            {
+                                "path":  "target/exm021-evidence/focused.log",
+                                "sha256":  "6b994ebd8bf9facf8da33e449fc9e380939b93fda2179516ca454cec512da4aa",
+                                "bytes":  4004
+                            },
+                            {
+                                "path":  "target/exm021-evidence/configuration.log",
+                                "sha256":  "7d19e88e61beb13f16958044fece0803cd202d8ca56d0e55baba5d8bdca506d9",
+                                "bytes":  2904
+                            },
+                            {
+                                "path":  "target/exm021-evidence/regression.log",
+                                "sha256":  "8aeaa884087d1cc6c7914002a1841c7fb602006cde862e36596fcfd9d8a2b3f9",
+                                "bytes":  28354
+                            },
+                            {
+                                "path":  "target/exm021-evidence/fmt.log",
+                                "sha256":  "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                "bytes":  0
+                            },
+                            {
+                                "path":  "target/exm021-evidence/clippy.log",
+                                "sha256":  "ae4befe8ff77005ee331292cf5b378c409862078e88f6aacaa7f7820289baef0",
+                                "bytes":  1734
+                            },
+                            {
+                                "path":  "target/exm021-evidence/architecture.log",
+                                "sha256":  "4f389e2d9cdf167261ce323cd3ff4bfc6fb9335b6d69cac66fc14320ab8eaece",
+                                "bytes":  180
+                            },
+                            {
+                                "path":  "target/debug/deps/fields-c7db01dd1199a37e.exe",
+                                "sha256":  "161b87e7c8112afefa04990219aa33166d68420a5632ff0fa7cbd5a936a17a2f",
+                                "bytes":  3057152
+                            }
+                        ],
+    "acceptance":  {
+                       "AC-01":  "PASS15 focused tests: independent integer extremes all native widths/orders; IEEE32/64 exact bits including NaN payloads/infinity/-0; every bit offset/width against independent physical-bit reference in both endians, signed bit boundaries, cross-endian disjoint containers. Exact bytes/ASCII/UTF8, constants/enums/raw bounds, scaling/units/explicit rounding tolerance, forward derived references/all RPN operators/scaled dependencies/exact i128. All132 accepted corpus cases run through real framing and classification into exact expected field values. Raw decode/encode preserves exact bytes and unrelated bits; failed writes are transactional.",
+                       "AC-02":  "PASS invalid bounds/width/types/overlap/constants/enums/constraints/expression stacks/references/cycles; every truncated prefix; invalid text/nonfinite/projection/overflow/divide-zero/dependency errors; exact numeric comparisons/conversions at i128/u64 boundaries. 2048 deterministic definition mutations,4096 hostile wire values, max256 fields/256-field dependency chain/65536 message, \u003e1MiB individual and aggregate definition budgets, excessive enum/op/count rejected. Checked i128 MIN neg/abs/division failures, bounded RPN stack.11 storage configuration tests verify old defaults/new extensions/strict admission/deterministic persistence/disabled TX and schedules. No ignored acceptance."
+                   },
+    "verification":  [
+                         {
+                             "command":  "cargo check -p exmon-domain --locked; cargo check -p exmon-protocol --locked",
+                             "result":  "PASS during implementation; final workspace Clippy also type-checks all consumers."
+                         },
+                         {
+                             "command":  "cargo test -p exmon-protocol --test fields --locked",
+                             "result":  "PASS15,0 failed/ignored,0.04s; rerun as part of final selected regression.",
+                             "log":  "target/exm021-evidence/focused.log"
+                         },
+                         {
+                             "command":  "cargo test -p exmon-storage --test configuration --locked",
+                             "result":  "PASS11,0 failed/ignored,0.18s on final code; subsequent changes documentation only.",
+                             "log":  "target/exm021-evidence/configuration.log"
+                         },
+                         {
+                             "command":  "cargo test -p exmon-protocol -p exmon-capture -p exmon-domain --locked",
+                             "result":  "PASS120 (70 protocol,44 capture,6 domain),0 failed/ignored plus doc-tests. Together with configuration131 selected tests; exit0. No physical/native capability inferred.",
+                             "log":  "target/exm021-evidence/regression.log"
+                         },
+                         {
+                             "command":  "cargo fmt --all -- --check",
+                             "result":  "PASS exit0",
+                             "log":  "target/exm021-evidence/fmt.log"
+                         },
+                         {
+                             "command":  "cargo clippy --workspace --all-targets --locked -- -D warnings",
+                             "result":  "PASS exit0 all six crates/targets, no lint allowance",
+                             "log":  "target/exm021-evidence/clippy.log"
+                         },
+                         {
+                             "command":  "node scripts/check-architecture.mjs",
+                             "result":  "PASS six workspace layers/resolved graph/three negative fixtures,exit0",
+                             "log":  "target/exm021-evidence/architecture.log"
+                         },
+                         {
+                             "command":  "git diff --check; git diff --cached --check; review nine staged product paths; git write-tree; git fetch origin main; git rev-parse HEAD origin/main",
+                             "result":  "PASS whitespace/source review; published claim HEAD=origin/main=462b4f0, same owner; policy/task/current rules unchanged; first021 request absent. No unrelated paths or accepted history changed."
+                         }
+                     ],
+    "contract":  {
+                     "admission":  "Single domain validator shared by configuration and immutable runtime Schema. Physical occupancy checked per bit after endian mapping; only disjoint shared-container bitfields accepted. Checked geometry and typed literal validity before access/copy; constants and raw constraints compatible; closed enums have admissible member. Cycles/missing/non-numeric references and malformed stacks rejected.",
+                     "representation":  "Wire literals preserve exact u64/i64 and IEEE bit patterns; engineering Number is checked i128/finite f64. Identity projection exact; lossy integer conversion, nonfinite projection and overflow errors explicit. Numeric ordering compares integers without rounding through f64. Bytes/text fixed byte lengths, strict ASCII/UTF8. Bounds/constant/closed enum operate before scale/bias; zero scale read allowed, inverse rejected.",
+                     "derived":  "Virtual read-only zero-length fields evaluated in topological order with bounded RPN stack. Dependencies are validated numeric engineering values. Raw derived numeric result constrained before own scale/bias; arithmetic checked and missing/invalid dependencies fail. No dynamic code or recursive expression evaluation.",
+                     "writing":  "Raw field/label and explicit-tolerance engineering writes validate before mutation, preserve unrelated bytes/physical bits, and return actual quantized engineering value. Whole-message preservation/HEX/checksum transactions remain022, not claimed here. No I/O or transmission.",
+                     "bounds":  "At most256 fields,256 enum entries/field,64 operations/expression,1MiB aggregate variable definition data/schema before cloning,65536 message bytes. Occupancy, topological graph, stacks and output bounded; no retained message history. Caller must bound schema counts/queues/report retention; this is not an RSS guarantee."
+                 },
+    "review":  "Author reviewed all9 staged product paths: shared validation/old default omission; exact integer/IEEE bits; safe public integer layout on invalid definitions; endian physical masks; signed extension/ranges; immutable compiled geometry; typed constraints/NaN raw validity; finite numeric projection; u64/i128 mixed ordering/conversion; checked i128 MIN arithmetic; graph/stack/reference bounds; transactional writes and quantization tolerance; corpus integration; strict JSON extension load/save; redacted diagnostics and unchanged layer graph. Workspace Clippy checks consumers. No independent Epic review claimed.",
+    "corrections":  [
+                        "Review made public integer_layout/literal_fits reject invalid width/offset before shifts; finite projection is checked even on identity; contradictory constant/nonfinite/range and unsatisfiable closed enum rejected. Added adversarial and boundary vectors before final pass; no accepted behavior weakened.",
+                        "Removed compile/lint unused-variable/import warnings during development. No final functional test failure or flaky acceptance; no unchanged failed test rerun presented as repair.",
+                        "PowerShell redirects normal Cargo stderr/cache waits as NativeCommandError records; actual command exits and test summaries were inspected, all final exits0. Live tool sessions polled to completion without restarting."
+                    ],
+    "limitations":  [
+                        "Windows VPS pure-processing evidence only; physical device/stand and macOS remain deferred035/036; broader034 fuzz/security and independent Epic gate/review unpassed.",
+                        "Field-level codec only. Whole-message edit transactions/HEX/checksum dependencies022, app/UI/chart worker integration and actual TX authorization remain separate accepted tasks.",
+                        "Nonfinite wire float bits remain readable/roundtrippable by default, with numeric NonFinite; finite/bounds constraints reject them explicitly. Text/bytes have numeric NotNumeric. Errors are never substituted with zero.",
+                        "Schema1 extensions preserve old documents in this reader; older applications need not accept new variants. External JSON editors must preserve integer precision. Explicit export/inspection exposes user values even though default Debug is redacted.",
+                        "Expression literals and wire constraints use u64/i64/IEEE typed literals; computed intermediate i128 values may exceed wire ranges but remain checked. Bounds are raw/unscaled, engineering quantization requires caller-specified absolute tolerance."
+                    ],
+    "cleanup":  "Only nine product paths and new021 evidence/Done/first request staged. Accepted TASK/events/evidence/ADRs, Cargo.lock/corpus/CI/allocator and unrelated .idea preserved. No build outputs/logs/binaries staged; bounded ignored logs and ordinary executable cache retained. All owned test/check sessions complete; no new helper/device/network process.",
+    "checkpoint":  {
+                       "task":  "EXM-021 verified Done upon successful publication",
+                       "goal":  "ACTIVE; product PROGRESS this turn; no global blocker/completion",
+                       "next":  "Fresh turn fetch/reconcile021 closure and allocator; read current rules and exact022 message decoding/encoding TASK, all events/evidence and021 dependency. Publish claim if ready/unowned.022 owns whole-message decode/encode preservation, HEX editing, constrained checksum extension and validation before TX. Do not claim022 in021 turn.",
+                       "authority":  "Owner authorizes safe Windows/virtual work across Epics before earlier Epic closure; actual hardware/macOS later other stands. Functional dependencies, one identity/turn, published owner and product safety remain.",
+                       "publication":  "Commit product+immutable evidence+Done+single first request, immediately pushmain; reconcile rejected/unknown publication before another commit/task. Allocator alone writes versions at actual qualified adoption boundary."
+                   }
+}

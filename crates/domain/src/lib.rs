@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 
 pub mod classification;
 pub mod config;
+pub mod fields;
 pub mod metrics;
 pub mod network_filter;
 pub mod observation;

@@ -250,6 +250,19 @@ pub struct Field {
     pub bias: f64,
     #[serde(default)]
     pub unit: String,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub bits: Option<crate::fields::Bits>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub constant: Option<crate::fields::Literal>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub enumeration: Vec<crate::fields::EnumEntry>,
+    #[serde(
+        default,
+        skip_serializing_if = "crate::fields::Constraints::is_default"
+    )]
+    pub constraints: crate::fields::Constraints,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub derived: Option<Vec<crate::fields::Operation>>,
 }
 fn one() -> f64 {
     1.0
@@ -262,6 +275,8 @@ pub enum Representation {
     Float,
     Bytes,
     Ascii,
+    Utf8,
+    Derived,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -376,35 +391,11 @@ impl Protocol {
             "prefix and optional positive length must fit frame limit",
         )?;
         ids(self.fields.iter().map(|f| f.id.as_str()), "fields")?;
-        for f in &self.fields {
-            check(
-                f.length > 0
-                    && f.offset
-                        .checked_add(f.length)
-                        .is_some_and(|end| end <= limit),
-                "field.range",
-                "positive field range must fit frame limit without overflow",
-            )?;
-            check(
-                match f.representation {
-                    Representation::Unsigned | Representation::Signed => {
-                        [1, 2, 4, 8].contains(&f.length)
-                    }
-                    Representation::Float => [4, 8].contains(&f.length),
-                    _ => true,
-                },
-                "field.representation",
-                "numeric widths must be 1/2/4/8; floats require 4/8 bytes",
-            )?;
-            check(
-                f.scale.is_finite()
-                    && f.bias.is_finite()
-                    && f.unit.len() <= 32
-                    && !f.unit.chars().any(char::is_control),
-                "field.transform",
-                "use finite scale/bias and a unit of at most 32 bytes",
-            )?;
-        }
+        check(
+            crate::fields::validate(&self.fields, limit).is_ok(),
+            "fields",
+            "invalid field definition, overlap, constraint or dependency",
+        )?;
         Ok(())
     }
 }
@@ -539,7 +530,10 @@ impl ProjectConfig {
                 field.is_some_and(|f| {
                     matches!(
                         f.representation,
-                        Representation::Unsigned | Representation::Signed | Representation::Float
+                        Representation::Unsigned
+                            | Representation::Signed
+                            | Representation::Float
+                            | Representation::Derived
                     )
                 }),
                 "chart.field_id",
