@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 33,
+  "version": "0.1.0.33",
+  "request_id": "EXM-032-20261125T224637Z-session-export-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-032",
+  "summary": "Stream selected committed session observations, decoded fields and chart series to cancellable local CSV and JSON exports",
+  "verification": [
+    "Tasks/items/sync/EXM-032-implement-csv-and-json-data-export/evidence/20261125T224637Z-export-verification.md"
+  ],
+  "request_file": "Tasks/version-requests/20261125-EXM-032-session-export.json",
+  "request_sha256": "f4be494bc276ce431f23d5d6833bba0f59e3855bfb5b92ffae0413d5e4578e57"
+}
