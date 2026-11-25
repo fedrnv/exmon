@@ -43,6 +43,7 @@ pub struct Key {
 pub struct FieldView {
     /// Checked engineering projection prepared off GUI; invalid values are gaps.
     pub numeric: Option<f64>,
+    pub decoded: Option<Literal>,
     pub name: String,
     pub value: String,
     pub invalid: bool,
@@ -81,7 +82,14 @@ impl Row {
             + self
                 .fields
                 .iter()
-                .map(|f| f.name.len() + f.value.len() + 80)
+                .map(|f| {
+                    let decoded = match &f.decoded {
+                        Some(Literal::Text { value }) => value.len(),
+                        Some(Literal::Bytes { value }) => value.len(),
+                        _ => 0,
+                    };
+                    f.name.len() + f.value.len() + decoded + 80
+                })
                 .sum::<usize>()
     }
     pub fn copy_format(self: &Arc<Self>) -> Option<Draft> {
@@ -634,14 +642,14 @@ impl Processor {
                         match codec.decode(row.bytes()) {
                             Ok(draft) => {
                                 let report = draft.inspect();
+                                let complete = quality == Quality::Complete
+                                    && report.checksums.iter().all(|c| c.result.is_ok());
                                 for field in report.fields {
                                     if let Some(def) = protocol.fields.get(field.index) {
+                                        let valid = complete && field.violations.is_empty();
                                         row.fields.push(FieldView {
                                             name: def.id.clone(),
-                                            numeric: if field.violations.is_empty()
-                                                && report.checksums.iter().all(|c| c.result.is_ok())
-                                                && quality == Quality::Complete
-                                            {
+                                            numeric: if valid {
                                                 field
                                                     .number
                                                     .as_ref()
@@ -656,6 +664,7 @@ impl Processor {
                                                 field.label.as_deref(),
                                                 &def.unit,
                                             ),
+                                            decoded: if valid { field.raw } else { None },
                                             invalid: !field.violations.is_empty(),
                                         });
                                     }

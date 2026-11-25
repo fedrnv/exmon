@@ -1,5 +1,8 @@
 use eframe::egui::{self, RichText};
-use exmon_app::sessions::{Controller, Entry, Event, Limits, Snapshot, Source, State};
+use exmon_app::sessions::{
+    Controller, Entry, Event, ExportCategory, ExportFormat, ExportSelection, Limits, Snapshot,
+    Source, State,
+};
 use std::sync::Arc;
 pub struct Sessions {
     pub path: String,
@@ -12,6 +15,46 @@ pub struct Sessions {
     pub pending: bool,
     page_stack: Vec<u64>,
     waiting_revision: u64,
+    exporting: bool,
+    export: ExportForm,
+    export_error: Option<&'static str>,
+}
+
+#[derive(Default)]
+struct ExportForm {
+    path: String,
+    format: ExportFormat,
+    category: ExportCategory,
+    from_ns: String,
+    through_ns: String,
+    type_id: String,
+    field: String,
+}
+
+impl ExportForm {
+    fn selection(&self) -> Result<ExportSelection, &'static str> {
+        fn bound(text: &str) -> Result<Option<u64>, &'static str> {
+            let text = text.trim();
+            if text.is_empty() {
+                Ok(None)
+            } else {
+                text.parse()
+                    .map(Some)
+                    .map_err(|_| "Use whole nanoseconds for time bounds")
+            }
+        }
+        Ok(ExportSelection {
+            category: self.category,
+            from_ns: bound(&self.from_ns)?,
+            through_ns: bound(&self.through_ns)?,
+            type_id: self.type_id.trim().into(),
+            field: if self.category == ExportCategory::Observations {
+                String::new()
+            } else {
+                self.field.trim().into()
+            },
+        })
+    }
 }
 impl Default for Sessions {
     fn default() -> Self {
@@ -26,6 +69,9 @@ impl Default for Sessions {
             pending: false,
             page_stack: vec![0],
             waiting_revision: 0,
+            exporting: false,
+            export: ExportForm::default(),
+            export_error: None,
         }
     }
 }
@@ -34,9 +80,14 @@ impl Sessions {
         if let Some(s) = controller.snapshot() {
             if s.recovery != self.snapshot.recovery {
                 self.page_stack = vec![0];
+                self.export_error = None;
             }
-            if self.pending && s.revision != self.waiting_revision {
+            if self.pending
+                && s.revision != self.waiting_revision
+                && (!self.exporting || !controller.busy())
+            {
                 self.pending = false;
+                self.exporting = false;
                 self.notice = None;
             }
             if s.state == State::Recovered
@@ -101,6 +152,7 @@ impl Sessions {
                 }
             });
             if self.snapshot.state==State::Recovered {
+                self.show_export(ui, controller);
                 ui.separator();ui.heading("Committed session records");
                 ui.horizontal_wrapped(|ui|{
                     if ui.add_enabled(self.page_stack.len()>1&&!self.pending,egui::Button::new("Previous records")).clicked(){self.page_stack.pop();self.requested(controller.page(*self.page_stack.last().unwrap_or(&0)));}
@@ -115,6 +167,56 @@ impl Sessions {
                         egui::ScrollArea::both().id_salt("session-record-details").max_height(330.).show(ui,|ui|details(ui,&e.event));
                     }
                 });
+            }
+        });
+    }
+
+    fn show_export(&mut self, ui: &mut egui::Ui, controller: &Controller) {
+        ui.collapsing("Export session data", |ui| {
+            ui.add_enabled_ui(!self.pending && !controller.busy(), |ui| {
+                ui.horizontal_wrapped(|ui| {
+                    input(ui, "New export file path", &mut self.export.path, 4096, 340.);
+                });
+                ui.horizontal_wrapped(|ui| {
+                    ui.radio_value(&mut self.export.format, ExportFormat::Json, "JSON");
+                    ui.radio_value(&mut self.export.format, ExportFormat::Csv, "CSV");
+                });
+                ui.horizontal_wrapped(|ui| {
+                    ui.radio_value(&mut self.export.category, ExportCategory::Fields, "Decoded fields");
+                    ui.radio_value(&mut self.export.category, ExportCategory::ChartSeries, "Chart series");
+                    ui.radio_value(&mut self.export.category, ExportCategory::Observations, "Raw observations");
+                });
+                ui.horizontal_wrapped(|ui| {
+                    input(ui, "From (ns)", &mut self.export.from_ns, 20, 128.);
+                    input(ui, "Through (ns)", &mut self.export.through_ns, 20, 128.);
+                });
+                ui.horizontal_wrapped(|ui| {
+                    let raw = self.export.category == ExportCategory::Observations;
+                    let label = if raw { "Transport (optional)" } else { "Protocol ID (optional)" };
+                    input(ui, label, &mut self.export.type_id, 128, 140.);
+                    if !raw {
+                        input(ui, "Field ID (optional)", &mut self.export.field, 128, 120.);
+                    }
+                });
+                ui.label("Exports may contain sensitive data. Raw observations include payloads and transport metadata.");
+                if ui.button("Save export").clicked() {
+                    let result = self.export.selection().and_then(|selection| {
+                        controller.export(self.snapshot.recovery, &self.export.path, self.export.format, selection)
+                    });
+                    self.export_error = result.err();
+                    if self.export_error.is_none() {
+                        self.exporting = true;
+                        self.requested(Ok(()));
+                    }
+                }
+            });
+            if self.exporting {
+                ui.label("Exporting session…");
+                if ui.button("Cancel export").clicked() {
+                    controller.cancel_export();
+                }
+            } else if let Some(message) = self.export_error.or(self.snapshot.export_notice) {
+                ui.label(message);
             }
         });
     }

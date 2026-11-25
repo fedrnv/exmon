@@ -133,6 +133,42 @@ fn explicit_start_stop_and_recovery_preserve_records_without_resuming() {
             .iter()
             .any(|e| matches!(e.event.as_ref(),Event::Annotation{text,..}if text=="Recorded note"))
     );
+    let export = root.0.join("selected.json");
+    let filter = || ExportSelection {
+        category: ExportCategory::Observations,
+        type_id: "serial".to_string(),
+        from_ns: Some(1),
+        through_ns: Some(1),
+        ..ExportSelection::default()
+    };
+    c.export(
+        s.recovery + 1,
+        export.to_str().unwrap(),
+        ExportFormat::Json,
+        filter(),
+    )
+    .unwrap();
+    wait(&c, |s| {
+        s.export_notice == Some("Invalid export path, filters, or recovery selection") && !c.busy()
+    });
+    assert!(!export.exists());
+    c.export(
+        s.recovery,
+        export.to_str().unwrap(),
+        ExportFormat::Json,
+        filter(),
+    )
+    .unwrap();
+    wait(&c, |s| {
+        s.export_notice == Some("Export complete") && !c.busy()
+    });
+    let actual: serde_json::Value =
+        serde_json::from_slice(&std::fs::read(&export).unwrap()).unwrap();
+    assert_eq!(actual["rows"].as_array().unwrap().len(), 1);
+    assert_eq!(actual["rows"][0]["bytes_hex"], "000102FF");
+    assert_eq!(actual["rows"][0]["generation"], 8);
+    assert!(!c.requested());
+    assert_eq!(c.client().token(), 0);
     c.start(
         root.path().to_str().unwrap(),
         Limits::default(),
@@ -320,7 +356,15 @@ fn processing_definitions_renames_and_engineering_samples_are_recorded_before_di
     c.stop();
     wait(&c, |s| s.state == State::Stopped);
     let entries = all(&root.path());
-    assert!(entries.iter().any(|e|matches!(e.event.as_ref(),Event::Message{source,timestamp_ns,samples,..}if source.generation==9&&*timestamp_ns==100&&samples.iter().any(|s|s.field=="sequence"&&s.value==Some(42.0)))));
+    assert!(entries.iter().any(|e| {
+        matches!(e.event.as_ref(), Event::Message { source, timestamp_ns: 100, samples, .. }
+            if source.generation == 9 && samples.iter().any(|s| {
+                s.field == "sequence"
+                    && s.value == Some(42.0)
+                    && matches!(&s.decoded, Some(exmon_domain::fields::Literal::Unsigned { value: 42 }))
+            })
+        )
+    }));
     assert!(entries.iter().any(|e|matches!(e.event.as_ref(),Event::Definitions{config,..}if config.protocols.iter().any(|p|p.name=="Stored name"))));
     assert!(entries.iter().any(|e|matches!(e.event.as_ref(),Event::Charts{definitions}if definitions[0]["name"]=="Recorded samples")));
 }

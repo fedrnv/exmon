@@ -1,5 +1,8 @@
 //! Nonblocking session producers and transactional recording/recovery controller.
 use exmon_domain::{config::ProjectConfig, observation::Observation};
+pub use exmon_storage::export::{
+    Category as ExportCategory, Format as ExportFormat, Selection as ExportSelection,
+};
 pub use exmon_storage::sessions::{
     Entry, Event, Limits, Raw, Recovery, Sample, Source, Span, Summary,
 };
@@ -34,6 +37,7 @@ pub struct Snapshot {
     pub dropped: u64,
     pub last_loss: Option<Source>,
     pub notice: Option<&'static str>,
+    pub export_notice: Option<&'static str>,
     pub entries: Vec<Entry>,
     pub more: bool,
     pub after: u64,
@@ -48,6 +52,7 @@ struct Shared {
     gate: Mutex<()>,
     quit: AtomicBool,
     busy: AtomicBool,
+    export_cancelled: AtomicBool,
     producers: AtomicUsize,
     wake: OnceLock<thread::Thread>,
     snapshot: Mutex<Arc<Snapshot>>,
@@ -94,6 +99,12 @@ enum Command {
     },
     Recover(String),
     Page(u64),
+    Export {
+        recovery: u64,
+        path: String,
+        format: ExportFormat,
+        selection: ExportSelection,
+    },
 }
 #[derive(Clone)]
 pub struct Client {
@@ -314,6 +325,7 @@ fn prepare(input: Input) -> Result<Vec<Event>, Error> {
                             .and_then(|p| p.fields.iter().find(|d| d.id == f.name))
                             .map_or(String::new(), |d| d.unit.clone()),
                         value: f.numeric.filter(|v| v.is_finite()),
+                        decoded: f.decoded.clone(),
                     })
                     .collect(),
                 spans: row
@@ -490,6 +502,50 @@ impl Controller {
             .inspect(|_| wake(&self.client.shared))
             .map_err(|_| "Session command queue full")
     }
+    pub fn export(
+        &self,
+        recovery: u64,
+        path: &str,
+        format: ExportFormat,
+        selection: ExportSelection,
+    ) -> Result<(), &'static str> {
+        if recovery == 0 || path.is_empty() || path.len() > 4096 || !selection.valid() {
+            return Err("Choose an export path and valid filters");
+        }
+        let shared = &self.client.shared;
+        let _gate = shared
+            .gate
+            .lock()
+            .map_err(|_| "Session worker unavailable")?;
+        if self.busy() {
+            return Err("Session worker is busy");
+        }
+        shared.export_cancelled.store(false, Ordering::Release);
+        shared.busy.store(true, Ordering::Release);
+        if self
+            .commands
+            .try_send(Command::Export {
+                recovery,
+                path: path.into(),
+                format,
+                selection,
+            })
+            .is_err()
+        {
+            shared.busy.store(false, Ordering::Release);
+            return Err("Session command queue full");
+        }
+        wake(shared);
+        Ok(())
+    }
+    pub fn cancel_export(&self) {
+        if let Ok(_gate) = self.client.shared.gate.lock() {
+            self.client
+                .shared
+                .export_cancelled
+                .store(true, Ordering::Release);
+        }
+    }
     pub fn charts(&self, specs: &[crate::charts::Spec]) -> bool {
         if self.client.token() == 0 {
             return false;
@@ -590,6 +646,7 @@ fn run(state: Arc<Shared>, rx: mpsc::Receiver<Batch>, cmd: mpsc::Receiver<Comman
             state.busy.store(false, Ordering::Release);
         }
         if let Ok(command) = cmd.try_recv() {
+            let mut export_finished = false;
             match command {
                 Command::Note {
                     token,
@@ -678,6 +735,7 @@ fn run(state: Arc<Shared>, rx: mpsc::Receiver<Batch>, cmd: mpsc::Receiver<Comman
                         }) {
                             Ok((r, entries, context)) => {
                                 view.recovery = context;
+                                view.export_notice = None;
                                 state.dropped.store(r.summary.dropped, Ordering::Relaxed);
                                 if let Ok(mut source) = state.last_loss.lock() {
                                     *source = r.summary.last_loss;
@@ -697,7 +755,13 @@ fn run(state: Arc<Shared>, rx: mpsc::Receiver<Batch>, cmd: mpsc::Receiver<Comman
                                 });
                                 recovered = Some(r);
                             }
-                            Err(e) => view.notice = Some(error(e)),
+                            Err(e) => {
+                                view.notice = Some(if recovered.is_some() {
+                                    "Recovery failed; still showing the previously recovered session"
+                                } else {
+                                    error(e)
+                                })
+                            }
                         }
                     }
                 }
@@ -714,8 +778,46 @@ fn run(state: Arc<Shared>, rx: mpsc::Receiver<Batch>, cmd: mpsc::Receiver<Comman
                         }
                     }
                 }
+                Command::Export {
+                    recovery,
+                    path,
+                    format,
+                    selection,
+                } => {
+                    use exmon_storage::export::{self, Error as ExportError};
+                    let result = recovered
+                        .as_ref()
+                        .filter(|_| recovery == view.recovery && view.state == State::Recovered)
+                        .ok_or(ExportError::Invalid)
+                        .and_then(|session| {
+                            export::create(session, Path::new(&path), format, &selection, || {
+                                state.export_cancelled.load(Ordering::Acquire)
+                                    || state.quit.load(Ordering::Acquire)
+                            })
+                        });
+                    view.export_notice = Some(match result {
+                        Ok(0) => "Export complete; no rows matched the filters",
+                        Ok(_) => "Export complete",
+                        Err(ExportError::Cancelled) => "Export cancelled",
+                        Err(ExportError::Exists) => "Export destination exists; choose a new file",
+                        Err(ExportError::Limit) => "Export exceeded the 1 GiB output limit",
+                        Err(ExportError::Invalid) => {
+                            "Invalid export path, filters, or recovery selection"
+                        }
+                        Err(ExportError::Session(_)) => {
+                            "Invalid or unreadable record; export failed"
+                        }
+                        Err(ExportError::Io) => {
+                            "Export failed; check local permissions, disk space and hard-link support"
+                        }
+                    });
+                    export_finished = true;
+                }
             }
             publish(&mut view);
+            if export_finished {
+                state.busy.store(false, Ordering::Release);
+            }
         }
         if let Ok(batch) = rx.try_recv() {
             let scope = batch.input.scope();
@@ -749,6 +851,56 @@ fn run(state: Arc<Shared>, rx: mpsc::Receiver<Batch>, cmd: mpsc::Receiver<Comman
 mod tests {
     use super::*;
     use std::time::Instant;
+
+    #[test]
+    fn cancel_queued_export_before_worker_processes_it() {
+        let path = std::env::temp_dir().join(format!(
+            "exmon032-cancel-{}-{}.sqlite",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let target = path.with_extension("json");
+        let mut writer = Writer::create(&path, Limits::default()).unwrap();
+        writer.finish(0).unwrap();
+        drop(writer);
+        let shared = Arc::new(Shared::default());
+        let (data, rx) = mpsc::sync_channel(8);
+        let (commands, cmd) = mpsc::sync_channel(8);
+        let controller = Controller {
+            client: Client {
+                shared: shared.clone(),
+                data,
+            },
+            commands,
+        };
+        controller.recover(path.to_str().unwrap()).unwrap();
+        controller
+            .export(
+                1,
+                target.to_str().unwrap(),
+                ExportFormat::Json,
+                ExportSelection::default(),
+            )
+            .unwrap();
+        controller.cancel_export();
+        let worker = thread::spawn(move || run(shared, rx, cmd));
+        let deadline = Instant::now() + Duration::from_secs(3);
+        while controller.busy() {
+            assert!(Instant::now() < deadline);
+            thread::sleep(Duration::from_millis(1));
+        }
+        let snapshot = controller.snapshot().unwrap();
+        assert_eq!(snapshot.export_notice, Some("Export cancelled"));
+        assert_eq!(snapshot.state, State::Recovered);
+        assert!(!target.exists());
+        drop(controller);
+        worker.join().unwrap();
+        std::fs::remove_file(path).unwrap();
+    }
+
     #[test]
     fn cancelled_queued_start_is_acknowledged_without_creating_file() {
         let path = std::env::temp_dir().join(format!(

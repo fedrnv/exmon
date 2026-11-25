@@ -168,6 +168,29 @@ fn actual_record_capture_annotation_stop_recover_and_no_overwrite() {
         .clone();
     click(&mut h, &format!("#{} Raw observation", raw.id));
     assert_eq!(h.state().sessions.selected.as_ref().unwrap().id, raw.id);
+    click(&mut h, "Export session data");
+    click(&mut h, "Raw observations");
+    click(&mut h, "CSV");
+    let export = root.0.join("export.csv");
+    edit(&mut h, "New export file path", export.to_str().unwrap());
+    assert!(!export.exists());
+    click(&mut h, "Save export");
+    wait(&mut h, |s| {
+        s.sessions.snapshot.export_notice == Some("Export complete") && !s.sessions.pending
+    });
+    let csv = std::fs::read_to_string(&export).unwrap();
+    assert!(csv.starts_with("schema_version,kind,"));
+    assert!(csv.contains("\"observation\""));
+    assert!(!h.state().status().requested);
+    assert_eq!(h.state().recorder.client().token(), 0);
+    assert!(!h.state().outgoing.active());
+    click(&mut h, "Save export");
+    wait(&mut h, |s| {
+        s.sessions.snapshot.export_notice == Some("Export destination exists; choose a new file")
+            && !s.sessions.pending
+    });
+    assert_eq!(std::fs::read_to_string(&export).unwrap(), csv);
+    click(&mut h, "Export session data");
     if h.state().sessions.snapshot.more {
         let first = h.state().sessions.snapshot.entries[0].id;
         click(&mut h, "Next records");
@@ -249,8 +272,8 @@ fn invalid_limits_recovery_and_recording_error_are_explicit() {
     drop(h);
 }
 #[test]
-fn sessions_visual_matrix_recovered_raw_and_safe_controls() {
-    let screenshots = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../target/exm031-visual");
+fn sessions_visual_matrix_recovered_raw_and_export_controls() {
+    let screenshots = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../target/exm032-visual");
     std::fs::create_dir_all(&screenshots).unwrap();
     for (w, height) in [(900., 600.), (1360., 900.)] {
         for scale in [1., 1.5] {
@@ -300,8 +323,11 @@ fn sessions_visual_matrix_recovered_raw_and_safe_controls() {
                     .unwrap()
                     .clone();
                 click(&mut h, &format!("#{} Raw observation", raw.id));
-                h.get_by_label("Session recording and recovery")
-                    .scroll_to_me();
+                click(&mut h, "Export session data");
+                if light {
+                    click(&mut h, "Raw observations");
+                }
+                h.get_by_label("Save export").scroll_to_me();
                 h.run_steps(20);
                 h.render()
                     .unwrap()

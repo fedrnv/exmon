@@ -2,6 +2,7 @@
 use exmon_domain::{
     Direction,
     config::ProjectConfig,
+    fields::Literal,
     observation::{Metadata, Observation},
 };
 use rusqlite::{Connection, OpenFlags, limits::Limit, params};
@@ -125,6 +126,8 @@ pub struct Sample {
     pub field: String,
     pub unit: String,
     pub value: Option<f64>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub decoded: Option<Literal>,
 }
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -188,6 +191,11 @@ impl Event {
                         text(&s.field, 128)
                             && text(&s.unit, 128)
                             && s.value.is_none_or(f64::is_finite)
+                            && match &s.decoded {
+                                Some(Literal::Bytes { value }) => value.len() <= 65_536,
+                                Some(Literal::Text { value }) => value.len() <= 65_536,
+                                _ => true,
+                            }
                     })
                     && spans.len() <= 256
                     && spans.iter().all(|s| {

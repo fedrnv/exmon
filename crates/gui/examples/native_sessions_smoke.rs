@@ -1,5 +1,5 @@
-//! Hidden native synthetic recording/stop/recovery smoke, no physical interfaces.
-use exmon_app::sessions::{Event, Limits, State};
+//! Hidden native synthetic session recording, recovery and export.
+use exmon_app::sessions::{Event, ExportCategory, ExportFormat, ExportSelection, Limits, State};
 use exmon_gui::{Shell, egui};
 use std::{
     path::PathBuf,
@@ -92,10 +92,24 @@ impl eframe::App for Smoke {
                 .iter()
                 .find(|e| matches!(e.event.as_ref(), Event::Raw(_)))
                 .cloned();
+            self.shell
+                .recorder
+                .export(
+                    self.shell.sessions.snapshot.recovery,
+                    self.path.with_extension("json").to_str().unwrap(),
+                    ExportFormat::Json,
+                    ExportSelection {
+                        category: ExportCategory::Observations,
+                        ..ExportSelection::default()
+                    },
+                )
+                .expect("explicit synthetic export");
+            self.phase = 4;
         }
         self.shell.show(ui);
-        if ready {
-            self.phase = 4;
+        if self.phase == 4 && self.shell.sessions.snapshot.export_notice == Some("Export complete")
+        {
+            self.phase = 5;
             let result = self.result.clone();
             let ctx = ui.ctx().clone();
             ui.ctx()
@@ -105,7 +119,7 @@ impl eframe::App for Smoke {
                             let bytes: Vec<_> =
                                 image.pixels.iter().flat_map(|p| p.to_array()).collect();
                             let output = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-                                .join("../../target/exm031-native.png");
+                                .join("../../target/exm032-native.png");
                             let saved = image::save_buffer(
                                 output,
                                 &bytes,
@@ -130,12 +144,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let result = Arc::new(AtomicU8::new(0));
     let app_result = result.clone();
     let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join(format!(
-        "../../target/exm031-native-{}-{}.sqlite",
+        "../../target/exm032-native-{}-{}.sqlite",
         std::process::id(),
         std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)?
             .as_nanos()
     ));
+    let cleanup_path = path.clone();
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_visible(false)
@@ -143,7 +158,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         persist_window: false,
         ..Default::default()
     };
-    eframe::run_native(
+    let run = eframe::run_native(
         "Exchange Monitor session smoke",
         options,
         Box::new(move |cc| {
@@ -157,15 +172,29 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 path,
             }))
         }),
-    )?;
+    );
+    let export = std::fs::read_to_string(cleanup_path.with_extension("json"));
+    for file in [&cleanup_path, &cleanup_path.with_extension("json")] {
+        let deadline = Instant::now() + Duration::from_secs(2);
+        loop {
+            match std::fs::remove_file(file) {
+                Ok(()) => break,
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => break,
+                Err(e) if Instant::now() >= deadline => return Err(e.into()),
+                Err(_) => std::thread::sleep(Duration::from_millis(10)),
+            }
+        }
+    }
+    run?;
     if result.load(Ordering::Acquire) != 1 {
         return Err(std::io::Error::other(
-            "Native session recording/recovery screenshot did not complete",
+            "Native session recording/recovery/export screenshot did not complete",
         )
         .into());
     }
+    assert!(export?.contains("\"kind\":\"observation\""));
     println!(
-        "PASS: native synthetic recording/stop/recovery rendered and closed; target/exm031-native.png"
+        "PASS: native synthetic recording/stop/recovery/export rendered and closed; target/exm032-native.png"
     );
     Ok(())
 }

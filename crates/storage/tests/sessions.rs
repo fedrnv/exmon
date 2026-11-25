@@ -75,11 +75,13 @@ fn fixture() -> Vec<Event> {
                     field: "level".into(),
                     unit: "V".into(),
                     value: Some(25.5),
+                    decoded: None,
                 },
                 Sample {
                     field: "gap".into(),
                     unit: "V".into(),
                     value: None,
+                    decoded: None,
                 },
             ],
             spans: vec![Span {

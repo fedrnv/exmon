@@ -1,6 +1,7 @@
 //! Exchange Monitor storage layer. See docs/domain-model.md for the domain contract.
 
 pub mod config;
+pub mod export;
 pub mod inspection_files;
 pub mod layout;
 pub mod pcap;

@@ -70,7 +70,48 @@ details. Pages contain at most 64 records and 1 MiB of serialized record data;
 one selection may stay pinned separately. Raw previews show the first 256 bytes;
 complete bytes and definitions remain in the store. Recovery displays inert data:
 it does not apply settings, reconnect an interface, start capture, send bytes or
-enable a schedule. Full CSV/JSON export belongs to EXM-032.
+enable a schedule.
+
+## Export for external analysis
+
+After recovering a session, expand **Export session data**. Choose CSV or JSON,
+the data category, and a new local file path. Time bounds are optional and
+inclusive, in session monotonic nanoseconds. The optional type filter takes a
+lowercase transport name for raw observations (`ethernet`, `tcp`, `udp`,
+`serial`, `usb`, or `can`) or an exact protocol ID for fields and chart
+series. The latter two also support an exact field ID filter.
+
+- **Raw observations** include transport metadata, direction, captured bytes in
+  uppercase hex, and original length when known. Export these files only to a
+  destination suitable for sensitive payloads and device or endpoint metadata.
+- **Decoded fields** include the engineering number and unit when available.
+  New recordings preserve the exact typed decoded literal when valid, including
+  integer or IEEE bits, bytes and text. Earlier recordings omit the literal and
+  retain their recorded engineering values. Missing and invalid values are
+  explicit as JSON null or an empty CSV cell.
+- **Chart series** include recorded field samples matching the chart selection
+  in effect at that record, with chart revision, series index, label and unit.
+  This gives the sample timeline at recording fidelity, before display
+  decimation or moving-average rendering. The recorded engineering unit and
+  the configured chart label unit are reported separately.
+
+Schema version 1 uses a JSON session object plus an array of rows, or a fixed CSV
+header followed by one session summary row and zero or more data rows. The
+summary carries committed count, finalization state, and known recording loss.
+Rows follow committed record order, then recorded field and chart selection
+order. Both clocks and source identifiers preserve their integer values in the
+file. Import large identifiers and raw hex as text in spreadsheets to preserve
+their exact digits. CSV quotes text, escapes embedded quotes and prefixes
+formula-like text with an apostrophe. Structured cells contain JSON.
+
+**Cancel export** requests cancellation while the session worker streams the
+same recovered snapshot in bounded pages. The worker validates records as it
+reads them and writes at most 1 GiB. It syncs a temporary sibling file and
+publishes the completed result atomically using a same-directory hard link.
+Use a filesystem with hard-link support. An existing destination is preserved,
+including if another process creates it during export. The worker discards its
+temporary file after cancellation or failure. An abrupt process termination
+can leave an `.exmon-export-*.partial` sibling without a completed export.
 
 The recorder owns all SQLite calls, serialization of captured data and local file
 I/O. Capture and GUI producers use bounded admission without waiting for disk.
@@ -95,7 +136,7 @@ These policies follow the upstream [SQLite PRAGMA reference](https://www.sqlite.
 and the pinned [rusqlite API](https://docs.rs/rusqlite/0.43.0/rusqlite/).
 The bundled dependency avoids a machine-wide SQLite installation.
 
-Focused checks are `cargo test -p exmon-storage --test sessions --locked`,
+Focused checks are `cargo test -p exmon-storage --test export --test sessions --locked`,
 `cargo test -p exmon-app --test sessions --locked`, and
 `cargo test -p exmon-gui --test sessions --locked -- --nocapture`.
 The abrupt-exit storage test runs its ignored subprocess fixture explicitly,
@@ -103,6 +144,6 @@ leaves a real hot journal, and compares two deterministic recoveries. It simulat
 process interruption, not power loss or damaged hardware. UI checks exercise
 actual start/annotation/stop/recovery/selection/paging controls and the supported
 size/theme/DPI matrix. `cargo run -p exmon-gui --example native_sessions_smoke --locked`
-records synthetic traffic in a hidden native window, stops, recovers, saves
-`target/exm031-native.png` and exits within eight seconds. Physical devices,
+records synthetic traffic in a hidden native window, stops, recovers, exports,
+saves `target/exm032-native.png` and exits within eight seconds. Physical devices,
 macOS, packaged permissions and signing remain separately unqualified.
