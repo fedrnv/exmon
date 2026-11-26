@@ -32,7 +32,8 @@ domain, protocol and default capture tests passed across 21 binaries. Each
 guest binary hash was matched to the cross-built artifact. The VM used two
 vCPUs, 1 GiB RAM, a read-only ISO and a read-only directory of test binaries,
 with no network adapter or physical passthrough. Loopback was enabled inside
-the guest. Storage's 48 tests passed on the earlier unchanged source. All 122
+the guest. Storage's 47 Linux tests passed on the earlier unchanged source,
+with one opt-in helper test ignored. All 122
 current application tests passed after EXM-101: 63 in its correction evidence
 and the remaining 59 in ten binaries under the resumed EXM-035 run. The latter
 run matched every binary hash, emitted `EXMON_ALL_PASS` and powered off cleanly.
