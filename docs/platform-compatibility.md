@@ -74,9 +74,10 @@ not finish their screenshot scenarios within the unchanged deadline. Across
 the attempted GUI regression cases, 15 passed, 11 failed and two visual cases
 were incomplete at the external process watchdog. The completed failures
 include GPU readback deadlines and existing FPS assertions. These results leave
-the full GUI gate pending. The all-examples Linux build also reports a
-Windows-only deadline variable unused on Linux in `performance_soak.rs`.
-That warning needs a separate correction before strict target lint sign-off.
+the full GUI gate pending. EXM-102 corrected the Linux benchmark cleanup lint
+failure at `1965fc8`, preserving Windows retry limits. A subsequent local
+Rust 1.98.0 GNU-target `clippy --workspace --all-targets --locked -- -D warnings`
+passed at `82f065c`. This is a cross-compile lint result, not a GUI runtime pass.
 
 The software-renderer comparison covered Vulkan/OpenGL and QEMU's default CPU
 plus `-cpu max` (llvmpipe 128/256 bits). No test assertion, eight-second native
@@ -109,8 +110,13 @@ The committed Windows-exported JSON fixture is preserved without line-ending
 conversion and checked against its original SHA-256 before import/re-export.
 `cargo run -p exmon-app --example portable_profile_smoke --locked -- import
 INPUT OUTPUT` exercises the public settings controller without starting I/O.
-Local Windows import/export and existing-file refusal passed. Local Linux/Apple
-Silicon qualification and the source lint correction remain required. Hosted
+Local Windows import/export and existing-file refusal passed. At `82f065c`, the
+committed verifier also ran in the local Ubuntu 24.04.5 x64 guest: import,
+validate, apply and export preserved the original fixture bytes; existing-file
+refusal returned exit 1 and left those bytes unchanged. Temporary profile
+fixtures were removed afterward. The stripped GNU verifier SHA-256 was
+`4f1951d24ccfff095970329416e747c32a71a44c46e68d5e614b56711da3d435`.
+The full local Linux GUI and Apple Silicon qualification remain required. Hosted
 diagnostics establish no task/Epic acceptance or platform sign-off.
 
 The current Windows host has no detected Npcap service or installed Npcap DLLs
