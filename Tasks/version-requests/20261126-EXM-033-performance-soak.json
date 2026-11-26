@@ -1,0 +1,11 @@
+{
+  "schema": "fdtasks-version-request/v1",
+  "request_id": "EXM-033-20261126T005628Z-performance-soak-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-033",
+  "summary": "Execute and verify the Windows synthetic prototype performance and soak release gate",
+  "verification": [
+    "Tasks/items/quality/EXM-033-establish-performance-and-soak-benchmarks/evidence/20261126T005628Z-performance-verification.md"
+  ]
+}
