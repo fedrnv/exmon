@@ -9,7 +9,7 @@ systems below.
 
 | Scenario | Windows x64 VPS | Linux x64 | macOS Apple Silicon |
 | --- | --- | --- | --- |
-| Default synthetic shell, capture, editing, charts, Stop and shutdown | Verified by EXM-039 native smoke and production GUI tests | Pending current desktop runtime | Pending target access |
+| Default synthetic shell, capture, editing, charts, Stop and shutdown | Verified by EXM-039 native smoke and production GUI tests | Manual mock Start/Stop/window close verified; full GUI gate pending | Pending target access |
 | Configuration schema, examples, roundtrip, disabled schedules | Verified shared JSON tests and export for Linux handoff | Current configuration/settings tests and exact Windows file import/export passed | Same source contract, target runtime pending |
 | TCP/UDP socket traffic | Verified local IPv4/IPv6 loopback | Current Linux QEMU local socket tests passed | Pending target runtime |
 | Serial and CAN virtual fixtures | Verified deterministic adapters | Current Linux virtual fixture tests and native vcan RX/TX passed | Pending target runtime |
@@ -54,6 +54,23 @@ guest-only `vcan` link after loading the version-matched Ubuntu `can-dev` and
 `vcan` modules. The link and added modules were removed afterward. These results
 provide current native-feature and virtual-CAN evidence; the other ignored
 fixtures and physical-device fidelity remain separate qualifications.
+
+The current debug Linux GNU GUI builds and opens under an ordinary user in the
+Ubuntu guest. Xvfb 21.1.12 provides X11; Vulkan exposes only the CPU adapter
+`llvmpipe (LLVM 20.1.2, 128 bits)` from Mesa 25.2.8. Minimal-server startup also
+needed `libxcursor1` and `libxi6`, alongside the X11/XKB and Vulkan libraries.
+The manual synthetic workflow rendered incoming observations, reached IDLE
+after Stop and exited normally on `WM_DELETE_WINDOW`. Chart controls and the
+settings form rendered; plotted-series, settings editing and theme switching
+were not established by that manual check.
+
+All eight existing native screenshot examples failed their unchanged
+eight-second completion checks in this debug TCG/software-renderer environment.
+A visible diagnostic also reached its unchanged deadline while capture made
+progress. These results leave the GUI gate pending; an optimized-build
+comparison is in progress. The all-examples Linux build also reports a
+Windows-only deadline variable unused on Linux in `performance_soak.rs`.
+That warning needs a separate correction before strict target lint sign-off.
 
 The current Windows host has no detected Npcap service or installed Npcap DLLs
 at the trusted System32/Npcap location. The default synthetic and socket routes
