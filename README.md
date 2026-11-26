@@ -30,6 +30,8 @@ mock capture, interface selection, incoming/outgoing panels and safe layout
 preferences. Run it with `cargo run -p exmon-gui --locked`; see
 [desktop shell details](docs/desktop-shell.md). Optional selected HID report
 controls use `--features native-hid`; physical qualification remains pending.
+The [virtual prototype demonstration](docs/virtual-prototype.md) covers capture,
+inspection, message editing, mock transmission, charts and session persistence.
 
 ## Local development
 

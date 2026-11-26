@@ -1,0 +1,11 @@
+{
+  "schema": "fdtasks-version-request/v1",
+  "request_id": "EXM-039-20261126T070735Z-prototype-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-039",
+  "summary": "Verify the complete virtual prototype across production GUI and background worker workflows",
+  "verification": [
+    "Tasks/items/quality/EXM-039-deliver-the-complete-virtual-prototype/evidence/20261126T070735Z-prototype-verification.md"
+  ]
+}

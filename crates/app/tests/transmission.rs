@@ -81,15 +81,17 @@ fn history(w: &TxWorker) -> Vec<Attempt> {
     }
 }
 fn outcome(w: &TxWorker, id: u64) -> Attempt {
-    until(|| {
-        history(w)
-            .iter()
-            .any(|a| a.id == id && a.outcome != Outcome::Pending)
-    });
-    history(w)
-        .into_iter()
-        .find(|a| a.id == id && a.outcome != Outcome::Pending)
-        .unwrap()
+    let deadline = Instant::now() + Duration::from_secs(3);
+    loop {
+        if let Some(attempt) = history(w)
+            .into_iter()
+            .find(|a| a.id == id && a.outcome != Outcome::Pending)
+        {
+            return attempt;
+        }
+        assert!(Instant::now() < deadline, "TX outcome fixture deadline");
+        thread::sleep(Duration::from_millis(1));
+    }
 }
 struct Gate {
     armed: AtomicBool,

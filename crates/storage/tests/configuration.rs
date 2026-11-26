@@ -499,7 +499,7 @@ fn remaining_schema_variants_and_nested_unknown_fields() {
 
 #[test]
 fn documented_examples_are_loadable() {
-    let document = include_str!("../../../docs/configuration.md");
+    let document = include_str!("../../../docs/configuration.md").replace("\r\n", "\n");
     let examples: Vec<_> = document
         .split("```json\n")
         .skip(1)
