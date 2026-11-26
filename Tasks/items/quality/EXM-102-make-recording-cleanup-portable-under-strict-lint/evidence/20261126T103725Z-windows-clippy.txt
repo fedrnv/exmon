@@ -1,0 +1,8 @@
+cargo :     Checking exmon-gui v0.1.0 (C:\GitHub\ExMon\crates\gui)
+At line:2 char:1
++ cargo +1.98.0 clippy -p exmon-gui --example performance_soak --locked ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (    Checking ex...Mon\crates\gui):String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 13.13s

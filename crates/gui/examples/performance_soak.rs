@@ -270,14 +270,20 @@ fn recording_finish(app: &Shell, phase: &mut Phase, path: &Path) -> io::Result<(
     phase.recording_drops += summary.dropped;
     phase.record_bursts += 1;
     phase.max_stop_ms = phase.max_stop_ms.max(started.elapsed().as_millis());
-    let deadline = Instant::now() + Duration::from_millis(500);
-    loop {
-        match std::fs::remove_file(path) {
-            #[cfg(windows)]
-            Err(e) if e.raw_os_error() == Some(32) && Instant::now() < deadline => {
-                thread::sleep(Duration::from_millis(5));
+    #[cfg(not(windows))]
+    {
+        std::fs::remove_file(path)
+    }
+    #[cfg(windows)]
+    {
+        let deadline = Instant::now() + Duration::from_millis(500);
+        loop {
+            match std::fs::remove_file(path) {
+                Err(e) if e.raw_os_error() == Some(32) && Instant::now() < deadline => {
+                    thread::sleep(Duration::from_millis(5));
+                }
+                result => return result,
             }
-            result => return result,
         }
     }
 }

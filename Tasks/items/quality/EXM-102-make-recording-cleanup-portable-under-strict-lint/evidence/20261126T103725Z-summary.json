@@ -1,0 +1,26 @@
+{
+    "mode":  "smoke",
+    "source_commit":  "287c3daedc0f98fa0634503551fd37c01a00e1ab",
+    "executable_sha256":  "7073e0c810a52579eab8234a4e150bb2fc97cab98a3c91a6e83f2cbb25e0043d",
+    "toolchain":  "1.98.0",
+    "cpu":  "AMD EPYC-Milan Processor",
+    "logical_cpus":  8,
+    "host_memory_bytes":  17169162240,
+    "os":  "Microsoft Windows Server 2025 Datacenter",
+    "os_build":  "26100",
+    "filesystem":  "NTFS",
+    "elapsed_seconds":  17.921,
+    "sampling_interval_seconds":  1,
+    "samples":  16,
+    "peak_private_bytes":  391176192,
+    "peak_working_set_bytes":  106868736,
+    "private_growth_bytes":  35258368,
+    "slow_storage_fixture":  "passed",
+    "phase_results":  [
+                          "phase=small_packets seconds=5.006 packets=58912 packets_per_sec=11768.8 bytes=1885184 processed=22848 processed_per_sec=4564.3 frames=179 frames_per_sec=35.8 ui_p95_ms=40 ui_max_us=58770 gpu_frames=1 gpu_max_ms=481 retained=1024 retained_bytes=1208832 backend_loss=0 app_drops=0 display_decimation=35712 processing_output_decimation=0 chart_samples=11712 fragments=0 reassembled=false committed=8163 recording_drops=10657 record_bursts=1 record_stop_max_ms=42 pass=true",
+                          "phase=mixed_fragmented seconds=5.018 packets=59296 packets_per_sec=11816.2 bytes=1897472 processed=26034 processed_per_sec=5187.9 frames=202 frames_per_sec=40.3 ui_p95_ms=30 ui_max_us=35891 gpu_frames=1 gpu_max_ms=330 retained=1024 retained_bytes=1208832 backend_loss=0 app_drops=0 display_decimation=33184 processing_output_decimation=662 chart_samples=12376 fragments=204 reassembled=true committed=7985 recording_drops=11581 record_bursts=1 record_stop_max_ms=40 pass=true",
+                          "phase=chart_heavy seconds=5.027 packets=60480 packets_per_sec=12030.6 bytes=1935360 processed=19360 processed_per_sec=3851.1 frames=152 frames_per_sec=30.2 ui_p95_ms=40 ui_max_us=53973 gpu_frames=1 gpu_max_ms=476 retained=1024 retained_bytes=1208832 backend_loss=0 app_drops=0 display_decimation=40768 processing_output_decimation=0 chart_samples=11840 fragments=0 reassembled=false committed=7715 recording_drops=10049 record_bursts=1 record_stop_max_ms=49 pass=true"
+                      ],
+    "exit_code":  0,
+    "passed":  true
+}
