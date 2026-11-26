@@ -10,8 +10,8 @@ systems below.
 | --- | --- | --- | --- |
 | Default synthetic shell, capture, editing, charts, Stop and shutdown | Verified by EXM-039 native smoke and production GUI tests | Pending current desktop runtime | Pending target access |
 | Configuration schema, examples, roundtrip, disabled schedules | Verified shared JSON tests | Same source contract, target runtime pending | Same source contract, target runtime pending |
-| TCP/UDP socket traffic | Verified local IPv4/IPv6 loopback | Historical native virtual adapter evidence | Pending target runtime |
-| Serial and CAN virtual fixtures | Verified deterministic adapters | Historical isolated serial/SocketCAN fixture evidence | Pending target runtime |
+| TCP/UDP socket traffic | Verified local IPv4/IPv6 loopback | Current Linux QEMU local socket tests passed | Pending target runtime |
+| Serial and CAN virtual fixtures | Verified deterministic adapters | Current Linux virtual fixture tests passed; native SocketCAN historical | Pending target runtime |
 | USB/HID mock selection and explicit Send | Verified production worker and GUI | Historical emulated HID/USB evidence | Pending target runtime |
 | Native HID feature build and mock UI | Current Windows check recorded under EXM-035 | Pending current feature/runtime checks | Pending target access |
 | Raw Ethernet native capture | Historical Windows Npcap virtual adapter evidence | Historical Linux veth/libpcap evidence | Pending BPF/libpcap qualification |
@@ -24,6 +24,15 @@ The historical native adapter results have their exact earlier source, library,
 OS and fixture identities in the immutable task evidence for EXM-008, EXM-013
 through EXM-017. They provide adapter evidence for those revisions. They do not
 establish current native desktop or packaged compatibility.
+
+Current Linux core verification uses Rust 1.98.0 x86_64-unknown-linux-musl
+executables in Alpine 3.23.8, kernel 6.18.60-0-lts, under QEMU TCG. All 142
+domain, protocol and default capture tests passed across 21 binaries. Each
+guest binary hash was matched to the cross-built artifact. The VM used two
+vCPUs, 1 GiB RAM, a read-only ISO and a read-only directory of test binaries,
+with no network adapter or physical passthrough. Loopback was enabled inside
+the guest. This establishes Linux core execution. Desktop, packaged permission
+and hardware qualification remain pending in the table.
 
 The current Windows host has no detected Npcap service or installed Npcap DLLs
 at the trusted System32/Npcap location. The default synthetic and socket routes
