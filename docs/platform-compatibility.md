@@ -9,12 +9,12 @@ systems below.
 
 | Scenario | Windows x64 VPS | Linux x64 | macOS Apple Silicon |
 | --- | --- | --- | --- |
-| Default synthetic shell, capture, editing, charts, Stop and shutdown | Verified by EXM-039 native smoke and production GUI tests | Partial native release screenshots and manual Stop/close verified; full GUI gate pending | Pending native hosted execution |
+| Default synthetic shell, capture, editing, charts, Stop and shutdown | Verified by EXM-039 native smoke and production GUI tests | Partial local release screenshots and manual Stop/close verified; full local GUI gate pending | Pending local target access |
 | Configuration schema, examples, roundtrip, disabled schedules | Verified shared JSON tests and export for Linux handoff | Current configuration/settings tests and exact Windows file import/export passed | Same source contract, target runtime pending |
 | TCP/UDP socket traffic | Verified local IPv4/IPv6 loopback | Current Linux QEMU local socket tests passed | Pending target runtime |
 | Serial and CAN virtual fixtures | Verified deterministic adapters | Current Linux virtual fixture tests and native vcan RX/TX passed | Pending target runtime |
 | USB/HID mock selection and explicit Send | Verified production worker and GUI | Historical emulated HID/USB evidence | Pending target runtime |
-| Native HID feature build and mock UI | Current Windows check recorded under EXM-035 | Feature build, native synthetic HID screenshot and all three default HID GUI tests passed | Pending native hosted execution |
+| Native HID feature build and mock UI | Current Windows check recorded under EXM-035 | Local feature build, synthetic HID screenshot and all three default HID GUI tests passed | Pending local target access |
 | Raw Ethernet native capture | Historical Windows Npcap virtual adapter evidence | Historical Linux veth/libpcap evidence | Pending BPF/libpcap qualification |
 | Native CAN | Unsupported vendor backend | Current native SocketCAN RX/TX/filter test passed on guest-only vcan | Unsupported vendor backend |
 | Passive USB capture | Unsupported USBPcap backend | Requires enabled usbmon and selected bus access | Unsupported backend |
@@ -84,33 +84,34 @@ deadline or ten-second GPU wait limit was relaxed. A native runner is the next
 qualification target. Windows Hypervisor Platform was installed under the
 existing owner installation authority with `-NoRestart`; Windows reports a
 required restart, and the immediate WHPX re-probe still fails to initialize.
-The host has not been restarted. Hosted verification can proceed independently.
+The host has not been restarted. Local acceleration availability must be
+rechecked after a coordinated restart or on a separate local target.
 
-## Manual hosted verification
+## Local verification boundary
 
-[The manual workflow](../.github/workflows/manual-platform-qualification.yml)
-targets standard `ubuntu-24.04` x64 and `macos-15` Apple Silicon runners. It has
-only `workflow_dispatch`, a trusted-main guard and read-only job permissions.
-It records exact source, lockfile, policy, OS/architecture, toolchain, graphics
-and individual command outcomes. Builds use two Cargo jobs; debug symbols and
-incremental output are omitted to bound disk use while retaining the default
-debug assertions and optimization. Existing test assertions/deadlines remain.
+[FDTasks 5.7](../Tasks/tasks_file_structure_v5_7.md) prohibits hosted product
+tests, including manually dispatched workflows. Task and Epic acceptance tests
+must run in the owning local development/verification turn. The agent-created
+manual hosted qualification route at `aa88a9d` was a policy error. Its workflow
+has been disabled and removed; its run observations are retained as diagnostics
+and are excluded from task/Epic acceptance. The earlier accepted records remain
+unchanged and a new amendment records this correction.
 
-The workflow runs workspace tests, format/lint, native-feature compilation,
-synthetic native GUI examples, a developer Cargo install/startup/uninstall
-probe and the Windows-exported portable profile handoff. The installed startup
-probe uses supervised termination as fixture cleanup; normal window-close
-behavior is verified separately by native examples. Packaged installers remain
-EXM-037. Only synthetic logs, profile bytes and bounded screenshots are retained;
-no build binary or credential is uploaded.
+The retained [local supervisor](../.github/scripts/platform_qualification.py)
+rejects hosted-CI environments. It can be used only from an owning local
+Linux/macOS turn with explicit `EXMON_EXPECTED_MACHINE` and `RUNNER_TEMP` values.
+It records exact source, lockfile, policy, OS/architecture, graphics and individual
+command outcomes. The installed startup probe uses supervised termination as
+fixture cleanup; normal window-close behavior is checked separately. Packaged
+installers remain EXM-037. No current hosted workflow invokes this supervisor.
 
 The committed Windows-exported JSON fixture is preserved without line-ending
 conversion and checked against its original SHA-256 before import/re-export.
 `cargo run -p exmon-app --example portable_profile_smoke --locked -- import
 INPUT OUTPUT` exercises the public settings controller without starting I/O.
-Local Windows import/export and existing-file refusal passed. Hosted runtime
-results must be recorded after the explicit manual run; workflow presence alone
-does not establish Linux/macOS support or close EXM-035.
+Local Windows import/export and existing-file refusal passed. Local Linux/Apple
+Silicon qualification and the source lint correction remain required. Hosted
+diagnostics establish no task/Epic acceptance or platform sign-off.
 
 The current Windows host has no detected Npcap service or installed Npcap DLLs
 at the trusted System32/Npcap location. The default synthetic and socket routes

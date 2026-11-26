@@ -1,0 +1,275 @@
+{
+  "classification": "diagnostic-only; excluded from task and Epic acceptance under FDTasks 5.7",
+  "source": "aa88a9dcf8a9237bd192477fb1ca361be2d56e42",
+  "run_id": 45797483203,
+  "run_url": "https://github.com/fedrnv/exmon/actions/runs/45797483203",
+  "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+  "targets": [
+    {
+      "environment": {
+        "source": "aa88a9dcf8a9237bd192477fb1ca361be2d56e42",
+        "system": "Linux",
+        "release": "7.0.0-1017-azure",
+        "machine": "x86_64",
+        "runner_os": "Linux",
+        "runner_arch": "X64",
+        "runner_image": "ubuntu24",
+        "runner_image_version": "20261116.376.1",
+        "cargo_lock_sha256": "02ce926f073ddc0239107cd965a5c8fb5521f3a2fa69d67ed62072300996dd2d",
+        "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+        "profile": "default debug assertions/optimization; debug symbols omitted and incremental disabled to bound disk",
+        "backend": "vulkan",
+        "fixture_sha256": "8f8b9c51a2a0ae2ca05c9d350ef24ba6fb126beba2e00c980ac1537edc6950db",
+        "graphics": {
+          "exit_code": 0,
+          "fields": [
+            "apiVersion         = 1.4.318",
+            "driverVersion      = 25.2.8",
+            "vendorID           = 0x10005",
+            "deviceType         = PHYSICAL_DEVICE_TYPE_CPU",
+            "deviceName         = llvmpipe (LLVM 20.1.2, 256 bits)",
+            "driverName         = llvmpipe",
+            "driverInfo         = Mesa 25.2.8-0ubuntu0.24.04.5 (LLVM 20.1.2)"
+          ]
+        }
+      },
+      "artifact_id": 15106201758,
+      "archive_sha256": "003dfacb21c87afab54d4871da78312bbec5623914571bd3448863a00b22767d",
+      "workspace_observation": {
+        "passed": 339,
+        "failed": 0,
+        "ignored": 2
+      },
+      "command_outcomes": [
+        {
+          "name": "toolchain",
+          "status": "passed"
+        },
+        {
+          "name": "build",
+          "status": "passed"
+        },
+        {
+          "name": "workspace-tests",
+          "status": "passed"
+        },
+        {
+          "name": "format",
+          "status": "passed"
+        },
+        {
+          "name": "lint",
+          "status": "failed"
+        },
+        {
+          "name": "architecture",
+          "status": "passed"
+        },
+        {
+          "name": "native-feature-build",
+          "status": "passed"
+        },
+        {
+          "name": "hid-production-ui",
+          "status": "passed"
+        },
+        {
+          "name": "portable-profile",
+          "status": "passed"
+        },
+        {
+          "name": "portable-exact-bytes",
+          "status": "passed"
+        },
+        {
+          "name": "native_shell_smoke",
+          "status": "passed"
+        },
+        {
+          "name": "native_incoming_smoke",
+          "status": "passed"
+        },
+        {
+          "name": "native_outgoing_smoke",
+          "status": "passed"
+        },
+        {
+          "name": "native_charts_smoke",
+          "status": "passed"
+        },
+        {
+          "name": "native_settings_smoke",
+          "status": "passed"
+        },
+        {
+          "name": "native_inspection_smoke",
+          "status": "passed"
+        },
+        {
+          "name": "native_sessions_smoke",
+          "status": "passed"
+        },
+        {
+          "name": "native_hid_smoke",
+          "status": "passed"
+        },
+        {
+          "name": "developer-install",
+          "status": "passed"
+        },
+        {
+          "name": "installed-startup",
+          "status": "passed"
+        },
+        {
+          "name": "developer-uninstall",
+          "status": "passed"
+        },
+        {
+          "name": "developer-uninstall-files",
+          "status": "passed"
+        }
+      ],
+      "strict_lint_diagnostics": [
+        "unused Windows-only deadline on Unix",
+        "never_loop on Unix"
+      ],
+      "file_hashes": {
+        "results.json": "aa10f9e4f4f37b127298246f761b985ea8dd0346696447c105b8758b6bce3262",
+        "environment.json": "9c6e6592df2471b6dc794264522fec83bf1edf212c16b46e097ef7933b13dbae",
+        "workspace-tests.log": "96a087e36ade7a287ac60bcf983aaf08146d4d286f7115628467580f2db1ef41",
+        "lint.log": "66e22a94b2cf84efcfa6c52091d9604b16b2f463a863ff0300c68e55eddceb26",
+        "images.json": "ca5d9ae1f74a7f74b0ba2ab962cb10bcd7d8fe95962b9300195c544e76b0111b"
+      }
+    },
+    {
+      "environment": {
+        "source": "aa88a9dcf8a9237bd192477fb1ca361be2d56e42",
+        "system": "Darwin",
+        "release": "24.6.0",
+        "machine": "arm64",
+        "runner_os": "macOS",
+        "runner_arch": "ARM64",
+        "runner_image": "macos15",
+        "runner_image_version": "20261118.0550.1",
+        "cargo_lock_sha256": "02ce926f073ddc0239107cd965a5c8fb5521f3a2fa69d67ed62072300996dd2d",
+        "policy_sha256": "b7c6929e7bbf540ec19cf23beeca24d47030c7654ba5501e019ce5938b137dd8",
+        "profile": "default debug assertions/optimization; debug symbols omitted and incremental disabled to bound disk",
+        "backend": "metal",
+        "fixture_sha256": "8f8b9c51a2a0ae2ca05c9d350ef24ba6fb126beba2e00c980ac1537edc6950db",
+        "graphics": {
+          "exit_code": 0,
+          "devices": []
+        }
+      },
+      "artifact_id": 15106446602,
+      "archive_sha256": "724fd4f8bd3eeeaa66f4d956b0fe497b52ff91e3f868d98ffb6b8d4833d2da41",
+      "workspace_observation": {
+        "passed": 339,
+        "failed": 0,
+        "ignored": 2
+      },
+      "command_outcomes": [
+        {
+          "name": "toolchain",
+          "status": "passed"
+        },
+        {
+          "name": "build",
+          "status": "passed"
+        },
+        {
+          "name": "workspace-tests",
+          "status": "passed"
+        },
+        {
+          "name": "format",
+          "status": "passed"
+        },
+        {
+          "name": "lint",
+          "status": "failed"
+        },
+        {
+          "name": "architecture",
+          "status": "passed"
+        },
+        {
+          "name": "native-feature-build",
+          "status": "passed"
+        },
+        {
+          "name": "hid-production-ui",
+          "status": "passed"
+        },
+        {
+          "name": "portable-profile",
+          "status": "passed"
+        },
+        {
+          "name": "portable-exact-bytes",
+          "status": "passed"
+        },
+        {
+          "name": "native_shell_smoke",
+          "status": "passed"
+        },
+        {
+          "name": "native_incoming_smoke",
+          "status": "passed"
+        },
+        {
+          "name": "native_outgoing_smoke",
+          "status": "passed"
+        },
+        {
+          "name": "native_charts_smoke",
+          "status": "passed"
+        },
+        {
+          "name": "native_settings_smoke",
+          "status": "passed"
+        },
+        {
+          "name": "native_inspection_smoke",
+          "status": "passed"
+        },
+        {
+          "name": "native_sessions_smoke",
+          "status": "passed"
+        },
+        {
+          "name": "native_hid_smoke",
+          "status": "passed"
+        },
+        {
+          "name": "developer-install",
+          "status": "passed"
+        },
+        {
+          "name": "installed-startup",
+          "status": "passed"
+        },
+        {
+          "name": "developer-uninstall",
+          "status": "passed"
+        },
+        {
+          "name": "developer-uninstall-files",
+          "status": "passed"
+        }
+      ],
+      "strict_lint_diagnostics": [
+        "unused Windows-only deadline on Unix",
+        "never_loop on Unix"
+      ],
+      "file_hashes": {
+        "results.json": "2fd434719ea03b595620d9032bb26dc994e93834f332398c5e079b14f7766cd7",
+        "environment.json": "2879e30c99464325763318df63ab522ca4a90a1664c38964641a3219b34da5a1",
+        "workspace-tests.log": "5f5e767481d4220bc20f4508b2f57f18ae0bcc9def599c4f09c71968af3dd20c",
+        "lint.log": "91a03295e0c8e89fd23c87c1382df866f1effd6f57d86311fd93fb05a3e64be6",
+        "images.json": "35d07ac74b81740f928eaa673d38f0bbfb6334470e2c34f4be6baa620827a8cf"
+      }
+    }
+  ]
+}

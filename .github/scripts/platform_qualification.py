@@ -1,4 +1,9 @@
-"""Manual hosted qualification. No physical interfaces, releases or signing."""
+"""Local Linux/macOS qualification only. Never invoke from a hosted workflow.
+
+FDTasks 5.7 prohibits hosted product tests, including manual dispatch.
+This file is retained as a local-only entrypoint; no workflow references it.
+No physical interfaces, releases or signing are authorized by this helper.
+"""
 import hashlib
 import json
 import os
@@ -141,6 +146,9 @@ def startup_probe(executable):
 
 def main():
     os.chdir(ROOT)
+    hosted_flags = ("GITHUB_ACTIONS", "GITLAB_CI", "TF_BUILD", "BUILDKITE", "CIRCLECI", "TRAVIS", "CI")
+    if any(os.environ.get(key, "").lower() in ("true", "1") for key in hosted_flags) or os.environ.get("JENKINS_URL"):
+        raise RuntimeError("FDTasks 5.7 forbids hosted qualification; run in an owning local turn")
     if sys.platform not in ("linux", "darwin"):
         raise RuntimeError("this supervisor supports only its declared Linux/macOS jobs")
     machine = platform.machine()
