@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 37,
+  "version": "0.1.0.37",
+  "request_id": "EXM-101-20261126T074232Z-revocation-first-closure",
+  "type": "bug_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-101",
+  "summary": "Revoke stale outgoing readiness before publishing interface-loss outcomes",
+  "verification": [
+    "Tasks/items/server/EXM-101-revoke-stale-outgoing-readiness/evidence/20261126T074232Z-outgoing-revocation.md"
+  ],
+  "request_file": "Tasks/version-requests/20261126-EXM-101-outgoing-revocation.json",
+  "request_sha256": "9f94f80077bcd9355add332a903326efff3e34f4108b41dbc98a061c8ca07525"
+}
