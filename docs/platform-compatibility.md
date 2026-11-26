@@ -1,7 +1,8 @@
 # Platform qualification
 
 EXM-035 remains in progress. The reference source is the published virtual
-prototype at 95068a1, followed by task/version records. The Windows development
+prototype at 95068a1 with the outgoing readiness correction at 9b53499,
+followed by task/version records. The Windows development
 qualification covers the default synthetic desktop and loopback boundaries.
 The full supported-platform acceptance requires runtime evidence on the target
 systems below.
@@ -9,13 +10,13 @@ systems below.
 | Scenario | Windows x64 VPS | Linux x64 | macOS Apple Silicon |
 | --- | --- | --- | --- |
 | Default synthetic shell, capture, editing, charts, Stop and shutdown | Verified by EXM-039 native smoke and production GUI tests | Pending current desktop runtime | Pending target access |
-| Configuration schema, examples, roundtrip, disabled schedules | Verified shared JSON tests | Same source contract, target runtime pending | Same source contract, target runtime pending |
+| Configuration schema, examples, roundtrip, disabled schedules | Verified shared JSON tests and export for Linux handoff | Current configuration/settings tests and exact Windows file import/export passed | Same source contract, target runtime pending |
 | TCP/UDP socket traffic | Verified local IPv4/IPv6 loopback | Current Linux QEMU local socket tests passed | Pending target runtime |
-| Serial and CAN virtual fixtures | Verified deterministic adapters | Current Linux virtual fixture tests passed; native SocketCAN historical | Pending target runtime |
+| Serial and CAN virtual fixtures | Verified deterministic adapters | Current Linux virtual fixture tests and native vcan RX/TX passed | Pending target runtime |
 | USB/HID mock selection and explicit Send | Verified production worker and GUI | Historical emulated HID/USB evidence | Pending target runtime |
-| Native HID feature build and mock UI | Current Windows check recorded under EXM-035 | Pending current feature/runtime checks | Pending target access |
+| Native HID feature build and mock UI | Current Windows check recorded under EXM-035 | Current feature build and ordinary adapter tests passed; mock GUI pending | Pending target access |
 | Raw Ethernet native capture | Historical Windows Npcap virtual adapter evidence | Historical Linux veth/libpcap evidence | Pending BPF/libpcap qualification |
-| Native CAN | Unsupported vendor backend | Requires enabled SocketCAN and provisioned link | Unsupported vendor backend |
+| Native CAN | Unsupported vendor backend | Current native SocketCAN RX/TX/filter test passed on guest-only vcan | Unsupported vendor backend |
 | Passive USB capture | Unsupported USBPcap backend | Requires enabled usbmon and selected bus access | Unsupported backend |
 | Install/update/uninstall and packaged permissions | Pending EXM-037 | Pending EXM-037 | Pending EXM-037 |
 | Physical timing/electrical/report fidelity | Pending declared EXM-036 devices | Pending declared EXM-036 devices | Pending declared EXM-036 devices |
@@ -31,8 +32,28 @@ domain, protocol and default capture tests passed across 21 binaries. Each
 guest binary hash was matched to the cross-built artifact. The VM used two
 vCPUs, 1 GiB RAM, a read-only ISO and a read-only directory of test binaries,
 with no network adapter or physical passthrough. Loopback was enabled inside
-the guest. This establishes Linux core execution. Desktop, packaged permission
+the guest. Storage's 48 tests passed on the earlier unchanged source. All 122
+current application tests passed after EXM-101: 63 in its correction evidence
+and the remaining 59 in ten binaries under the resumed EXM-035 run. The latter
+run matched every binary hash, emitted `EXMON_ALL_PASS` and powered off cleanly.
+This establishes Linux core/application execution. Desktop, packaged permission
 and hardware qualification remain pending in the table.
+
+A synthetic profile exported through the Windows settings controller was
+imported and exported through the same public controller in an actual Ubuntu
+24.04.5 LTS x64 guest. The exported files were byte-identical, SHA-256
+`8f8b9c51a2a0ae2ca05c9d350ef24ba6fb126beba2e00c980ac1537edc6950db`.
+The profile covered numeric field endianness/scaling/units, a moving-average
+chart, a TX template and a disabled schedule. The harness started no capture or
+transmission worker. Apple Silicon handoff remains pending.
+
+The Ubuntu guest also executed 49 ordinary capture tests with native CAN, HID,
+USB and usbmon features enabled. Five opt-in fixture tests were ignored in that
+run. A separate native SocketCAN RX/TX/filter test then passed on a declared
+guest-only `vcan` link after loading the version-matched Ubuntu `can-dev` and
+`vcan` modules. The link and added modules were removed afterward. These results
+provide current native-feature and virtual-CAN evidence; the other ignored
+fixtures and physical-device fidelity remain separate qualifications.
 
 The current Windows host has no detected Npcap service or installed Npcap DLLs
 at the trusted System32/Npcap location. The default synthetic and socket routes
