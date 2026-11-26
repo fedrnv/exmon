@@ -1,0 +1,15 @@
+{
+  "schema": "fdtasks-version-event/v1",
+  "sequence": 35,
+  "version": "0.1.0.35",
+  "request_id": "EXM-034-20261126T065356Z-parser-first-closure",
+  "type": "task_closed",
+  "epic_id": "EXM-EPIC-001",
+  "work_item_id": "EXM-034",
+  "summary": "Verify bounded synthetic parser mutation campaigns with replayable failures",
+  "verification": [
+    "Tasks/items/quality/EXM-034-fuzz-parsers-framing-decoders-and-capture-imports/evidence/20261126T065356Z-parser-verification.md"
+  ],
+  "request_file": "Tasks/version-requests/20261126-EXM-034-parser-campaign.json",
+  "request_sha256": "587e4f72ea3f9afac1aa64673e0c45fabb1e5735125a77306fde99d058582c8b"
+}
