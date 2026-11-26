@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "protocols": [
+    {
+      "id": "p",
+      "name": "Synthetic voltage",
+      "framing": {
+        "kind": "fixed",
+        "length": 4
+      },
+      "classification": {
+        "length": 4,
+        "prefix": [
+          165
+        ]
+      },
+      "fields": [
+        {
+          "id": "word",
+          "offset": 1,
+          "length": 2,
+          "representation": "unsigned",
+          "endian": "little",
+          "scale": 0.5,
+          "bias": 1.0,
+          "unit": "V"
+        }
+      ]
+    }
+  ],
+  "interfaces": [
+    {
+      "id": "port",
+      "protocol_id": "p",
+      "transport": {
+        "kind": "udp"
+      },
+      "filter": {
+        "direction": "Rx",
+        "ports": [
+          42
+        ],
+        "can_ids": []
+      },
+      "tx_allowed": true
+    }
+  ],
+  "charts": [
+    {
+      "id": "voltage",
+      "protocol_id": "p",
+      "field_id": "word",
+      "samples": 32,
+      "moving_average": 4
+    }
+  ],
+  "templates": [
+    {
+      "id": "frame",
+      "interface_id": "port",
+      "bytes": [
+        165,
+        1,
+        2,
+        0
+      ]
+    }
+  ],
+  "schedules": [
+    {
+      "id": "periodic",
+      "template_id": "frame",
+      "interval_ms": 100,
+      "count": 3,
+      "enabled": false
+    }
+  ]
+}
