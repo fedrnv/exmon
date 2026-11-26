@@ -120,7 +120,7 @@ fn scheduled_count_stop_option_failure_and_edit_revocation_use_real_tx_worker() 
         },
     )
     .unwrap();
-    wait(|| e.mock_status().unwrap().calls > 2);
+    wait(|| e.mock_status().is_some_and(|s| s.calls > 2));
     e.stop_schedule(id);
     let n = e.mock_status().unwrap().calls;
     thread::sleep(Duration::from_millis(30));
@@ -145,7 +145,7 @@ fn scheduled_count_stop_option_failure_and_edit_revocation_use_real_tx_worker() 
         },
     )
     .unwrap();
-    wait(|| e.mock_status().unwrap().calls > n);
+    wait(|| e.mock_status().is_some_and(|s| s.calls > n));
     e.invalidate(id).unwrap();
     let n = e.mock_status().unwrap().calls;
     thread::sleep(Duration::from_millis(30));
@@ -212,7 +212,7 @@ fn received_structured_copy_edits_exact_bytes_and_preserves_original() {
     e.bind_mock(1, true).unwrap();
     ready(&e, id);
     e.send_once(id).unwrap();
-    wait(|| e.mock_status().unwrap().calls == 1);
+    wait(|| e.mock_status().is_some_and(|s| s.calls == 1));
     let mut expected = original;
     expected[2] = 42;
     assert_eq!(e.mock_status().unwrap().last.as_ref(), expected);
@@ -258,7 +258,7 @@ fn checksums_engineering_enum_validation_and_readonly_hex_use_actual_codec() {
     wait(|| template(&e, id).bytes.as_ref() == [4, 2, 6]);
     ready(&e, id);
     e.send_once(id).unwrap();
-    wait(|| e.mock_status().unwrap().calls == 1);
+    wait(|| e.mock_status().is_some_and(|s| s.calls == 1));
     e.edit(id, Operation::Hex("04 02 FF".into())).unwrap();
     wait(|| template(&e, id).error == Some(Error::Codec));
     assert_eq!(template(&e, id).bytes.as_ref(), &[4, 2, 6]);
@@ -295,7 +295,7 @@ fn missing_preserved_header_is_not_inferred_and_explicit_header_rebuilds_exact_w
     e.edit(id, Operation::Header("A5 00".into())).unwrap();
     ready(&e, id);
     e.send_once(id).unwrap();
-    wait(|| e.mock_status().unwrap().calls == 1);
+    wait(|| e.mock_status().is_some_and(|s| s.calls == 1));
     assert_eq!(e.mock_status().unwrap().last.as_ref(), &[165, 2, 7, 8]);
 }
 #[test]
@@ -434,6 +434,11 @@ fn actual_partial_unknown_busy_and_interface_loss_are_not_successful_tx_counts()
     wait(|| template(&e, id).last.is_some());
     assert_eq!(a.lock().unwrap().calls, 0);
     assert!(!e.can_send(id));
+    let (e, id, a) = audited(Err(Backend::Disconnected));
+    e.send_once(id).unwrap();
+    wait(|| template(&e, id).last.is_some());
+    assert_eq!(a.lock().unwrap().calls, 1);
+    assert!(!e.can_send(id));
 }
 #[test]
 fn oversized_edit_revokes_active_schedule_before_returning_admission_error() {
@@ -450,7 +455,7 @@ fn oversized_edit_revokes_active_schedule_before_returning_admission_error() {
         },
     )
     .unwrap();
-    wait(|| e.mock_status().unwrap().calls > 0);
+    wait(|| e.mock_status().is_some_and(|s| s.calls > 0));
     assert_eq!(
         e.edit(id, Operation::Hex("0".repeat(3 * 65536 + 1))),
         Err(Error::Capacity)
@@ -475,7 +480,7 @@ fn variable_length_structured_hex_preserves_checksum_ownership_and_unknown_tails
     e.bind_mock(1, true).unwrap();
     ready(&e, id);
     e.send_once(id).unwrap();
-    wait(|| e.mock_status().unwrap().calls == 1);
+    wait(|| e.mock_status().is_some_and(|s| s.calls == 1));
     assert_eq!(e.mock_status().unwrap().last.as_ref(), &[2, 2, 153, 136]);
     e.edit(id, Operation::Hex("02".into())).unwrap();
     wait(|| template(&e, id).error == Some(Error::Codec));

@@ -741,6 +741,11 @@ impl TxWorker {
                 mpsc::TrySendError::Disconnected(_) => Failure::Disconnected,
             })
     }
+    /// Current worker authority, independent of asynchronously published snapshots.
+    pub(crate) fn ticket_current(&self, ticket: &Ticket) -> bool {
+        Arc::ptr_eq(&ticket.owner, &self.shared.owner)
+            && self.shared.authority.load(Ordering::Acquire) & !SUBMITTED == ticket.generation
+    }
     pub fn send_once(&self, ticket: &Ticket, template: u64, revision: u64) -> Result<u64, Failure> {
         let id = self
             .shared
@@ -755,9 +760,7 @@ impl TxWorker {
                 Failure::Exhausted
             })?
             + 1;
-        let failure = if !Arc::ptr_eq(&ticket.owner, &self.shared.owner)
-            || self.shared.authority.load(Ordering::Acquire) & !SUBMITTED != ticket.generation
-        {
+        let failure = if !self.ticket_current(ticket) {
             Some(Failure::Stale)
         } else {
             self.enqueue(Command::Send {
@@ -784,9 +787,7 @@ impl TxWorker {
             .control
             .lock()
             .map_err(|_| Failure::Disconnected)?;
-        if !Arc::ptr_eq(&ticket.owner, &self.shared.owner)
-            || self.shared.authority.load(Ordering::Acquire) & !SUBMITTED != ticket.generation
-        {
+        if !self.ticket_current(ticket) {
             return Err(Failure::Stale);
         }
         let mut grants = self
@@ -1243,6 +1244,17 @@ fn terminal(
     if let Some(due) = &pending.due {
         schedules.finish(shared, due, &mut pending.attempt);
     }
+    if matches!(
+        pending.attempt.outcome,
+        Outcome::Failed {
+            error: BackendError::Disconnected
+                | BackendError::PermissionDenied
+                | BackendError::Backend,
+            ..
+        }
+    ) {
+        shared.revoke();
+    }
     shared.record(pending.attempt);
     shared.release(pending.generation);
     shared.update(|s| s.pending = false);
@@ -1572,8 +1584,6 @@ fn run(shared: Arc<Shared>, rx: mpsc::Receiver<Command>) {
                             if let Some(due) = &due {
                                 schedules.reject(&shared, due, e);
                             }
-                            record.outcome = Outcome::Rejected(e);
-                            shared.record(record);
                             if matches!(
                                 e,
                                 Failure::Binding
@@ -1592,6 +1602,8 @@ fn run(shared: Arc<Shared>, rx: mpsc::Receiver<Command>) {
                                     s.identity = None;
                                 });
                             }
+                            record.outcome = Outcome::Rejected(e);
+                            shared.record(record);
                         }
                         Ok((t, metadata)) => {
                             record.source = t.spec.source;

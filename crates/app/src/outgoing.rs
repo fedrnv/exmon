@@ -465,7 +465,7 @@ impl Editor {
             .ticket
             .filter(|t| Some(t.binding()) == c.binding)
             .ok_or(Error::NotReady)?;
-        if !s.templates.contains(&(id, view.revision)) {
+        if !s.templates.contains(&(id, view.revision)) || !self.tx.ticket_current(&t) {
             return Err(Error::NotReady);
         }
         Ok((view, t))
@@ -1285,6 +1285,38 @@ mod tests {
         e.bind_mock(1, true).unwrap();
         wait(|| e.can_send(id));
         (e, id)
+    }
+    #[test]
+    fn underlying_revocation_defeats_cached_ready_state_while_publication_is_blocked() {
+        let (e, id) = ready_editor();
+        let control = e.shared.control.lock().unwrap();
+        assert!(
+            e.shared
+                .state
+                .lock()
+                .unwrap()
+                .tx
+                .as_ref()
+                .unwrap()
+                .ticket
+                .is_some()
+        );
+        e.tx.close();
+        wait(|| e.tx.snapshot().is_some_and(|s| s.ticket.is_none()));
+        // The editor worker cannot refresh its cache while control is held.
+        assert!(
+            e.shared
+                .state
+                .lock()
+                .unwrap()
+                .tx
+                .as_ref()
+                .unwrap()
+                .ticket
+                .is_some()
+        );
+        assert!(matches!(e.ready(&control, id), Err(Error::NotReady)));
+        assert_eq!(e.mock_status().unwrap().calls, 0);
     }
     #[test]
     fn exhausted_editor_authority_closes_existing_source_without_wrapping() {
